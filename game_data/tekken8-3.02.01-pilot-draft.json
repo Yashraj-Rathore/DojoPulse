@@ -1,0 +1,45 @@
+{
+  "id": "tekken8-3.02.01-pilot-draft/1",
+  "game": "tekken8",
+  "game_build": "3.02.01",
+  "verification_status": "UNVERIFIED",
+  "redistribution_status": "NO_EXTERNAL_TABLE_IMPORTED",
+  "characters": [
+    "jin"
+  ],
+  "moves": [
+    {
+      "id": "jin.uf4",
+      "command": "uf+4",
+      "move_version": "jin.uf4/3.02.01/draft",
+      "frame_data": {
+        "startup": null,
+        "block_disadvantage": null
+      },
+      "verified": false
+    },
+    {
+      "id": "jin.24",
+      "command": "2,4",
+      "move_version": "jin.24/3.02.01/draft",
+      "frame_data": {
+        "startup": null,
+        "block_disadvantage": null
+      },
+      "verified": false
+    }
+  ],
+  "provenance": [
+    {
+      "url": "https://www.bandainamcoent.com/news/tekken-8-patch-notes-v3-02-01",
+      "kind": "official_build_notice",
+      "checked_at": "2026-09-18"
+    }
+  ],
+  "release_requirements": [
+    "in-game build confirmation",
+    "two-reviewer reach/timing/response fixtures",
+    "record source and rights",
+    "freeze approved knowledge hash"
+  ]
+}

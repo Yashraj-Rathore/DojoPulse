@@ -1,0 +1,60 @@
+{
+  "id": "tekken8.jin-vs-jin.blocked-uf4/v1",
+  "status": "DRAFT_UNVERIFIED",
+  "game_build": "3.02.01",
+  "build_status": "LATEST_DOCUMENTED_NOT_CAPTURE_VERIFIED",
+  "own_character": "jin",
+  "opponent_character": "jin",
+  "trigger_definition": "Opponent Jin executes uf+4 and the player Jin blocks it.",
+  "eligible_actor": "Confirmed defender participant, stable across screen-side changes",
+  "required_observations": [
+    "move_identity",
+    "block_contact",
+    "actor_identity",
+    "standing_state",
+    "response_window_complete",
+    "reach_validated",
+    "alignment_validated",
+    "knowledge_verified",
+    "build_verified"
+  ],
+  "timing_window": {
+    "start": "defender first actionable time after block",
+    "end": "opponent first actionable recovery; include uncertainty",
+    "max_uncertainty_us": 16667,
+    "ambiguity_policy": "UNKNOWN whenever uncertainty crosses classification boundary"
+  },
+  "valid_responses": [
+    "reviewed standing punish; candidate Jin 2,4 requires in-game verification"
+  ],
+  "invalid_responses": [
+    "confirmed late response",
+    "confirmed non-punishing response",
+    "fully observed no qualifying response with established eligibility"
+  ],
+  "unknown_conditions": [
+    "unknown reach",
+    "unknown build",
+    "missing or conflicting knowledge",
+    "incomplete window",
+    "ambiguous attribution",
+    "uncertain timing",
+    "unreviewed response"
+  ],
+  "exclusion_conditions": [
+    "wall contact or unknown wall state",
+    "off-axis",
+    "non-standing defender",
+    "resource-dependent variant",
+    "practice included as ranked",
+    "pause or replay takeover"
+  ],
+  "successful_outcomes": [
+    "verified attributable game punish plus qualifying contact"
+  ],
+  "failed_outcomes": [
+    "eligible full window, expert-adjudicated absence of any qualifying punish"
+  ],
+  "analysis_revision": "rules/1",
+  "knowledge_revision": "tekken8-3.02.01-pilot-draft/1"
+}

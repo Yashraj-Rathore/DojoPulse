@@ -1,0 +1,27 @@
+{
+  "id": "jin-block-uf4-punish/v1",
+  "status": "DRAFT_REVIEW_REQUIRED",
+  "reviewers": [],
+  "situation_definition": "tekken8.jin-vs-jin.blocked-uf4/v1",
+  "game_build": "3.02.01",
+  "character": "jin",
+  "opponent": "jin",
+  "side": "both, in separate recorded blocks",
+  "initial_state": "standing, neutral, open stage, fixed reviewed close spacing; normal resources",
+  "scenario": "Native practice recording slot: opponent Jin performs uf+4; defend and perform an approved standing punish.",
+  "response_alternatives": [
+    "candidate 2,4; expert must verify before approval",
+    "any separately reviewed qualifying standing punish"
+  ],
+  "randomization": "Random playback delays; add a safe non-target control slot only after its properties are verified. Record actual practice settings.",
+  "success": "eligible target attempt with verified qualifying punish",
+  "failure": "eligible target, complete window, adjudicated non-punish",
+  "invalid_attempt": "wrong setup, interrupted stimulus, non-target control, wall/off-axis, incompatible build",
+  "unknown_attempt": "missing window, ambiguous reach/outcome/timing",
+  "difficulty": "one target, fixed spacing; no adaptive progression",
+  "repetitions": 40,
+  "blocks": 2,
+  "measurement": "recorded in-game footage with two independent reviews and adjudication",
+  "integration": "manual_native_practice",
+  "export_adapter": null
+}

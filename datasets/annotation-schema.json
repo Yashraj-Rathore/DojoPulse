@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reviewed target opportunity annotations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "source_sha256",
+    "dataset_kind",
+    "game_build",
+    "session_id",
+    "source_kind",
+    "played_at",
+    "examples"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "annotation/1"
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "dataset_kind": {
+      "enum": [
+        "real",
+        "synthetic"
+      ]
+    },
+    "game_build": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_kind": {
+      "enum": [
+        "ranked",
+        "practice",
+        "takeover",
+        "synthetic"
+      ]
+    },
+    "played_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "start_us",
+          "end_us",
+          "situation",
+          "characters",
+          "eligibility",
+          "outcome",
+          "evidence",
+          "reviews",
+          "adjudication",
+          "conditions"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "start_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "end_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "situation": {
+            "const": "tekken8.jin-vs-jin.blocked-uf4/v1"
+          },
+          "characters": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "const": "jin"
+              },
+              {
+                "const": "jin"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "eligibility": {
+            "enum": [
+              "ELIGIBLE",
+              "INELIGIBLE",
+              "UNKNOWN"
+            ]
+          },
+          "outcome": {
+            "enum": [
+              "SUCCESS",
+              "FAILURE",
+              "UNKNOWN"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reviewer",
+                "eligibility",
+                "outcome",
+                "confidence",
+                "seconds"
+              ],
+              "properties": {
+                "reviewer": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "eligibility": {
+                  "enum": [
+                    "ELIGIBLE",
+                    "INELIGIBLE",
+                    "UNKNOWN"
+                  ]
+                },
+                "outcome": {
+                  "enum": [
+                    "SUCCESS",
+                    "FAILURE",
+                    "UNKNOWN"
+                  ]
+                },
+                "confidence": {
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low",
+                    "unobservable"
+                  ]
+                },
+                "seconds": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "adjudication": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "reviewer": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "seconds": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "reviewer",
+              "reason",
+              "seconds"
+            ],
+            "additionalProperties": false
+          },
+          "conditions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "build_verified",
+              "knowledge_verified",
+              "move_verified",
+              "block_verified",
+              "actor_verified",
+              "standing",
+              "reach_validated",
+              "alignment_validated",
+              "window_complete",
+              "timing_validated",
+              "wall_clear",
+              "resource_independent",
+              "punish_confirmed",
+              "failure_confirmed",
+              "uncertainty_us"
+            ],
+            "properties": {
+              "build_verified": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "knowledge_verified": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "move_verified": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "block_verified": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "actor_verified": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "standing": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "reach_validated": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "alignment_validated": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "window_complete": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "timing_validated": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "wall_clear": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "resource_independent": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "punish_confirmed": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "failure_confirmed": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "uncertainty_us": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

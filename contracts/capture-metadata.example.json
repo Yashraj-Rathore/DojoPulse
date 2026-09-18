@@ -1,0 +1,15 @@
+{
+  "game_build": "3.02.01",
+  "build_confirmed": false,
+  "capture_profile": "tekken8-steam-en-1080p60/v1",
+  "overlays_confirmed": false,
+  "source_kind": "ranked",
+  "played_at": "2026-09-18T15:00:00Z",
+  "session_id": "replace-with-session",
+  "actor_id": "player-confirmed-participant",
+  "characters": [
+    "jin",
+    "jin"
+  ],
+  "knowledge_revision": "tekken8-3.02.01-pilot-draft/1"
+}

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "performance-training-platform"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "Django>=5.2,<5.3", "djangorestframework>=3.16,<3.17",
+  "psycopg[binary]>=3.2,<4", "numpy>=2,<3", "scipy>=1.14,<2",
+  "opencv-python-headless>=4.10,<5", "jsonschema>=4.23,<5", "psutil>=6,<8"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-django>=4.9,<5", "ruff>=0.9,<1", "mypy>=1.14,<2", "types-jsonschema", "types-psutil"]
+
+[tool.setuptools.packages.find]
+include = ["analysis*", "backend*", "tools*"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "backend.config.settings"
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["postgres: requires PostgreSQL", "media: executes FFmpeg"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [".venv", "frontend", "backend/core/migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["analysis", "tools"]
+ignore_missing_imports = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+

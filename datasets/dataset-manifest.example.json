@@ -1,0 +1,27 @@
+{
+  "schema_version": "dataset/1",
+  "dataset_id": "example-not-collected",
+  "dataset_kind": "real",
+  "private_root_env": "PTP_DATA_ROOT",
+  "sources": [
+    {
+      "source_id": "capture-example",
+      "relative_path": "player-01/session-01/capture.mp4",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "player_id": "pseudonym-01",
+      "session_id": "session-01",
+      "split": "development",
+      "game_build": "3.02.01",
+      "characters": [
+        "jin",
+        "jin"
+      ],
+      "consent": {
+        "service_processing": true,
+        "model_training": false,
+        "retention_until": "2026-11-01"
+      },
+      "annotation_path": "player-01/session-01/annotations.json"
+    }
+  ]
+}
