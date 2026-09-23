@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AttachRecording, { type RecordingTarget } from "./attach-recording";
+import { displayTime } from "./workspace-api";
 
 type Provider = { key: string; label: string; enabled: boolean; reason: string; example_id?: string };
 type Candidate = { display_name: string; value: string; provider: string; selection_token: string; ownership_verified: boolean };
@@ -30,10 +31,11 @@ async function request<T>(csrf: string, path: string, method = "GET", body?: obj
   return data;
 }
 
-const date = (value: string) => new Date(value).toLocaleString();
 const words = (value: string) => value.toLowerCase().replaceAll("_", " ");
 
-export default function MatchHistory({ csrf }: { csrf: string }) {
+export default function MatchHistory({ csrf, zone = "UTC", onEvidence }: { csrf: string; zone?: string; onEvidence?: (id: string) => void }) {
+  const date = (value: string) => displayTime(value, zone);
+  const [filters, setFilters] = useState("");
   const [providers, setProviders] = useState<Provider[]>([]);
   const [identities, setIdentities] = useState<Identity[]>([]);
   const [history, setHistory] = useState<History>(blank);
@@ -62,7 +64,7 @@ export default function MatchHistory({ csrf }: { csrf: string }) {
       if (loading) return;
       loading = true;
       try {
-        const suffix = `?offset=${offset}&limit=20${identityFilter ? `&identity=${encodeURIComponent(identityFilter)}` : ""}`;
+        const suffix = `?offset=${offset}&limit=20&${filters}${identityFilter ? `&identity=${encodeURIComponent(identityFilter)}` : ""}`;
         const [sources, links, matches] = await Promise.all([
           request<{ providers: Provider[] }>(csrf, "match-providers", "GET", undefined, controller.signal),
           request<{ identities: Identity[] }>(csrf, "player-identities", "GET", undefined, controller.signal),
@@ -80,7 +82,7 @@ export default function MatchHistory({ csrf }: { csrf: string }) {
     void load();
     const timer = setInterval(() => { if (document.visibilityState === "visible") void load(); }, 5000);
     return () => { controller.abort(); clearInterval(timer); };
-  }, [csrf, identityFilter, offset, reload]);
+  }, [csrf, identityFilter, offset, reload, filters]);
 
   function resetSelection() { setCandidates([]); setSelection(""); setConsent(false); setSearched(false); }
   async function act(work: () => Promise<void>) {
@@ -156,13 +158,19 @@ export default function MatchHistory({ csrf }: { csrf: string }) {
         </div>
       </div>
       <div className="history-heading"><h3>3. Review your history</h3><button className="secondary" disabled={busy} onClick={() => { setError(""); setReload(value => value + 1); }}>Refresh history</button></div>
+      <details><summary>Search and filter matches</summary><form onSubmit={event => { event.preventDefault(); const query = new URLSearchParams(); for (const [key, value] of new FormData(event.currentTarget)) if (value) query.set(key, String(value)); setFilters(query.toString()); setOffset(0); }}><div className="rows">
+        <div><label htmlFor="match-from">Matches from (UTC date)</label><input id="match-from" name="date_from" type="date" /></div><div><label htmlFor="match-to">Matches through (UTC date)</label><input id="match-to" name="date_to" type="date" /></div>
+        <div><label htmlFor="match-character">Character key</label><input id="match-character" name="character" maxLength={50} placeholder="For example: jin" /></div><div><label htmlFor="match-situation">Reviewed situation key</label><input id="match-situation" name="situation" maxLength={160} /></div>
+        <div><label htmlFor="match-outcome">Reviewed event outcome</label><select id="match-outcome" name="outcome"><option value="">Any outcome</option><option>SUCCESS</option><option>FAILURE</option><option>UNKNOWN</option></select></div>
+        <div><label htmlFor="match-evidence">Evidence availability</label><select id="match-evidence" name="evidence"><option value="">Any evidence state</option><option value="VIDEO">Attributed video</option><option value="PENDING">Attribution pending</option><option value="METADATA">Metadata only</option></select></div>
+      </div><p className="muted">Dates use UTC calendar boundaries. Situation/outcome filters search current undisputed reviewed events; metadata-only results cannot supply gameplay outcomes.</p><button disabled={busy}>Search matches</button><button type="reset" className="secondary" onClick={() => { setFilters(""); setOffset(0); }}>Clear match filters</button></form></details>
       <label htmlFor="history-player">Show player</label><select id="history-player" value={identityFilter} onChange={event => { setIdentityFilter(event.target.value); setOffset(0); setHistory(blank); }}>
         <option value="">All players and recordings</option>{identities.map(identity => <option key={identity.id} value={identity.id}>{identity.display_label || identity.value}</option>)}
       </select>
       {history.matches.length ? <div className="scroll"><table><caption>{history.total} imported matches and recordings · results are separate from coaching evidence</caption><thead><tr><th>Played</th><th>Match</th><th>Result</th><th>Source & evidence</th><th>Actions</th></tr></thead><tbody>
         {history.matches.map(match => <tr key={match.id}>
           <td data-label="Played">{date(match.played_at)}{match.dataset_kind === "synthetic" && <p><span className="tag">Fictional demo</span></p>}</td>
-          <td data-label="Match"><strong>vs {match.opponent || "Unknown opponent"}</strong><p className="muted">{match.character || "Unknown character"} / {match.opponent_character || "Unknown character"}<br />Mode: {words(match.mode)}<br />Build: {match.game_build || "Unknown"}</p></td>
+          <td data-label="Match"><strong>vs {match.opponent || "Unknown opponent"}</strong><p className="muted">{match.character || "Unknown character"} / {match.opponent_character || "Unknown character"}<br />Mode: {words(match.mode)}<br />Build: {match.game_build || "Unknown"}</p>{onEvidence && <button className="secondary" onClick={() => onEvidence(match.id)}>Browse match evidence</button>}</td>
           <td data-label="Result">{words(match.result)}{match.metadata_state === "REVIEW_REQUIRED" && <p className="notice">Correction needs review</p>}</td>
           <td data-label="Source & evidence">{match.source ? <><strong>{providers.find(item => item.key === match.source?.provider)?.label || match.source.provider}</strong><p className="muted">Revision {match.source.revision} · imported {date(match.source.retrieved_at)}</p></> : <strong>User recording</strong>}
             <p>{match.evidence_status === "EVIDENCE_REQUIRED" ? "Gameplay evidence needed" : match.evidence_status === "ATTRIBUTION_PENDING" ? "Recording attribution needs review" : "Video attached — gameplay review required"}</p>
@@ -182,7 +190,7 @@ export default function MatchHistory({ csrf }: { csrf: string }) {
             <button className="secondary" disabled={busy} onClick={() => setRemoving(null)}>Keep match</button></div> : <button className="secondary" disabled={busy} onClick={() => setRemoving(match.id)}>Remove match</button>)}</td>
         </tr>)}
       </tbody></table></div> : <p className="empty">No matches in this view yet. Link a player and import available matches, or use a recording below.</p>}
-      {history.matches.filter(match => match.id === attaching && match.recording_target).map(match => <AttachRecording key={match.id} csrf={csrf} match={{...match, recording_target: match.recording_target!}}
+      {history.matches.filter(match => match.id === attaching && match.recording_target).map(match => <AttachRecording key={match.id} csrf={csrf} zone={zone} match={{...match, recording_target: match.recording_target!}}
         onCancel={() => setAttaching(null)} onComplete={() => {setAttaching(null); setMessage("Recording queued. Attribution and gameplay evidence require separate review."); setReload(value => value + 1);}} />)}
       <div className="history-pagination"><button className="secondary" disabled={offset === 0 || busy} onClick={() => { setOffset(Math.max(0, offset - 20)); setHistory(blank); }}>Previous matches</button><button className="secondary" disabled={history.next_offset === null || busy} onClick={() => { setOffset(history.next_offset!); setHistory(blank); }}>Next matches</button></div>
       <p className="muted">Match results alone cannot identify missed punishes or measure practice. <a href="#capture">Record a supported gameplay clip</a> to use the existing evidence-review flow.</p>

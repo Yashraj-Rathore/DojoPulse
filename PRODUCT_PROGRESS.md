@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-09-23** · Architecture: **2.3.0** · Current stage: **local research prototype**
+Last updated: **2026-09-23** · Architecture: **2.4.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -19,12 +19,13 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Core loop | Baseline → drill assignment → reviewed practice → later-match comparison implemented and tested synthetically |
 | Match acquisition | Player confirmation, consent, queued sync, source history and deletion work with two fictional providers |
 | Recording attribution | Local UI/API attaches video to imported history; media validation and operator attribution precede separate gameplay review; removal retains match metadata |
+| Player experience (M13) | Local onboarding, searchable timeline/history, guided training, export/deletion, feedback and in-app preferences implemented; real-user release acceptance remains open |
 | Real player IDs / providers | No live identity resolver or match transport enabled; EWGF usage rights, credentials and current authenticated schema unresolved |
 | Gameplay recognition | Bounded media tooling and deterministic rules exist; no released Tekken detector or calibrated templates |
 | Knowledge and drills | One provisional Jin/Jin uf+4 target and one draft drill; expert approval and current-build verification missing |
 | Scientific validation | G1–G6 are all NOT_RUN; no completed real-player improvement study |
 | Hosting and release | Loopback development only; external uploads and paid/cloud production services not enabled |
-| Latest recorded checks | 145 Python tests; 7 headless Edge tests; frontend build/lint/types; Ruff/mypy; Django system/migration checks passed; migration 0005 applied locally |
+| Latest recorded checks | 163 Python tests; 11 headless Edge tests; frontend build/lint/types; Ruff/mypy; Django system/migration checks passed; migration 0006 applied locally |
 | Evidence for those checks | [Software validation](docs/experiment-results/software-validation.md), recorded 2026-09-23; synthetic/local software validation only |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
@@ -78,7 +79,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M10 | Player model and weakness prioritization | PARTIAL | Real event validation and useful evidence-backed diagnosis |
 | M11 | Reviewed drills and measured practice | PARTIAL | Expert-approved drill and G4 |
 | M12 | Trustworthy longitudinal evaluation | PARTIAL | Real prospective chronology, comparability and G5/G6 |
-| M13 | Complete player-facing product experience | PARTIAL | Real onboarding, evidence inspection, search and usability |
+| M13 | Complete player-facing product experience | PARTIAL | Local engineering delivered across M13.01–M13.08; real provider/account/reviewer flows, participant usability, screen readers and real devices remain release dependencies |
 | M14 | Accounts, consent and data ownership | PARTIAL | Hosted identity/account recovery and full user data lifecycle |
 | M15 | Security, privacy and reliability hardening | PARTIAL | Isolation, abuse, deletion/restore and third-party review |
 | M16 | Hosted asynchronous delivery and deployment | PARTIAL | Real cloud/storage integrations and release prerequisites |
@@ -124,7 +125,7 @@ Owner: frontend/backend owner. Exit: a local operator can exercise the implement
 | M03.03 Two synthetic adapters, idempotent pages, corrections, coverage, retries and revocation | DONE | [Synthetic adapter](ingestion/synthetic.py), import/API/concurrency tests |
 | M03.04 Private paginated history with provenance, unknowns, expiry and mobile layout | DONE | Browser tests and inspected desktop/mobile screenshots; disputed outcomes remain unknown |
 | M03.05 Capture → review → practice → comparison local UI and services | DONE | Complete synthetic loop test; actual measurement validation remains open |
-| M03.06 Local verification commands and CI definition | DONE | 124 Python/5 browser checks recorded; CI authored, remote runner execution tracked under M19 |
+| M03.06 Local verification commands and CI definition | DONE | 163 Python/11 browser checks recorded; CI authored, remote runner qualification tracked under M19 |
 
 ## M04 — Permitted real player identity linking
 
@@ -260,14 +261,14 @@ Owner: frontend/product owner. Exit: supported players can complete the real wor
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M13.01 Explain supported game/build/capture scope and onboard a real player | PARTIAL | Local setup exists; real account and supported-profile onboarding needed |
-| M13.02 Find/confirm identity, show sync/coverage and browse source-aware history | PARTIAL | Complete local demo; connect approved real provider and validate empty, ambiguous, expired and failed states |
-| M13.03 Review timestamped evidence and understand corrections/unknowns | PARTIAL | Local attachment form, pending attribution, private review link, reprocessing and removal implemented; mobile browser checks pass. Integrated evidence timeline and real-player usability remain |
-| M13.04 Present weakness, drill, measured practice and follow-up plan coherently | PARTIAL | Local loop UI exists; real-player usability and adherence/comparison experience not validated |
-| M13.05 Search/filter supported matches and events | PARTIAL | Player filter/pagination implemented; date, character, situation, outcome and evidence-availability search remain |
-| M13.06 Account/privacy controls, export, deletion and understandable support states | PARTIAL | Local deletion/revocation controls exist; full self-service account/export/appeal/help flows needed |
-| M13.07 Keyboard, screen-reader, mobile, timezone and supported-browser validation | PARTIAL | Desktop/mobile browser checks exist; comprehensive accessibility and real-device testing remain |
-| M13.08 User feedback and notification preferences | NOT_STARTED | Minimal actionable analysis-ready/practice/follow-up notices, opt-out and delivery reliability; channels decided before external sends |
+| M13.01 Explain supported game/build/capture scope and onboard a real player | PARTIAL | Persisted scope acknowledgement, capture guide and next steps implemented; no implied consent/build approval. Real accounts, released scope and unaided onboarding validation remain |
+| M13.02 Find/confirm identity, show sync/coverage and browse source-aware history | PARTIAL | Local consent/selection/sync/coverage/error/expiry flow and match-to-evidence navigation implemented; approved real provider and real ambiguous-profile fixtures remain M04/M05 dependencies |
+| M13.03 Review timestamped evidence and understand corrections/unknowns | PARTIAL | Paginated timeline, authenticated range playback, source provenance, disputed-event exclusion, complete-match selection and correction requests implemented; real media/player/reviewer usability and accessibility validation remain |
+| M13.04 Present weakness, drill, measured practice and follow-up plan coherently | PARTIAL | Ordered journey, measured baseline summaries, frozen-plan details and practice gating implemented; synthetic browser path returns honest insufficient exposure. Real adherence and comparison usefulness remain unvalidated |
+| M13.05 Search/filter supported matches and events | DONE | Current local supported scope: owner/player, UTC dates, character, situation/outcome, purpose/eligibility and history evidence state with typed pagination. Metadata-only records cannot satisfy gameplay filters; backend/browser checks pass |
+| M13.06 Account/privacy controls, export, deletion and understandable support states | PARTIAL | Local private JSON export, password/CSRF-confirmed deletion, purge retry, sign-out, consent explanation, help and correction queue implemented; hosted signup/recovery/provider/backup/export operations remain M14–M16 dependencies |
+| M13.07 Keyboard, screen-reader, mobile, timezone and supported-browser validation | PARTIAL | Skip link/focus, labeled controls, mobile overflow, reduced motion and UTC/America-Toronto checks pass in headless Edge; manual screen-reader, real-device, captions/visual-evidence accessibility and additional browser qualification remain |
+| M13.08 User feedback and notification preferences | DONE | Agreed local channel: in-app only. Durable-state analysis/practice/follow-up notices, persistent dismissal/category opt-out, idempotent feedback and operator queue implemented/tested; no external sends. Bounded feed is explicit in [contract](docs/architecture/player-experience.md) |
 
 ## M14 — Accounts, consent and data ownership
 
@@ -278,8 +279,8 @@ Owner: backend/security/product owner. Exit: users control their account and per
 | M14.01 Secure sign-up/sign-in, session lifecycle and recovery | PARTIAL | Local Django sessions/CSRF exist; production identity provider or equivalent verified/recovery flow needed |
 | M14.02 Separate player identity claims from authenticated application ownership | DONE | Owner-scoped claimed links and cross-owner tests; no ID-as-password behavior |
 | M14.03 Version processing consent, optional training consent and withdrawals | PARTIAL | Local consent separation exists; hosted policy versions, receipts and user controls needed |
-| M14.04 Private data access, minimal opponent information and export | PARTIAL | Owner filters/private local files exist; hosted download authorization and user export verification needed |
-| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Local account/source lifecycle implemented; provider/backup retention and restore suppression need rehearsal |
+| M14.04 Private data access, minimal opponent information and export | PARTIAL | Owner-only range playback and allowlisted JSON export tested locally; private storage/session fields and other people's identity snapshots excluded. Hosted download/export authorization and scale still need verification |
+| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Self-service local password-confirmed deletion pseudonymizes login, clears feedback/receipts and tombstones every asset before purge; failure/retry tested. Provider/backup retention and restore suppression remain unverified |
 | M14.06 Review identity re-linking and per-match suppression retention | BLOCKED | Current local deletion revokes identity-wide sync; approve production policy and narrower suppression if appropriate |
 
 ## M15 — Security, privacy and reliability hardening
@@ -424,7 +425,7 @@ Reconsider them only through an explicit product/architecture decision with supp
 | 1 | Prepare activation of one documented public provider | M04.01–M04.03, M05.01–M05.04 | Product owner obtains applicable usage evidence and privately configures a key; integration owner verifies permitted fixtures; never paste secrets into this tracker |
 | 2 | Acquire first consented captures and expert review | M07.02–M07.05, M08.02–M08.03 | Participants, exact-build evidence, Tekken expert, two reviewers and adjudicator |
 | 3 | Validate observability/practice before promoting recognition | M09, M11, G1/G4 then G2 | Dataset/review findings; select backup/narrow if required |
-| 4 | Continue independent product engineering while inputs are missing | M13.03–M13.07, M15.02 | Local recording attribution is implemented. Next: evidence timeline/accessibility; rehearse parser isolation when a container runtime is available. Neither requires live providers |
+| 4 | Qualify the completed local player journey and harden media processing | M13.01–M13.04/M13.06–M13.07, M15.02 | M13 local engineering is delivered. Next: manual screen-reader/real-device and participant checks; rehearse parser isolation when a runtime is available; retain real-provider/account gates |
 | 5 | Run prospective real loop, then qualify hosting/beta | M12, M16–M19 | Measurement decisions, permitted data and validated security/operational integrations |
 
 The tracker is not authorization to purchase, contact providers, collect new personal data,
@@ -454,3 +455,5 @@ release gates still govern those actions. Do not let one external blocker stop i
 | Date | Requirements | Change | Validation |
 |---|---|---|---|
 | 2026-09-19 | M01.05; baseline M01–M21 and X01–X12 | Established the comprehensive current-status tracker from Architecture 2.2, the implementation brief, provider addition and recorded work | Documentation/requirement-ID/link checks; software results referenced from the preceding implementation |
+| 2026-09-23 | M06.03/M06.06/M06.07, M13.03 | Delivered local reviewed recording attachment and immutable evidence lineage | 145 Python / 7 browser tests; migration 0005 |
+| 2026-09-23 | M13.01–M13.08, M14.04/M14.05 | Delivered available local M13 product flows; kept external release dependencies explicit | 163 Python / 11 browser tests; migration 0006; build/static/schema checks |

@@ -1,3 +1,4 @@
+import { mockWorkspace } from "./workspace-fixtures";
 import { test, expect } from "@playwright/test";
 
 const providers = [
@@ -34,7 +35,7 @@ test("explicit selection, consent, import and removal flow", async ({ page }) =>
     else return route.fulfill({ status: 404, json: { error: "Unexpected request" } });
     await route.fulfill({ json: body });
   });
-  await page.goto("/");
+  await mockWorkspace(page); await page.goto("/");
   await expect(page.getByRole("heading", { name: "Bring your match history" })).toBeVisible();
   await page.getByLabel("Match source", { exact: true }).selectOption("synthetic-a");
   await page.getByLabel("Player ID", { exact: true }).fill("ExamplePlayer-A");
@@ -71,7 +72,7 @@ test("partial history, replay expiry and unknown build remain visible on mobile"
         syncs: [{ id: "sync-1", provider: "synthetic-a", status: "COMPLETE", last_succeeded_at: "2026-09-19T00:00:00Z", coverage: { coverage: "PARTIAL", truncated: true, gaps: ["older history unavailable"] } }] };
     return route.fulfill({ json: body });
   });
-  await page.goto("/");
+  await mockWorkspace(page); await page.goto("/");
   await expect(page.getByText("Partial history: some matches may be missing.")).toBeVisible();
   await expect(page.getByText("native replay: expired")).toBeVisible();
   await page.locator("#matches").screenshot({ path: "test-results/match-history-mobile.png" });
@@ -88,7 +89,7 @@ test("disabled sources and empty lookup do not pretend to import", async ({ page
       : path === "/api/player-candidates" ? { candidates: [] } : blank;
     return route.fulfill({ json: body });
   });
-  await page.goto("/");
+  await mockWorkspace(page); await page.goto("/");
   await expect(page.getByRole("button", { name: "Find player" })).toBeDisabled();
   await expect(page.locator("#match-provider option[value=ewgf-public]")).toBeDisabled();
   await page.getByLabel("Match source", { exact: true }).selectOption("synthetic-a");
@@ -126,7 +127,7 @@ for (const reject of [false, true]) {
       else return route.fulfill({ status: 404, json: { error: "Unexpected request" } });
       await route.fulfill({ json: body });
     });
-    await page.goto("/");
+    await mockWorkspace(page); await page.goto("/");
     await page.getByRole("button", { name: "Attach recording", exact: true }).click();
     await page.getByLabel("Gameplay recording", { exact: true }).setInputFiles({ name: "synthetic.mp4", mimeType: "video/mp4", buffer: Buffer.from("synthetic-upload-fixture") });
     await page.getByLabel("Recorded game build").fill("fixture");

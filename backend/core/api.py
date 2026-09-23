@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import F
-from django.http import FileResponse, JsonResponse
+from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
@@ -25,6 +25,7 @@ from backend.core.evidence import as_opportunity
 from backend.core.jobs import cancel_run
 from backend.core.loops import create_assignment, create_plan, evaluate_plan, record_practice
 from backend.core.match_ingestion import register_upload_source
+from backend.core.media_response import video_response
 from backend.core.models import (
     AnalysisRun,
     DefinitionVersion,
@@ -34,6 +35,7 @@ from backend.core.models import (
     ImprovementEvaluation,
     Match,
     Profile,
+    Recommendation,
     ReplayAsset,
     TrainingSession,
 )
@@ -116,6 +118,7 @@ def overview(request):
                     "match_id": e.match_id,
                     "mode": e.match.mode,
                     "start_us": e.start_us,
+                    "end_us": e.end_us,
                     "eligibility": e.eligibility,
                     "outcome": e.outcome,
                     "situation": e.situation,
@@ -134,6 +137,12 @@ def overview(request):
                 EvaluationPlan.objects.filter(owner=user).values(
                     "id", "assignment_id", "specification"
                 )
+            ),
+            "event_total": events.count(),
+            "recommendations": list(
+                Recommendation.objects.filter(owner=user)
+                .order_by("-created_at")
+                .values("id", "situation", "state", "summary")[:50]
             ),
             "evaluations": list(
                 ImprovementEvaluation.objects.filter(owner=user)
@@ -258,9 +267,7 @@ def media(request, asset_id):
     path = private_path(asset.storage_key)
     if not path.is_file():
         return Response({"error": "Media is unavailable"}, status=404)
-    response = FileResponse(path.open("rb"), content_type="video/mp4")
-    response["Cache-Control"] = "private, no-store"
-    return response
+    return video_response(path, request.headers.get("Range"))
 
 
 class AssignmentInput(serializers.Serializer):

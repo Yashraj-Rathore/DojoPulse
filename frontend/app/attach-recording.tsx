@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { displayTime } from "./workspace-api";
 
 export type RecordingTarget = {
   metadata_revision: number; player_namespace: string; player_id: string; player_slot: number;
   opponent_ids: { namespace: string; value: string }[];
 };
 
-export default function AttachRecording({ csrf, match, onComplete, onCancel }: {
+export default function AttachRecording({ csrf, match, onComplete, onCancel, zone = "UTC" }: {
   csrf: string;
   match: { id: string; played_at: string; mode: string; game_build: string | null; dataset_kind: string; recording_target: RecordingTarget };
   onComplete: () => void; onCancel: () => void;
+  zone?: string;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -46,7 +48,7 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel }: {
     <h3>Attach gameplay recording</h3>
     <p>This recording will be linked to the selected match. A local operator must review the attribution before its gameplay evidence can be published.</p>
     <p className="muted">Current capture support: Jin vs Jin, 1080p, constant 60 fps, SDR H.264 MP4; one continuous match or practice block, up to 10 minutes / 512 MiB.</p>
-    <p>Original match time: {new Date(match.played_at).toLocaleString()}. Player slot: {match.recording_target.player_slot}. Match data is {match.dataset_kind}.</p>
+    <p>Original match time: {displayTime(match.played_at, zone)}. Player slot: {match.recording_target.player_slot}. Match data is {match.dataset_kind}.</p>
     {error && <p className="notice error" role="alert">{error}</p>}
     <form onSubmit={submit} onChange={() => { if (!busy) setRequestId(crypto.randomUUID()); }}>
       <fieldset disabled={busy}>

@@ -154,3 +154,23 @@ match API/attachment tests passed in 5.91 seconds. Documentation links and diff 
 These results establish local workflow behavior, not human attribution accuracy, real-game
 recognition, safe hostile-media processing, hosted upload readiness or live provider access.
 G1–G6 remain NOT_RUN. See [ADR-014](../adr/ADR-014-recording-attribution.md).
+
+## M13 local player experience — 2026-09-23
+
+**163 Python tests passed in 42.65s** against PostgreSQL. Eighteen new API tests cover preferences,
+owner/CSRF filtering, UTC dates/pagination, corrections, feedback and notice idempotency, follow-up
+window transitions, export redaction, password-confirmed account deletion, cleanup failure/retry,
+and valid/invalid single-range media requests. Migration 0006 was applied locally; schema drift
+and Django system checks pass. Ruff lint/format and mypy (21 modules) pass.
+
+**11 headless Edge tests passed in 14.3s**. Four new journeys cover setup/preferences/feedback/export,
+mobile keyboard evidence inspection and correction requests, account deletion/sign-out and the
+synthetic training sequence through an insufficient-exposure result. Dates exercise UTC and
+America/Toronto; mobile overflow/reduced-motion/skip-link focus are checked. Desktop/mobile
+screenshots inspected. ESLint, TypeScript and production build pass. Browser HTTP is mocked;
+actual API/database/media behavior is independently covered in Python. This is not a real user,
+assistive-technology, media-decoder compatibility or gameplay-quality study.
+
+The full M13 release exit remains open for real providers/accounts, measurement/review readiness,
+participant usability, screen readers and actual device/browser qualification. No external
+notification, provider request, hosted deployment or real gameplay gate was activated.

@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.3.0. Decision date: 2026-09-23. Status: local engineering approved;
+Version: 2.4.0. Decision date: 2026-09-23. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -56,6 +56,13 @@ The match UUID and source assertions remain intact. Deleting the recording withd
 evidence while retaining imported history. Event source identity follows its original run,
 so replacement recordings cannot rewrite frozen evidence. See
 [ADR-014](../adr/ADR-014-recording-attribution.md). Hosted uploads and real-game validation remain gated.
+
+M13's local player experience includes persisted onboarding, searchable history and current
+evidence, private timeline playback, guided training plans, feedback/corrections, in-app
+notices/preferences, JSON export and password-confirmed deletion. The
+[player-experience contract](player-experience.md) defines limits and remaining release tests.
+No email delivery, provider activation or automatic gameplay approval is implied. Real
+onboarding and usability still depend on the earlier data/access/account gates.
 
 Local CLI and synthetic fixtures establish software behavior, never Tekken accuracy.
 Uncalibrated template detections are candidate observations and cannot establish a miss.

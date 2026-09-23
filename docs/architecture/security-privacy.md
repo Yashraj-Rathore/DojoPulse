@@ -37,3 +37,10 @@ Candidate confirmations use signed owner-bound tokens with a five-minute lifetim
 API enforces session/CSRF protection and owner filters; history responses are private/no-store.
 The demo flag requires DEBUG and staff status and cannot enable any live provider. Revoking an
 identity fences queued jobs; schema failures are quarantined without advancing a checkpoint.
+
+M13 adds owner-scoped preferences, feedback/corrections, in-app notice receipts and a bounded
+allowlisted JSON export. Account deletion requires current password, exact confirmation and CSRF.
+It pseudonymizes login fields and tombstones all assets before filesystem IO; purge failures
+remain retriable even for assets not yet visited. New feedback and receipts are erased.
+Authenticated range playback preserves private/no-store headers and never accepts arbitrary paths.
+See [player experience](player-experience.md) for export exclusions and local-only limits.

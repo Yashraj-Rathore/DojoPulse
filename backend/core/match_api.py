@@ -14,7 +14,14 @@ from rest_framework.response import Response
 
 from backend.core.api import handled
 from backend.core.match_ingestion import active_owner, link_local_identity, start_local_sync
-from backend.core.models import Match, MatchSourceRecord, MatchSync, PlayerGameIdentity
+from backend.core.models import (
+    Match,
+    MatchSourceRecord,
+    MatchSync,
+    PlayerGameIdentity,
+    ReplaySource,
+)
+from backend.core.search import SearchInput, current_events, filter_events, filter_matches
 from backend.core.storage import delete_metadata_match
 from ingestion.contracts import ExternalId, Operation
 from ingestion.synthetic import END, START, SyntheticProvider
@@ -270,8 +277,9 @@ def unlink_identity(request, identity_id):
     return Response({"state": "REVOKED", "history_retained": True})
 
 
-class HistoryInput(serializers.Serializer):
+class HistoryInput(SearchInput):
     identity = serializers.UUIDField(required=False)
+    evidence = serializers.ChoiceField(choices=["VIDEO", "PENDING", "METADATA"], required=False)
     offset = serializers.IntegerField(default=0, min_value=0, max_value=100000)
     limit = serializers.IntegerField(default=20, min_value=1, max_value=100)
 
@@ -365,7 +373,22 @@ def history(request):
     data = HistoryInput(data=request.query_params)
     data.is_valid(raise_exception=True)
     values = data.validated_data
-    matches = Match.objects.filter(owner=request.user, deleted_at=None)
+    matches = filter_matches(Match.objects.filter(owner=request.user, deleted_at=None), values)
+    if "situation" in values or "outcome" in values:
+        events = filter_events(
+            current_events(request.user).exclude(match__metadata_state="REVIEW_REQUIRED"), values
+        )
+        matches = matches.filter(pk__in=events.values("match_id"))
+    if "evidence" in values:
+        pending = ReplaySource.objects.filter(asset__isnull=False, asset__deleted_at=None).values(
+            "match_id"
+        )
+        if values["evidence"] == "VIDEO":
+            matches = matches.filter(asset__isnull=False, asset__deleted_at=None)
+        elif values["evidence"] == "PENDING":
+            matches = matches.filter(asset__isnull=True, pk__in=pending)
+        else:
+            matches = matches.filter(asset__isnull=True).exclude(pk__in=pending)
     if "identity" in values:
         identity = PlayerGameIdentity.objects.get(pk=values["identity"], owner=request.user)
         matches = matches.filter(player_identity=identity)

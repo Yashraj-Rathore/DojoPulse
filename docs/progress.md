@@ -223,3 +223,57 @@ No live or undocumented provider transport was added. M06.03 is PARTIAL at produ
 the completed local implementation. Cross-provider deduplication remains future work.
 Next: integrated evidence timeline/accessibility (M13.03–M13.07), and parser isolation rehearsal
 (M15.02) when the container runtime is available; continue obtaining consented real evidence.
+
+## M13 player experience — implementation checkpoint, 2026-09-23
+
+Scope: all M13.01–M13.08 local engineering, plus supporting M14.04/M14.05 services.
+Added persistent onboarding/timezone/notice preferences, owner-scoped timeline and match filters,
+private byte-range playback, guided baseline/practice/follow-up navigation, feedback/correction
+queue, in-app notices/dismissals, whitelisted JSON export and password-confirmed account deletion.
+Deletion tombstones every asset before file cleanup so a failed purge can resume safely.
+Frontend integration and synthetic browser checks are being verified; real providers, hosted
+accounts, reviewer operations and real-player/screen-reader/device studies remain unvalidated.
+Migration 0006 applied locally; first 17 new backend API/security/playback checks pass (13.83s).
+Final regression results and remaining acceptance criteria will be recorded below before push.
+
+## M13 player experience — implementation verified, 2026-09-23
+
+All M13.01–M13.08 local engineering is integrated: persistent supported-scope onboarding,
+searchable owner-scoped match history and current-event timeline, source-window player and byte
+ranges, complete-match selection, provenance/correction states, coherent baseline/drill/frozen-plan/
+practice/follow-up navigation, local account export/deletion, help and correction queue, in-app
+notices and preferences. M13.05 and M13.08 meet the declared local acceptance scope; the milestone
+remains PARTIAL because its real-player exit depends on permitted providers, production accounts,
+review/measurement readiness, real usability, screen readers and device/browser qualification.
+
+Privacy controls do not expose source paths, upload tokens, raw provider assertions or other
+people's identity snapshots in exports. Password/confirmation/CSRF protect account deletion;
+login identity is pseudonymized, all assets tombstoned before file IO, late workers fenced, and
+feedback/receipts removed. Failed purges remain retryable for every asset. Correction feedback
+cannot rewrite an event. Onboarding/notice preferences do not grant training consent. Notices
+remain in-app, bounded to latest 100 records/category; no external messages were sent.
+
+Files: experience_api/search/media_response, Profile/Feedback/NoticeReceipt and migration 0006,
+API/history/overview/admin/storage integration; workspace tools, evidence browser, training journey,
+shared client/time formatter, history/attachment/page/styles; API and browser tests. Added the
+player-experience architecture contract, updated README/data/privacy docs, decisions D022/D023,
+Architecture 2.4.0 and this tracker. The existing validated foundation was committed separately
+as db2b6b1 because the remote initially contained only the architecture skeleton.
+
+Validation: **163 PostgreSQL-backed Python tests passed in 42.65s**; **11 headless Edge browser
+tests passed in 14.3s**. Eighteen new API tests include consent separation, owner/CSRF boundaries,
+UTC filters/pagination, disputed evidence, idempotent feedback/notices, plan-window transitions,
+export exclusions, account deletion failure/retry and range playback. Four new browser journeys
+cover onboarding/preferences/notices/feedback/export, mobile keyboard/timeline/corrections,
+confirmed deletion/sign-out, and synthetic baseline -> frozen plan -> practice -> honest comparison.
+Browser tests mock HTTP; actual persistence/media serving are tested in Python. Desktop/mobile
+screenshots inspected; UTC and America/Toronto rendering checked. ESLint, production build,
+TypeScript, Ruff lint/format, mypy (21 modules), Django system/migration-drift checks pass.
+Migration 0006 applied locally. Export now checks API success before creating a downloaded JSON
+file, avoiding silent download of an error response. No secrets/media/dependencies staged.
+
+Remaining: no real provider access, signup/recovery service, automatic detector, approved real
+drill, hosted deployment or completed user study. G1–G6 remain NOT_RUN. Next: real-device and
+screen-reader/participant qualification and M15.02 parser isolation once its runtime is available;
+continue provider, expert and consented-data preparation. User authorized publication to main;
+push/remote CI outcome is recorded separately after execution.

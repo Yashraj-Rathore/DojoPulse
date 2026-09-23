@@ -24,6 +24,31 @@ class Profile(models.Model):
     deleted_at = models.DateTimeField(null=True)
     processing_consent_at = models.DateTimeField(null=True)
     training_consent_at = models.DateTimeField(null=True)
+    onboarding_completed_at = models.DateTimeField(null=True)
+    display_timezone = models.CharField(max_length=20, default="UTC")
+    analysis_notices = models.BooleanField(default=True)
+    practice_notices = models.BooleanField(default=True)
+    followup_notices = models.BooleanField(default=True)
+
+
+class Feedback(Owned):
+    category = models.CharField(max_length=20)
+    message = models.TextField(max_length=2000)
+    event = models.ForeignKey("GameplayEvent", on_delete=models.SET_NULL, null=True)
+    status = models.CharField(max_length=20, default="OPEN")
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="feedback_request")
+        ]
+
+
+class NoticeReceipt(Owned):
+    key = models.CharField(max_length=150)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["owner", "key"], name="notice_receipt")]
 
 
 class Game(models.Model):

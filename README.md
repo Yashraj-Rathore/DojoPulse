@@ -211,6 +211,35 @@ Endpoints: `POST /api/matches/{id}/recordings` (multipart file, metadata JSON, r
 explicit consent), and `POST /api/matches/{id}/recordings/{source}/reprocess` (request UUID).
 Both are owner-scoped local operator operations. Hosted uploads remain disabled.
 
+## Player workspace (M13 local flows)
+
+**Your workspace** contains the supported-scope setup guide, in-app updates, account preferences,
+JSON export, password-confirmed account deletion and a local feedback/correction queue. Existing
+local accounts are required; signup, recovery and hosted account operations are not enabled.
+No email or external notification service is connected. Staff review feedback at `/admin/`.
+
+Search history by UTC date, character, reviewed situation/outcome or evidence availability.
+**Browse match evidence** opens the timeline for that match. Inspect source windows and provenance,
+select complete matches, and submit correction requests without rewriting reviewed labels.
+Selections persist across filters/pages and are counted explicitly. The server rejects incomplete
+capture selections. Playback supports authenticated byte ranges for seeking.
+
+Follow **Your training path**: reviewed baseline, approved drill, frozen plan, measured practice,
+later matches and comparison. Draft drills and unvalidated gameplay remain gated. Display time can
+be UTC or your device's timezone; search dates stay UTC and capture/plan inputs are labeled local.
+
+Workspace data export is a private JSON download capped at 10,000 records, excluding media bytes,
+private storage/session secrets, raw provider assertions and reviewer/opponent identity snapshots.
+Download original recordings separately. Deletion logs out and disables/pseudonymizes the account,
+withdraws evidence and queues any failed local purge for `purge_expired` retry. Minimal audit facts
+remain; downloaded copies and hosted/provider backups are outside local deletion coverage.
+
+New APIs: `GET|PATCH /api/preferences`, `GET /api/evidence`, `GET|POST /api/feedback`,
+`GET|POST /api/notices`, `GET /api/account/export`, `DELETE /api/account`. All require the current
+owner's authenticated session; mutations require CSRF. Apply migration 0006 before using them.
+See [player experience contract](docs/architecture/player-experience.md) for bounds and remaining
+real-user, account, provider and accessibility validation.
+
 ## Evaluation and retention
 
 Freeze a complete baseline capture selection before practice. Submit recorded practice,

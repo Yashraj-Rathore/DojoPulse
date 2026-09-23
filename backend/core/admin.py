@@ -4,6 +4,7 @@ from backend.core.models import (
     AnalysisRun,
     DefinitionVersion,
     EvaluationPlan,
+    Feedback,
     GameplayEvent,
     ImprovementEvaluation,
     Match,
@@ -34,3 +35,13 @@ for model in (
 ):
     admin.site.register(model, ReadOnlyEvidenceAdmin)
 admin.site.register(Profile)
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ("id", "category", "status", "created_at")
+    list_filter = ("status", "category")
+    readonly_fields = ("owner", "category", "message", "event", "request_id", "created_at")
+
+    def has_add_permission(self, request):
+        return False

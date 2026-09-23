@@ -1,11 +1,16 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import MatchHistory from "./match-history";
+import WorkspaceTools from "./workspace-tools";
+import EvidenceBrowser from "./evidence-browser";
+import TrainingJourney from "./training-journey";
 
 type Event = {id:string;mode:string;start_us:number;eligibility:string;outcome:string;source_asset_id:string};
 type Counts = {numerator:number;denominator:number;eligible_unknown:number;unknown_eligibility:number;coverage:number|null;rate:number|null;credible_interval?:number[]|null;excluded?:number;sessions?:number;eligibility_coverage?:number|null};
 type Result = {status:string;dataset_kind:string;baseline:Counts;followup:Counts;verified_practice:number;observed_change:number|null;change_interval:number[]|null;next_action:string};
 type Data = {
+ event_total?:number;
+ recommendations?:{id:string;situation:string;state:string;summary:Counts}[];
  runs:{id:string;asset_id:string;status:string;error_code:string}[];
  events:Event[];
  drills:{key:string;status:string;payload:{title?:string;scenario?:string;response?:string;repetitions?:number}}[];
@@ -24,6 +29,8 @@ export default function Home(){
  const [assignment,setAssignment]=useState(""),[plan,setPlan]=useState(""),[file,setFile]=useState<File|null>(null);
  const [preview,setPreview]=useState(""),[validPreview,setValidPreview]=useState(false),[consent,setConsent]=useState(false);
  const [sourceKind,setSourceKind]=useState("ranked");
+ const [zone,setZone]=useState("UTC"),[reportEvent,setReportEvent]=useState(""),[matchEvidence,setMatchEvidence]=useState("");
+ const [removingAsset,setRemovingAsset]=useState<string|null>(null);
  const request=useCallback(async(path:string,method="GET",body?:object|FormData)=>{
   const response=await fetch("/api/"+path,{method,credentials:"same-origin",headers:{"X-CSRFToken":csrf,...(body instanceof FormData?{}:{"Content-Type":"application/json"})},body:body?(body instanceof FormData?body:JSON.stringify(body)):undefined});
   const json=await response.json();
@@ -50,17 +57,20 @@ export default function Home(){
   const body=new FormData();body.set("file",file);body.set("metadata",JSON.stringify(metadata));body.set("processing_consent","true");
   await act(async()=>{await request("uploads","POST",body);chooseFile(null);});
  }
- const picked=selected.filter(id=>data.events.some(e=>e.id===id));
+ const picked=selected;
  return <main>
+  {authenticated&&<a className="skip-link" href="#workspace-content">Skip to workspace</a>}
   <header><span className="brand">Performance Lab<span style={{color:"#809255"}}> /</span></span><span className="tag">LOCAL RESEARCH PROTOTYPE</span></header>
   <div className="intro"><div className="eyebrow">Tekken 8 · One measured situation</div><h1>Practice with a question.<br/>Return with evidence.</h1><p>Observe a defensive response, practice it, and measure the same situation in later matches. An uncertain result is a useful result.</p></div>
   <div className="notice">Gameplay validation is pending. Automated judgments and the draft drill are gated until capture, knowledge and reviewer checks pass.</div>
   {error&&<div role="alert" className="notice error">{error}</div>}
   {!ready?<p>Connecting to local API…</p>:!authenticated?
    <section className="login"><h2>Open your local workspace</h2><p className="muted">Use the operator account created in the development setup.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
-   <><nav className="steps"><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a></nav>
-   <div className="grid">
-    <MatchHistory csrf={csrf}/>
+   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a></nav>
+   <div className="grid" id="workspace-content" tabIndex={-1}>
+    <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
+    <TrainingJourney events={data.event_total??data.events.length} assignments={data.assignments.length} plans={data.plans} practice={data.practice.reduce((sum,p)=>sum+p.attempts,0)} evaluations={data.evaluations.length} zone={zone}/>
+    <MatchHistory csrf={csrf} zone={zone} onEvidence={id=>{setMatchEvidence(id);document.getElementById("evidence")?.scrollIntoView();}}/>
     <section id="capture"><h2>01 / Capture one situation</h2><p>Jin defending against Jin’s u/f+4 is the provisional target. Move identity and the response still require expert verification.</p><ol><li>Record Steam PC, English UI, 1920 × 1080 at constant 60 fps.</li><li>Show HUD, both input histories, frame information and battle status. Capture one continuous match or practice block.</li><li>Keep the source uncut, with no pauses, rewinds or missing overlays. Export SDR H.264 MP4, up to 10 minutes / 512 MiB.</li></ol>
      <form onSubmit={upload}><label htmlFor="capture-file">Capture file</label><input id="capture-file" type="file" accept="video/mp4" onChange={e=>chooseFile(e.target.files?.[0]??null)}/>
       {preview&&<video controls src={preview} onLoadedMetadata={e=>{const v=e.currentTarget;setValidPreview(v.videoWidth===1920&&v.videoHeight===1080&&v.duration>0&&v.duration<=600&&!!file&&file.size<=536870912);}}/>}
@@ -74,15 +84,15 @@ export default function Home(){
      </form>
     </section>
     <section><h2>Processing & review</h2><p className="muted">Analysis happens in a separate worker. Reviewed evidence appears only after an operator imports adjudicated labels.</p>
-     {data.runs.length?data.runs.map(run=><div className="result" key={run.id}><span className="tag">{run.status.replaceAll("_"," ")}</span><p className="muted">Capture {run.asset_id.slice(0,8)}</p>{run.error_code&&<p>{run.error_code}</p>}<button className="secondary" disabled={busy} onClick={()=>void act(async()=>{await request("assets/"+run.asset_id,"DELETE");})}>Delete capture</button></div>):<p className="empty">No captures yet. Upload a supported recording to begin.</p>}
+     {data.runs.length?data.runs.map(run=><div className="result" key={run.id}><span className="tag">{run.status.replaceAll("_"," ")}</span><p className="muted">Capture {run.asset_id.slice(0,8)}</p>{run.error_code&&<p>{run.error_code}</p>}{["QUEUED","PROCESSING"].includes(run.status)&&<button className="secondary" disabled={busy} onClick={()=>void act(async()=>{await request("runs/"+run.id,"DELETE");})}>Cancel analysis</button>}{removingAsset===run.asset_id?<div><p>Delete this recording and withdraw dependent evidence? Imported match metadata is retained.</p><button disabled={busy} onClick={()=>void act(async()=>{await request("assets/"+run.asset_id,"DELETE");setRemovingAsset(null);setSelected([]);})}>Confirm capture deletion</button><button className="secondary" onClick={()=>setRemovingAsset(null)}>Keep capture</button></div>:<button className="secondary" disabled={busy} onClick={()=>setRemovingAsset(run.asset_id)}>Delete capture</button>}</div>):<p className="empty">No captures yet. Upload a supported recording to begin.</p>}
     </section>
-    <section id="evidence" className="wide"><h2>02 / Inspect the evidence</h2><p className="muted">Select all reviewed opportunities from the relevant sessions. Unknown outcomes remain visible and never count as failure. Baseline membership freezes when you create a plan.</p>
-     {data.events.length?<div className="scroll"><table><thead><tr><th>Select</th><th>Purpose</th><th>Evidence</th><th>Eligibility</th><th>Outcome</th></tr></thead><tbody>{data.events.map(e=><tr key={e.id}><td><input aria-label={"Select event "+e.id} type="checkbox" checked={picked.includes(e.id)} onChange={v=>setSelected(v.target.checked?[...picked,e.id]:picked.filter(id=>id!==e.id))}/></td><td>{e.mode}</td><td><a href={"/api/assets/"+e.source_asset_id+"/media#t="+e.start_us/1e6} target="_blank" rel="noreferrer">{(e.start_us/1e6).toFixed(2)} s ↗</a></td><td>{e.eligibility}</td><td>{e.outcome}</td></tr>)}</tbody></table></div>:<p className="empty">No adjudicated opportunities. The absence of a detected attack does not establish a missed punish.</p>}
-    </section>
+    <EvidenceBrowser key={matchEvidence} csrf={csrf} selected={picked} onSelect={setSelected} zone={zone} onReport={setReportEvent} matchId={matchEvidence} onClearMatch={()=>setMatchEvidence("")}/>
     <section id="practice"><h2>03 / Practice the same response</h2><p>Target weakness: failing to convert a verified, reachable block-punish opportunity. Diagnosis requires eligible reviewed evidence.</p>
+     {data.recommendations?.map(r=><div className="result" key={r.id}><h3>Your baseline: {r.state.replaceAll("_"," ").toLowerCase()}</h3><p>{r.state==="INVALIDATED"?"This diagnosis was withdrawn because supporting evidence changed or was deleted.":`${r.summary.numerator} successful responses / ${r.summary.denominator} known eligible outcomes. ${r.summary.eligible_unknown} unknown outcomes; ${r.summary.unknown_eligibility} unknown eligibility.`}</p><p className="muted">{r.situation}. Sparse or incompatible evidence cannot establish a reliable weakness.</p></div>)}
      {data.drills.map(d=><div className="result" key={d.key}><span className="tag">{d.status}</span><h3>{d.payload.title||"Standing block-punish drill"}</h3><p className="muted">Jin vs Jin · standing · open space · 40 valid attempts. Randomize with a safe non-target alternative. Unobservable attempts remain unknown.</p><button disabled={busy||d.status!=="APPROVED"} onClick={()=>void act(async()=>{const a=await request("assignments","POST",{drill_key:d.key});setAssignment(a.id);})}>Assign reviewed drill</button></div>)}
      <label htmlFor="assignment">Drill assignment</label><select id="assignment" value={assignment} onChange={e=>setAssignment(e.target.value)}><option value="">Select an assignment</option>{data.assignments.map(a=><option key={a.id} value={a.id}>{a.drill_id} · {a.status}</option>)}</select>
-     <button disabled={busy||!assignment||!picked.length} onClick={()=>void act(async()=>{await request("assignments/"+assignment+"/practice","POST",{event_ids:picked});setSelected([]);})}>Link selected practice evidence</button>
+     <button disabled={busy||!assignment||!picked.length||!data.plans.some(p=>p.assignment_id===assignment)} onClick={()=>void act(async()=>{await request("assignments/"+assignment+"/practice","POST",{event_ids:picked});setSelected([]);})}>Link selected practice evidence</button>
+     {assignment&&!data.plans.some(p=>p.assignment_id===assignment)&&<p className="notice">Freeze a baseline plan for this assignment before linking practice. <a href="#compare">Set up your plan</a>.</p>}
      <p className="muted">Reviewed practice attempts linked: {data.practice.reduce((sum,p)=>sum+p.attempts,0)}. Only verified compatible outcomes satisfy the practice requirement.</p>
      {data.practice.map(p=>p.summary&&<p key={p.id} className="muted">Practice block {p.id.slice(0,8)}: {p.summary.numerator}/{p.summary.denominator} known successes · {percent(p.summary.coverage)} coverage · {p.summary.eligible_unknown} unknown outcomes. {p.summary.credible_interval?"Descriptive 95% interval: "+percent(p.summary.credible_interval[0])+" to "+percent(p.summary.credible_interval[1]):"Uncertainty unavailable until known outcomes exist."}</p>)}
     </section>

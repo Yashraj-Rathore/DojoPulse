@@ -48,3 +48,9 @@ attribution. Approval selects Match.asset without creating another Match. Gamepl
 hashes follow AnalysisRun.asset, never a replacement recording selected later on the match.
 Deleting a recording withdraws its events/contributions and retains imported metadata; frozen
 historical context and knowledge facts remain immutable. See [ADR-014](../adr/ADR-014-recording-attribution.md).
+
+Migration 0006 adds Profile onboarding/timezone/in-app notice preferences, owned Feedback with
+unique submission UUIDs and optional event references, and owner/key-unique NoticeReceipt rows.
+Notices are projections of runs, assignments and plan windows. Account deletion erases feedback/
+receipts and pseudonymizes login fields while retaining audit tombstones. See the
+[player experience contract](player-experience.md).
