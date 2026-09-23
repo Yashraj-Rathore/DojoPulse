@@ -277,3 +277,14 @@ drill, hosted deployment or completed user study. G1–G6 remain NOT_RUN. Next: 
 screen-reader/participant qualification and M15.02 parser isolation once its runtime is available;
 continue provider, expert and consented-data preparation. User authorized publication to main;
 push/remote CI outcome is recorded separately after execution.
+
+## M13 publication and first remote CI — 2026-09-23
+
+Published foundation `db2b6b1` and M13 `13209e1` to `origin/main` under the user's explicit push
+instruction. `git ls-remote` verified main matched the implementation SHA; the implementation
+working tree was clean. [GitHub run 35877396459](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459)
+reports successful frontend (Linux Chromium, 1m28s) and Python/PostgreSQL (1m52s) jobs. The workflow
+aggregate was still finalizing when this receipt was written; job-level success is the evidence
+recorded here. This establishes remote software checks, not hosted application/staging qualification.
+M19.02/M19 are therefore PARTIAL. Documentation-only publication receipt follows the implementation
+commit; it does not change the tested code. M13's real-player release dependencies remain open.

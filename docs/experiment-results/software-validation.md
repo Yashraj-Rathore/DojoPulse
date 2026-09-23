@@ -174,3 +174,9 @@ assistive-technology, media-decoder compatibility or gameplay-quality study.
 The full M13 release exit remains open for real providers/accounts, measurement/review readiness,
 participant usability, screen readers and actual device/browser qualification. No external
 notification, provider request, hosted deployment or real gameplay gate was activated.
+
+Publication verification: `origin/main` matched implementation commit `13209e1`. Its first
+[GitHub CI run](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) reports
+successful Linux frontend/Chromium and Python/PostgreSQL jobs (1m28s and 1m52s respectively).
+The aggregate workflow status was still finalizing when recorded. This adds remote software
+verification; it does not exercise real hosted accounts, providers, storage or staging.
