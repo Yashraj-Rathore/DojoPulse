@@ -281,7 +281,9 @@ npm test
 Browser tests use installed Microsoft Edge on Windows, Playwright Chromium on Linux.
 On Linux run npx playwright install --with-deps chromium once.
 CI runs PostgreSQL-backed tests, Python checks, the frontend build and browser smoke tests.
-CI has been authored; a hosted GitHub runner has not been executed from this workspace.
+The first [GitHub CI run](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459)
+reports successful frontend/Chromium and Python/PostgreSQL jobs for M13 commit `13209e1`.
+Real hosted application/staging integrations remain unqualified.
 
 ## Boundaries and next evidence
 

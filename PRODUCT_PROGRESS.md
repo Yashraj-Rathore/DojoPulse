@@ -27,6 +27,7 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Hosting and release | Loopback development only; external uploads and paid/cloud production services not enabled |
 | Latest recorded checks | 163 Python tests; 11 headless Edge tests; frontend build/lint/types; Ruff/mypy; Django system/migration checks passed; migration 0006 applied locally |
 | Evidence for those checks | [Software validation](docs/experiment-results/software-validation.md), recorded 2026-09-23; synthetic/local software validation only |
+| Published delivery | M13 commit `13209e1` pushed to `origin/main`; [remote CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) frontend and Python/PostgreSQL jobs report success; hosted release remains unqualified |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
 data access and demonstrated player benefit are different kinds of progress.
@@ -85,7 +86,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M16 | Hosted asynchronous delivery and deployment | PARTIAL | Real cloud/storage integrations and release prerequisites |
 | M17 | Operations, performance and unit economics | PARTIAL | Representative load, operational telemetry and actual costs |
 | M18 | Prospective real-player pilot | BLOCKED | Participants, consent, reviewers, expert and accepted measurement |
-| M19 | Hosted private beta and release qualification | NOT_STARTED | Pilot decisions plus operational/security readiness |
+| M19 | Hosted private beta and release qualification | PARTIAL | First remote software CI jobs passed; pilot decisions, staging and operational/security qualification remain |
 | M20 | Public supported release and commercial readiness | NOT_STARTED | Beta evidence, supported scope, support and commercial decisions |
 | M21 | Broader validated Tekken coverage | NOT_STARTED | First complete loop and measured value before expansion |
 
@@ -125,7 +126,7 @@ Owner: frontend/backend owner. Exit: a local operator can exercise the implement
 | M03.03 Two synthetic adapters, idempotent pages, corrections, coverage, retries and revocation | DONE | [Synthetic adapter](ingestion/synthetic.py), import/API/concurrency tests |
 | M03.04 Private paginated history with provenance, unknowns, expiry and mobile layout | DONE | Browser tests and inspected desktop/mobile screenshots; disputed outcomes remain unknown |
 | M03.05 Capture → review → practice → comparison local UI and services | DONE | Complete synthetic loop test; actual measurement validation remains open |
-| M03.06 Local verification commands and CI definition | DONE | 163 Python/11 browser checks recorded; CI authored, remote runner qualification tracked under M19 |
+| M03.06 Local verification commands and CI definition | DONE | 163 Python/11 browser checks recorded; first Linux frontend and PostgreSQL CI jobs passed; hosted staging qualification remains M19 work |
 
 ## M04 — Permitted real player identity linking
 
@@ -267,7 +268,7 @@ Owner: frontend/product owner. Exit: supported players can complete the real wor
 | M13.04 Present weakness, drill, measured practice and follow-up plan coherently | PARTIAL | Ordered journey, measured baseline summaries, frozen-plan details and practice gating implemented; synthetic browser path returns honest insufficient exposure. Real adherence and comparison usefulness remain unvalidated |
 | M13.05 Search/filter supported matches and events | DONE | Current local supported scope: owner/player, UTC dates, character, situation/outcome, purpose/eligibility and history evidence state with typed pagination. Metadata-only records cannot satisfy gameplay filters; backend/browser checks pass |
 | M13.06 Account/privacy controls, export, deletion and understandable support states | PARTIAL | Local private JSON export, password/CSRF-confirmed deletion, purge retry, sign-out, consent explanation, help and correction queue implemented; hosted signup/recovery/provider/backup/export operations remain M14–M16 dependencies |
-| M13.07 Keyboard, screen-reader, mobile, timezone and supported-browser validation | PARTIAL | Skip link/focus, labeled controls, mobile overflow, reduced motion and UTC/America-Toronto checks pass in headless Edge; manual screen-reader, real-device, captions/visual-evidence accessibility and additional browser qualification remain |
+| M13.07 Keyboard, screen-reader, mobile, timezone and supported-browser validation | PARTIAL | Skip link/focus, labeled controls, mobile overflow, reduced motion and UTC/America-Toronto checks pass in local Edge and Linux Chromium CI; manual screen-reader, real-device, captions/visual-evidence accessibility and further browser qualification remain |
 | M13.08 User feedback and notification preferences | DONE | Agreed local channel: in-app only. Durable-state analysis/practice/follow-up notices, persistent dismissal/category opt-out, idempotent feedback and operator queue implemented/tested; no external sends. Bounded feed is explicit in [contract](docs/architecture/player-experience.md) |
 
 ## M14 — Accounts, consent and data ownership
@@ -361,7 +362,7 @@ Owner: technical/product owner. Exit: real supported users complete the hosted f
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M19.01 Record pilot continuation decision and beta-supported scope | NOT_STARTED | M18 findings and applicable M04–M17 requirements accepted |
-| M19.02 Execute remote CI and staging end-to-end tests | NOT_STARTED | Hosted runner evidence; real auth/storage/job/provider integrations with permitted test data |
+| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | First [Linux CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) report success for M13 commit; actual staging auth/storage/job/provider integrations and permitted real data remain untested |
 | M19.03 Test onboarding → import/upload → coaching → practice → later evaluation | NOT_STARTED | Real participant paths and accessible error recovery; no staff-only bypass as user workflow |
 | M19.04 Exercise deletion, consent withdrawal, outage, rollback and restore | NOT_STARTED | Traceable operational evidence and resolved release-blocking defects |
 | M19.05 Measure beta usability, retention, useful decisions and support burden | NOT_STARTED | Predeclared denominators and adverse outcomes; product value beyond native workflow |
