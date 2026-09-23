@@ -1,4 +1,5 @@
 """Bounded local subprocess execution; hosted hostile-media isolation is a separate gate."""
+
 import subprocess
 import tempfile
 import time
@@ -16,7 +17,10 @@ class ProcessResult:
 
 
 def run_bounded(
-    argv: list[str], *, timeout: float = 30, max_output: int = 8_000_000,
+    argv: list[str],
+    *,
+    timeout: float = 30,
+    max_output: int = 8_000_000,
     max_rss: int = 1_073_741_824,
 ) -> ProcessResult:
     start = time.monotonic()
@@ -24,7 +28,11 @@ def run_bounded(
     cpu = 0.0
     with tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
         proc = subprocess.Popen(
-            argv, stdin=subprocess.DEVNULL, stdout=output, stderr=errors, shell=False,
+            argv,
+            stdin=subprocess.DEVNULL,
+            stdout=output,
+            stderr=errors,
+            shell=False,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
         monitor = psutil.Process(proc.pid)

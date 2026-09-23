@@ -1,4 +1,5 @@
 """Typed evidence contracts shared by CLI, persistence and evaluation."""
+
 from __future__ import annotations
 
 import hashlib
@@ -109,6 +110,21 @@ class EvaluationSpec:
     seed: int = 19
     measurement_approved: bool = False
     dataset_kind: str = "real"
+    capture_profile: str = "tekken8-steam-en-1080p60/v1"
+    policy_version: str = "comparison-policy/1"
+    exclusions: tuple[str, ...] = (
+        "wall",
+        "off-axis",
+        "unreachable",
+        "resource-variant",
+        "unverified-timing",
+    )
+    stop_rules: tuple[str, ...] = (
+        "fixed-followup-window",
+        "no-early-positive-stop",
+        "deleted-evidence-invalidates",
+        "build-change-requires-review",
+    )
 
     def __post_init__(self) -> None:
         if not (
@@ -134,7 +150,15 @@ class EvaluationSpec:
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> EvaluationSpec:
         data = dict(value)
-        for key in ("compatible_builds", "compatible_detectors", "compatible_knowledge"):
+        for key in (
+            "compatible_builds",
+            "compatible_detectors",
+            "compatible_knowledge",
+            "exclusions",
+            "stop_rules",
+        ):
+            if key not in data:
+                continue
             data[key] = tuple(data[key])
         data["baseline_membership"] = tuple(tuple(x) for x in data["baseline_membership"])
         return cls(**data)

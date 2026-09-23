@@ -18,3 +18,15 @@ isolation and least-privilege credentials before release. Synthetic fixtures tes
 
 For hosted execution retain outbox, leases/fencing, checkpoints, bounded retries, admission
 limits and atomic publication. Do not implement a second rule engine in workers or views.
+
+## Role in provider-neutral ingestion
+
+Video remains the supported local gameplay-evidence path. A metadata import can create
+a canonical match without video, then attach this pipeline's recording to the same match.
+Native replay bytes require a separate permitted, version-reviewed decoder; the FFmpeg path
+must never treat them as a video. Provider metadata alone creates no gameplay opportunities.
+The local attachment flow queues validation, requires explicit operator attribution, then uses
+the existing independent annotation workflow. Upload alone publishes no gameplay opportunities.
+Reprocessing retains the asset and creates a new run; the worker rejects changes to its pinned
+source hash. Purging an imported match's recording withdraws its evidence while retaining match
+history. See [match ingestion](match-ingestion.md) and [ADR-014](../adr/ADR-014-recording-attribution.md).

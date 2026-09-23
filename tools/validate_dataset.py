@@ -1,8 +1,12 @@
 """Validate private manifests, hashes, consent, independent splits and reviews."""
+
 import argparse
 import json
+from datetime import date
 from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft202012Validator, FormatChecker
 
 from analysis.annotations import validate_annotations
 from analysis.media import file_hash
@@ -18,12 +22,20 @@ def confined(root: Path, relative: str) -> Path:
     return result
 
 
-def validate_manifest(manifest: dict[str, Any], root: Path, metadata_only: bool = False) -> dict[str, Any]:
+def validate_manifest(
+    manifest: dict[str, Any], root: Path, metadata_only: bool = False
+) -> dict[str, Any]:
+    schema = json.loads(
+        (Path(__file__).resolve().parents[1] / "datasets/manifest-schema.json").read_text()
+    )
+    Draft202012Validator(schema, format_checker=FormatChecker()).validate(manifest)
     if manifest.get("schema_version") != "dataset/1":
         raise ValueError("Unknown manifest schema")
     if manifest.get("dataset_kind") not in {"real", "synthetic"}:
         raise ValueError("Dataset kind required")
-    seen: dict[str, dict[str, str]] = {k: {} for k in ("source_id", "sha256", "player_id", "session_id")}
+    seen: dict[str, dict[str, str]] = {
+        k: {} for k in ("source_id", "sha256", "player_id", "session_id")
+    }
     for source in manifest["sources"]:
         split = source["split"]
         if split not in {"development", "validation", "held-out"}:
@@ -35,6 +47,11 @@ def validate_manifest(manifest: dict[str, Any], root: Path, metadata_only: bool 
             group[value] = split
         if not source["consent"]["service_processing"]:
             raise ValueError("Missing processing consent")
+        if (
+            manifest["dataset_kind"] == "real"
+            and date.fromisoformat(source["consent"]["retention_until"]) < date.today()
+        ):
+            raise ValueError("Retention consent expired")
         media = confined(root, source["relative_path"])
         annotations_path = confined(root, source["annotation_path"])
         if not metadata_only:
@@ -42,13 +59,19 @@ def validate_manifest(manifest: dict[str, Any], root: Path, metadata_only: bool 
                 raise ValueError("Source hash mismatch")
             annotation = json.loads(annotations_path.read_text(encoding="utf-8"))
             validate_annotations(annotation, source["sha256"])
-            if (annotation["game_build"] != source["game_build"]
+            if (
+                annotation["game_build"] != source["game_build"]
                 or annotation["session_id"] != source["session_id"]
                 or annotation["source_id"] != source["source_id"]
-                or annotation["dataset_kind"] != manifest["dataset_kind"]):
+                or annotation["dataset_kind"] != manifest["dataset_kind"]
+            ):
                 raise ValueError("Annotation manifest mismatch")
-    return {"status": "VALID", "source_count": len(manifest["sources"]),
-            "source_bytes_verified": not metadata_only, "dataset_kind": manifest["dataset_kind"]}
+    return {
+        "status": "VALID",
+        "source_count": len(manifest["sources"]),
+        "source_bytes_verified": not metadata_only,
+        "dataset_kind": manifest["dataset_kind"],
+    }
 
 
 def main() -> None:
@@ -57,8 +80,9 @@ def main() -> None:
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--metadata-only", action="store_true")
     args = parser.parse_args()
-    result = validate_manifest(json.loads(args.manifest.read_text(encoding="utf-8")),
-                               args.root, args.metadata_only)
+    result = validate_manifest(
+        json.loads(args.manifest.read_text(encoding="utf-8")), args.root, args.metadata_only
+    )
     print(json.dumps(result))
 
 

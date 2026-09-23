@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "dataset_kind",
+    "sources"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "dataset/1"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dataset_kind": {
+      "enum": [
+        "real",
+        "synthetic"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "relative_path",
+          "sha256",
+          "player_id",
+          "session_id",
+          "split",
+          "game_build",
+          "characters",
+          "consent",
+          "annotation_path"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relative_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "player_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "session_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "split": {
+            "enum": [
+              "development",
+              "validation",
+              "held-out"
+            ]
+          },
+          "game_build": {
+            "type": "string",
+            "minLength": 1
+          },
+          "characters": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "string"
+            }
+          },
+          "annotation_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "consent": {
+            "type": "object",
+            "required": [
+              "service_processing",
+              "model_training",
+              "retention_until"
+            ],
+            "properties": {
+              "service_processing": {
+                "type": "boolean"
+              },
+              "model_training": {
+                "type": "boolean"
+              },
+              "retention_until": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 """Create an intentionally incomplete review sidecar for a private capture."""
+
 import argparse
 import json
 from pathlib import Path
@@ -17,13 +18,22 @@ def main() -> None:
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Refusing to overwrite existing annotations")
-    value = {"schema_version": "annotation/1", "source_id": args.source.stem,
-             "source_sha256": file_hash(args.source), "dataset_kind": "real",
-             "game_build": args.build, "session_id": args.session, "source_kind": args.mode,
-             "played_at": args.played_at, "examples": []}
+    value = {
+        "schema_version": "annotation/1",
+        "source_id": args.source.stem,
+        "source_sha256": file_hash(args.source),
+        "dataset_kind": "real",
+        "game_build": args.build,
+        "session_id": args.session,
+        "source_kind": args.mode,
+        "played_at": args.played_at,
+        "examples": [],
+    }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(value, indent=2), encoding="utf-8")
-    print("Blank sidecar created. Empty examples are not completed annotation or negative evidence.")
+    print(
+        "Blank sidecar created. Empty examples are not completed annotation or negative evidence."
+    )
 
 
 if __name__ == "__main__":

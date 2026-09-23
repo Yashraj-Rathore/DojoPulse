@@ -25,3 +25,26 @@ Model saves validate immutable fields; bulk SQL is trusted internal code and mus
 these commands. PostgreSQL is authoritative; SQLite is only a portable unit-test fallback.
 
 No table per raw video frame. No generic EAV schema. No all-game universal simulator.
+
+## Provider-neutral extension (local relational cutover implemented)
+
+PlayerGameIdentity links an owner to a namespaced public game ID with explicit aliases,
+provenance and claim/verification state. MatchSource is the versioned provider policy;
+MatchSourceRecord preserves source-scoped IDs and revisioned metadata assertions. ReplaySource
+links a canonical match to optional video, native payload or structured-event representations,
+each with its own availability, build compatibility and retention. Provider cursors and
+coverage gaps belong to durable sync state, not the match or player-statistic table.
+
+Migrations 0003/0004 make Match.asset optional and backfill USER_UPLOAD ReplaySource rows.
+The FK remains a compatibility pointer for the existing video analysis path. Historical event
+rows and frozen evaluation memberships are preserved. PlayerGameIdentity, MatchSourceRecord,
+ReplaySource and MatchSync are relational; identity alias bindings remain a future extension.
+Metadata-only records cannot enter the punish denominator. Full schema, ownership/uniqueness
+invariants and migration order: [match ingestion](match-ingestion.md).
+
+Migration 0005 adds recording attribution state and hashed review provenance to ReplaySource.
+New imported-match recordings stay PENDING_REVIEW until media validation and explicit operator
+attribution. Approval selects Match.asset without creating another Match. GameplayEvent source
+hashes follow AnalysisRun.asset, never a replacement recording selected later on the match.
+Deleting a recording withdraws its events/contributions and retains imported metadata; frozen
+historical context and knowledge facts remain immutable. See [ADR-014](../adr/ADR-014-recording-attribution.md).

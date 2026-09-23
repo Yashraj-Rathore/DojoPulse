@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.0.0. Decision date: 2026-09-18. Status: local engineering approved;
+Version: 2.3.0. Decision date: 2026-09-23. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -34,6 +34,28 @@ and comparison logic. `tools` provides local CLI entrypoints. `backend` owns per
 authorization, lifecycle commands and REST. `frontend` supplies only the improvement loop.
 Knowledge and contracts are versioned JSON under `game_data` and `contracts`.
 Dense observations remain files/artifacts; sparse opportunities are relational records.
+
+DojoPulse's [provider-neutral ingestion architecture](match-ingestion.md) adds player identity
+resolution, permitted match discovery and metadata-only import design. OFFICIAL,
+COMMUNITY_PUBLIC_API, REVERSE_ENGINEERED and USER_UPLOAD sources have separate operation and
+usage gates. Match identity is independent of a video; evidence sufficiency is independent of
+successful metadata ingestion. Match.asset is now optional; migrations backfill upload provenance
+while preserving existing match/event/evaluation facts. Local synthetic imports are implemented;
+network adapters and native replay decoding remain disabled. See [research](../research/tekken-match-sources.md)
+and [ADR-013](../adr/ADR-013-provider-neutral-match-ingestion.md).
+
+The local UI now supports explicit player selection, consent, queued metadata sync, source-aware
+history and deletion. A separate PostgreSQL-backed match worker processes only synthetic
+adapters under DEBUG/LOCAL_MATCH_IMPORTS/staff gates. The
+[EWGF activation review](../research/ewgf-activation-review-2026-09-19.md) leaves live access
+disabled pending usage rights, private credential setup and permitted current-schema fixtures.
+
+Local staff can attach a recording to an imported match, validate the media, and explicitly
+review player/time/build/mode attribution before publishing independently reviewed gameplay.
+The match UUID and source assertions remain intact. Deleting the recording withdraws its
+evidence while retaining imported history. Event source identity follows its original run,
+so replacement recordings cannot rewrite frozen evidence. See
+[ADR-014](../adr/ADR-014-recording-attribution.md). Hosted uploads and real-game validation remain gated.
 
 Local CLI and synthetic fixtures establish software behavior, never Tekken accuracy.
 Uncalibrated template detections are candidate observations and cannot establish a miss.

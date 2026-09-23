@@ -16,7 +16,7 @@ dependencies = [
 dev = ["pytest>=8,<10", "pytest-django>=4.9,<5", "ruff>=0.9,<1", "mypy>=1.14,<2", "types-jsonschema", "types-psutil"]
 
 [tool.setuptools.packages.find]
-include = ["analysis*", "backend*", "tools*"]
+include = ["analysis*", "backend*", "tools*", "ingestion*"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "backend.config.settings"
@@ -35,8 +35,7 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["analysis", "tools"]
+files = ["analysis", "tools", "ingestion"]
 ignore_missing_imports = true
 check_untyped_defs = true
 disallow_untyped_defs = true
-

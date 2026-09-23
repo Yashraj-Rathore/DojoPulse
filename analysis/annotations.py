@@ -1,4 +1,5 @@
 """Validate independent review records; no automatic promotion of client labels."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,9 @@ def validate_annotations(value: dict[str, Any], source_hash: str | None = None) 
     ids = [x["id"] for x in value["examples"]]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate annotation IDs")
+    ordered = sorted(value["examples"], key=lambda x: x["start_us"])
+    if any(b["start_us"] <= a["end_us"] for a, b in zip(ordered, ordered[1:], strict=False)):
+        raise ValueError("Overlapping target windows cannot count as independent opportunities")
     for item in value["examples"]:
         if item["end_us"] < item["start_us"]:
             raise ValueError("Reversed evidence window")
@@ -29,22 +33,35 @@ def validate_annotations(value: dict[str, Any], source_hash: str | None = None) 
         judgments = {(r["eligibility"], r["outcome"]) for r in reviews}
         final = (item["eligibility"], item["outcome"])
         adjudication = item["adjudication"]
+        if (
+            item["outcome"] != "UNKNOWN"
+            and any(r["confidence"] == "unobservable" for r in reviews)
+            and not adjudication
+        ):
+            raise ValueError("Unobservable review requires adjudication or abstention")
         if len(judgments) > 1 or final not in judgments:
             if not adjudication or adjudication["reviewer"] in reviewers:
                 raise ValueError("Disagreement requires independent adjudication")
         derived = judge(item["conditions"], reviewed=True)
         if (Eligibility(item["eligibility"]), Outcome(item["outcome"])) != (
-            derived.eligibility, derived.outcome
+            derived.eligibility,
+            derived.outcome,
         ):
             raise ValueError("Final label contradicts mandatory evidence conditions")
 
 
 def review_metrics(value: dict[str, Any]) -> dict[str, Any]:
     examples = value["examples"]
-    disagreements = sum(len({(r["eligibility"], r["outcome"])
-                             for r in x["reviews"]}) > 1 for x in examples)
-    seconds = sum(sum(r["seconds"] for r in x["reviews"])
-                  + (x["adjudication"]["seconds"] if x["adjudication"] else 0)
-                  for x in examples)
-    return {"review_seconds": seconds, "disagreement_count": disagreements,
-            "disagreement_rate": disagreements / len(examples) if examples else None}
+    disagreements = sum(
+        len({(r["eligibility"], r["outcome"]) for r in x["reviews"]}) > 1 for x in examples
+    )
+    seconds = sum(
+        sum(r["seconds"] for r in x["reviews"])
+        + (x["adjudication"]["seconds"] if x["adjudication"] else 0)
+        for x in examples
+    )
+    return {
+        "review_seconds": seconds,
+        "disagreement_count": disagreements,
+        "disagreement_rate": disagreements / len(examples) if examples else None,
+    }

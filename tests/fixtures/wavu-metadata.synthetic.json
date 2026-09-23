@@ -1,0 +1,22 @@
+{
+  "battle_id": "SYNTHETIC-BATTLE-A",
+  "battle_at": 1789689600,
+  "battle_type": 2,
+  "game_version": 30201,
+  "p1_polaris_id": "FakeCaseA123",
+  "p1_user_id": 9007199254740993,
+  "p1_name": "Same Name",
+  "p1_chara_id": 6,
+  "p1_power": 100000,
+  "p1_rank": 20,
+  "p1_rounds": 3,
+  "p2_polaris_id": "FakeCaseB456",
+  "p2_user_id": 9007199254740995,
+  "p2_name": "Same Name",
+  "p2_chara_id": 6,
+  "p2_power": 110000,
+  "p2_rank": 21,
+  "p2_rounds": 1,
+  "stage_id": 900,
+  "winner": 1
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": "match-sources/1",
+  "reviewed_on": "2026-09-19",
+  "status": "LOCAL_SYNTHETIC_FLOW_ONLY",
+  "providers": [
+    {
+      "key": "tekken-official-candidate",
+      "access_class": "OFFICIAL",
+      "upstream_lineage": [
+        "Bandai Namco"
+      ],
+      "documented_external_capabilities": [],
+      "enabled_operations": [],
+      "usage_approval": null,
+      "note": "Official in-game replay UX exists; no publisher-authorized external developer replay interface verified."
+    },
+    {
+      "key": "wavu",
+      "access_class": "COMMUNITY_PUBLIC_API",
+      "upstream_lineage": [
+        "Tekken Online Replay listing via maintainer-described game-client interface"
+      ],
+      "documentation": "https://wank.wavu.wiki/api",
+      "documented_external_capabilities": [
+        "GLOBAL_MATCH_METADATA_FEED"
+      ],
+      "unverified_capabilities": [
+        "RESOLVE_NAME",
+        "PER_PLAYER_HISTORY",
+        "FETCH_REPLAY",
+        "DECODE_EVENTS"
+      ],
+      "enabled_operations": [],
+      "usage_approval": null,
+      "rate_policy": {
+        "max_in_flight": 1,
+        "local_max_requests_per_second": 1,
+        "source_numeric_quota": null
+      },
+      "window": {
+        "seconds": 700,
+        "lower": "exclusive",
+        "upper": "inclusive",
+        "cursor": "before"
+      },
+      "offline_adapter": "ingestion.wavu:normalize_record"
+    },
+    {
+      "key": "ewgf-public",
+      "activation_review": "docs/research/ewgf-activation-review-2026-09-19.md",
+      "access_class": "COMMUNITY_PUBLIC_API",
+      "documentation": "https://ewgf.gg/api-docs",
+      "upstream_lineage": [
+        "Not fully verified for current closed-source deployment",
+        "Legacy: Wavu and game server integrations"
+      ],
+      "documented_external_capabilities": [
+        "BATTLES_BY_TEKKEN_ID",
+        "PROFILE_BY_TEKKEN_ID",
+        "BULK_PROFILES"
+      ],
+      "unverified_capabilities": [
+        "RESOLVE_NAME",
+        "FETCH_REPLAY",
+        "DECODE_EVENTS"
+      ],
+      "enabled_operations": [],
+      "usage_approval": null,
+      "auth": "provider-issued server-side Bearer key; not provisioned",
+      "dated_plan_limits": {
+        "free": {
+          "requests_per_hour": 100,
+          "recent_matches": 50,
+          "delay_hours": 24
+        },
+        "pro": {
+          "requests_per_hour": 1000,
+          "recent_matches": 100,
+          "delay_hours": 0
+        }
+      },
+      "note": "Recheck live terms, schema and tier limits before activation. No authenticated endpoint called."
+    },
+    {
+      "key": "tekken-undocumented-candidate",
+      "access_class": "REVERSE_ENGINEERED",
+      "documented_external_capabilities": [],
+      "enabled_operations": [],
+      "usage_approval": null,
+      "technical_approval": null,
+      "explicit_review_decision": null,
+      "note": "No endpoint, transport, credentials, protocol emulation or decoder implemented."
+    },
+    {
+      "key": "user-video",
+      "access_class": "USER_UPLOAD",
+      "documented_external_capabilities": [
+        "LOCAL_VIDEO_IMPORT"
+      ],
+      "enabled_operations": [
+        "LOCAL_VIDEO_IMPORT"
+      ],
+      "scope": "existing consented staff-only loopback workflow",
+      "binary_replay_import_enabled": false,
+      "external_uploads_enabled": false
+    }
+  ]
+}

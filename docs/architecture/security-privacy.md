@@ -19,3 +19,21 @@ Service processing consent and optional model training consent are independent. 
 training occurs in this implementation. Gameplay may identify opponents; no anonymous-data claim.
 Study source retention: through evaluation + audit, max 60 days unless renewed consent. Deletion
 wins over reproducibility. Restore must reapply tombstones before exposing records.
+
+Implemented local boundary: loopback operator uploads, source/derived-directory deletion,
+fenced job cancellation, tombstones, consent distinction and retention command. Asset deletion
+also invalidates evidence-backed recommendations and practice-dependent evaluations.
+Write transactions lock the owner first, then narrower rows, so deletion cannot race past
+publication of a new conclusion. PostgreSQL concurrency tests exercise that ordering.
+Manually copied exports, external annotation folders, backups and cloud objects still require
+an operator inventory/provider adapter; they are not silently covered by local asset deletion.
+
+Provider ingestion additionally requires operation/purpose-specific usage review and expiring
+technical approval. Public IDs do not prove account ownership. Network/provider credentials
+remain server-side, with shared quotas and allowlisted destinations. Revoking an identity must
+stop/fence syncs and handle source snapshots even when no video exists. These lifecycle additions
+are implemented for the local [metadata-import cutover](match-ingestion.md), not hosted services.
+Candidate confirmations use signed owner-bound tokens with a five-minute lifetime. The local
+API enforces session/CSRF protection and owner filters; history responses are private/no-store.
+The demo flag requires DEBUG and staff status and cannot enable any live provider. Revoking an
+identity fences queued jobs; schema failures are quarantined without advancing a checkpoint.

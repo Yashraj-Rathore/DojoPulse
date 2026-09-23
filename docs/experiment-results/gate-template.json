@@ -1,0 +1,19 @@
+{
+  "schema_version": "experiment-gate/1",
+  "gate": "G1",
+  "status": "NOT_RUN",
+  "hypothesis": null,
+  "dataset_revision": null,
+  "source_hashes": [],
+  "method_version": null,
+  "metrics": null,
+  "success_threshold": null,
+  "failure_threshold": null,
+  "exclusions": [],
+  "review_seconds": null,
+  "cost_usd": null,
+  "actual_result": null,
+  "decision": "WAIT_FOR_REAL_EVIDENCE",
+  "decision_owner": null,
+  "decided_at": null
+}

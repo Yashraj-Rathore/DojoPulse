@@ -14,3 +14,16 @@ Real golden regression is a separate NOT_RUN gate until private manifest data ex
 rename synthetic fixture accuracy as gameplay precision. Dataset evaluator reports per-outcome
 precision/recall/F1, abstention, coverage and time error with one-to-one matching.
 CI runs PostgreSQL-backed tests; SQLite fallback does not validate locking/concurrency semantics.
+
+## Ingestion contract checks
+
+tests/test_ingestion_contracts.py uses synthetic Wavu-shaped metadata with deliberately large
+integer IDs. It checks case/namespace preservation, ambiguous names, unknown versions/results,
+metadata/evidence separation, provider/purpose gates, Retry-After and bounded cursor overlap.
+No test calls an external provider. Relational import tests now cover source-record deduplication,
+identity revocation, metadata-only deletion, migration preservation and concurrent fencing.
+API tests exercise signed candidate confirmation, owner isolation, CSRF, provider gates,
+worker quarantine/retries, paging and conservative coverage. Browser tests exercise linking,
+consent, imports, removal, empty lookup and mobile incomplete/expired evidence states using
+mocked HTTP responses. PostgreSQL API tests separately execute the real domain/worker path.
+Live transport, shared provider quotas and replay decoding still require later integration tests.

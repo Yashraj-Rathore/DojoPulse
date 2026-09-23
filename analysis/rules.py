@@ -1,4 +1,5 @@
 """Conservative target rule. Never infer a miss from absent input/status."""
+
 from dataclasses import dataclass
 from typing import Any
 
@@ -13,15 +14,31 @@ class Judgment:
 
 
 REQUIRED = (
-    "build_verified", "knowledge_verified", "move_verified", "block_verified",
-    "actor_verified", "standing", "reach_validated", "alignment_validated",
-    "window_complete", "timing_validated", "wall_clear", "resource_independent",
+    "build_verified",
+    "knowledge_verified",
+    "move_verified",
+    "block_verified",
+    "actor_verified",
+    "standing",
+    "reach_validated",
+    "alignment_validated",
+    "window_complete",
+    "timing_validated",
+    "wall_clear",
+    "resource_independent",
 )
-EXCLUDED = ("standing", "reach_validated", "alignment_validated", "wall_clear",
-            "resource_independent")
+EXCLUDED = (
+    "standing",
+    "reach_validated",
+    "alignment_validated",
+    "wall_clear",
+    "resource_independent",
+)
 
 
-def judge(conditions: dict[str, Any], *, reviewed: bool, max_uncertainty_us: int = 16667) -> Judgment:
+def judge(
+    conditions: dict[str, Any], *, reviewed: bool, max_uncertainty_us: int = 16667
+) -> Judgment:
     if not reviewed:
         return Judgment(Eligibility.UNKNOWN, Outcome.UNKNOWN, ("REVIEW_REQUIRED",))
     missing = tuple(key.upper() for key in REQUIRED if conditions.get(key) is not True)
@@ -29,8 +46,10 @@ def judge(conditions: dict[str, Any], *, reviewed: bool, max_uncertainty_us: int
         return Judgment(Eligibility.INELIGIBLE, Outcome.UNKNOWN, missing)
     uncertainty = conditions.get("uncertainty_us")
     if (
-        isinstance(uncertainty, bool) or not isinstance(uncertainty, int)
-        or uncertainty < 0 or uncertainty > max_uncertainty_us
+        isinstance(uncertainty, bool)
+        or not isinstance(uncertainty, int)
+        or uncertainty < 0
+        or uncertainty > max_uncertainty_us
     ):
         missing += ("TIMING_UNCERTAINTY",)
     if missing:

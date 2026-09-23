@@ -1,4 +1,5 @@
 """Template observations only: similarity is not calibrated probability."""
+
 from pathlib import Path
 from typing import Any
 
@@ -6,7 +7,10 @@ import cv2
 
 
 def template_candidates(
-    frame: Path, template: Path, region: tuple[int, int, int, int], threshold: float,
+    frame: Path,
+    template: Path,
+    region: tuple[int, int, int, int],
+    threshold: float,
 ) -> dict[str, Any] | None:
     if not 0 < threshold <= 1:
         raise ValueError("Invalid template threshold")
@@ -19,15 +23,20 @@ def template_candidates(
         raise ValueError("Invalid crop")
     if x + width > source.shape[1] or y + height > source.shape[0]:
         raise ValueError("Crop exceeds frame")
-    crop = source[y:y + height, x:x + width]
+    crop = source[y : y + height, x : x + width]
     if target.shape[0] > height or target.shape[1] > width:
         raise ValueError("Template exceeds crop")
     scores = cv2.matchTemplate(crop, target, cv2.TM_CCOEFF_NORMED)
     _, score, _, location = cv2.minMaxLoc(scores)
     if score < threshold:
         return None
-    return {"similarity": score, "confidence": None, "status": "CANDIDATE",
-            "x": x + location[0], "y": y + location[1]}
+    return {
+        "similarity": score,
+        "confidence": None,
+        "status": "CANDIDATE",
+        "x": x + location[0],
+        "y": y + location[1],
+    }
 
 
 def reconcile(observations: list[dict[str, Any]], max_gap_us: int) -> list[dict[str, Any]]:
@@ -44,8 +53,14 @@ def reconcile(observations: list[dict[str, Any]], max_gap_us: int) -> list[dict[
             last["end_us"] = moment
             last["sample_count"] += 1
         else:
-            current = {"label": label, "start_us": moment, "end_us": moment,
-                       "sample_count": 1, "status": "CANDIDATE", "confidence": None}
+            current = {
+                "label": label,
+                "start_us": moment,
+                "end_us": moment,
+                "sample_count": 1,
+                "status": "CANDIDATE",
+                "confidence": None,
+            }
             active[label] = current
             results.append(current)
     return results

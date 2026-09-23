@@ -1,0 +1,7 @@
+.git
+.venv
+private_data
+reports
+frontend
+**/__pycache__
+.env
