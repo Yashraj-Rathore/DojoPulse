@@ -1,9 +1,13 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.4.0. Decision date: 2026-09-23. Status: local engineering approved;
+Version: 2.5.0. Decision date: 2026-09-29. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
+
+The [M15 security boundary](security.md) adds isolated media execution, durable admission,
+provider response guards and incident procedures. Live providers and external deployment
+remain gated; local qualification is documented separately from production acceptance.
 
 ## Product and release boundary
 

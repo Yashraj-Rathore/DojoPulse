@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from backend.core.api import handled
 from backend.core.recordings import attach_recording, reprocess_recording
+from backend.core.security import bounded_upload
 
 
 class AttributionInput(serializers.Serializer):
@@ -32,6 +33,7 @@ class RequestInput(serializers.Serializer):
 
 @api_view(["POST"])
 @handled
+@bounded_upload
 def upload_recording(request, match_id):
     if request.data.get("processing_consent") != "true":
         return Response({"error": "Explicit processing consent required"}, status=400)

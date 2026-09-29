@@ -125,6 +125,11 @@ def attach_recording(owner, match_id, upload, claim, request_id):
                 owner=owner, source_sha256=content.hexdigest(), deleted_at=None
             ).exists():
                 raise ValidationError("These exact recording bytes are already in this workspace")
+            from backend.core.security import admit_run, check_capacity, validate_admission
+
+            validate_admission(owner)
+            check_capacity(owner, written)
+            admit_run(owner)
             asset = ReplayAsset.objects.create(
                 id=asset_id,
                 owner=owner,
@@ -181,6 +186,7 @@ def review_recording(
         raise ValidationError("Explicit visual attribution review and a review note are required")
     if (
         not source.asset_id
+        or source.asset.owner_id != operator.pk
         or source.asset.deleted_at
         or source.attribution_state != "PENDING_REVIEW"
     ):
@@ -249,6 +255,7 @@ def reprocess_recording(owner, match_id, source_id, request_id):
     )
     if (
         not source.asset_id
+        or source.asset.owner_id != owner.pk
         or source.asset.deleted_at
         or source.attribution_state not in {"PENDING_REVIEW", "APPROVED"}
     ):
@@ -261,4 +268,7 @@ def reprocess_recording(owner, match_id, source_id, request_id):
         return prior
     if AnalysisRun.objects.filter(asset=source.asset, status__in=["QUEUED", "PROCESSING"]).exists():
         raise ValidationError("Recording is already queued or processing")
+    from backend.core.security import admit_run
+
+    admit_run(owner)
     return AnalysisRun.objects.create(owner=owner, asset=source.asset, request_key=key)

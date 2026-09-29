@@ -1,0 +1,11 @@
+# Parser runtime only; keep shared pins aligned with requirements.lock.
+attrs==26.1.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+numpy==2.5.3
+opencv-python-headless==4.14.0.94
+psutil==7.2.2
+referencing==0.37.0
+rpds-py==2026.6.3
+scipy==1.18.1
+typing_extensions==4.16.0

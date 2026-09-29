@@ -3,6 +3,13 @@
 Now: local CLI + Django API + PostgreSQL + Next.js, bound to loopback. Docker Compose supplies
 PostgreSQL when Docker is available. No paid cloud resources are provisioned by this task.
 
+As of 2026-09-29, the local database worker defaults to the tested Docker parser with an
+immutable image ID, bounded ephemeral scratch and no host output mount. PostgreSQL-backed
+request/admission budgets and atomic run finalization are implemented. See
+[security architecture](security.md) for exact limits, lock ordering and remaining gates.
+Hosted request-spooling quotas, an independent kill deadline, IAM and deployment-specific
+failure tests are still required; local Docker evidence does not establish these.
+
 Hosted design: one region; private object storage; Cloud SQL; Cloud Run API; Cloud Tasks short
 dispatch -> Cloud Run Job; durable PostgreSQL run state/outbox; scheduled reconciler. Lease
 fencing protects publication; task acknowledgement is not completion. Bound total active Jobs

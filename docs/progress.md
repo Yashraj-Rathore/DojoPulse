@@ -288,3 +288,60 @@ aggregate was still finalizing when this receipt was written; job-level success 
 recorded here. This establishes remote software checks, not hosted application/staging qualification.
 M19.02/M19 are therefore PARTIAL. Documentation-only publication receipt follows the implementation
 commit; it does not change the tested code. M13's real-player release dependencies remain open.
+
+## M15 local security, privacy and reliability implementation — 2026-09-29
+
+Requirements: M15.01–M15.07; CI configuration also affects M19.02. User requested the whole
+milestone. Implemented the available local module and kept its external release exit explicit.
+Architecture is now 2.5.0; decision D024 records the trust/admission boundaries.
+
+Changed backend settings/API/upload handlers and added `security.py`, `parsers.py`, migration
+0007 and `security_maintenance`: atomic PostgreSQL request budgets, fixed-code audit logging,
+private API responses, bounded JSON/form bodies, pre-multipart upload reservations, source
+storage accounting including unpurged tombstones, queue/daily/active-job limits and reservation
+revocation on account deletion. Match-sync admission is bounded too. Jobs, recordings and
+annotation publication enforce nested ownership; cancellation is limited to pending/active
+jobs. Fenced run completion now publishes source hashes transactionally, and the coordinator
+independently hashes source bytes before trusting decoder reports.
+
+Added `backend/core/parser.py` and `tools/sandbox_capture.py`; updated the Dockerfile and
+introduced `requirements-analysis.lock`. The default worker requires an immutable Docker
+image ID and fails closed. The parser has no network, application credentials, Docker socket
+or host output mount; kernel resource limits, ephemeral tmpfs, process cancellation and an
+explicit PID-1 lifetime handler are tested. Only shaped FAILED/REVIEW_REQUIRED reports return;
+no gameplay opportunities are accepted. Trusted local fixture mode remains explicitly gated.
+Offline `ingestion/boundary.py` validates reviewed target/DNS/response boundaries without
+performing any HTTP request or enabling a real provider.
+
+Added three security/provider/sandbox test modules, expanded CI with sandbox/advisory jobs,
+added Dependabot configuration, SECURITY.md, a threat model, incident runbook and
+[dated qualification receipt](experiment-results/m15-security.md). Updated setup/environment
+instructions and deployment architecture. No frontend source change or external deployment.
+
+Actual validation: **209 Python/PostgreSQL tests passed in 52.61s**; the ordinary run skipped
+seven explicit Docker tests, which were run separately: **seven passed in 153.86s** on local
+Docker 24.0.6/cgroup v1. The exact 600-second/512-MiB synthetic file decoded in 60.80s,
+with 58.45 decoder CPU seconds and sampled peak decoder RSS 239,579,136 bytes; oversized input,
+malformed input, scratch/PID/memory exhaustion and lifetime/cancellation cleanup were exercised.
+Ruff lint/format, mypy (23 modules), Django system/migration-drift checks passed; migration
+0007 applied to the existing loopback cluster. `pip check` passed after editable metadata refresh.
+
+The first audit found two DRF 3.16.1 advisories; upgraded the lockfile/project constraint and
+local environment to 3.17.2. Final pinned Python audit and npm production audit reported no
+known advisories. Installed pip-audit only as a development checking tool. Frontend checks
+remain the earlier 2026-09-23 evidence; new CI jobs have not run remotely. Initial test failures
+were resolved (legacy gate expectations, trusted local fixture settings, cgroup layout/network
+inventory assumptions, preserved hash-error code and bounded-body response handling).
+
+Operational changes: started Docker Desktop hidden and recovered the existing workspace
+PostgreSQL cluster after its prior unclean shutdown; no cluster recreation, credentials,
+accounts, provider access or paid/cloud resources. Test fixtures and local XML/JSON receipts
+remain ignored. No commit/push was performed for this task.
+
+Remaining: worst-complexity/exploit media corpus, independent security/privacy review and
+named response ownership, production ingress/temp quotas and kill deadline, managed IAM/secrets,
+OS image vulnerability review, restore suppression and actual permitted-provider failure injection.
+The in-container deadline is not a guarantee against compromised code disabling its handler.
+M15.02 moves BLOCKED → PARTIAL; M15.03/.07 move NOT_STARTED → PARTIAL. M15 stays PARTIAL
+because its exit concerns an externally exposed workload. Next: independent review and
+deployment-specific qualification, alongside the existing permitted-provider and real-data gates.

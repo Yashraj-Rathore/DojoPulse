@@ -3,9 +3,13 @@
 import subprocess
 import tempfile
 import time
+from collections.abc import Callable
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 import psutil
+
+execution_check: ContextVar[Callable[[], None] | None] = ContextVar("execution_check", default=None)
 
 
 @dataclass(frozen=True)
@@ -27,6 +31,9 @@ def run_bounded(
     peak = 0
     cpu = 0.0
     with tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
+        check = execution_check.get()
+        if check:
+            check()
         proc = subprocess.Popen(
             argv,
             stdin=subprocess.DEVNULL,
@@ -38,6 +45,8 @@ def run_bounded(
         monitor = psutil.Process(proc.pid)
         try:
             while proc.poll() is None:
+                if check:
+                    check()
                 try:
                     processes = [monitor, *monitor.children(recursive=True)]
                     peak = max(peak, sum(p.memory_info().rss for p in processes))

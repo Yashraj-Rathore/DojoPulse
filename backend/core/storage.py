@@ -25,6 +25,7 @@ from backend.core.models import (
     Profile,
     ReplayAsset,
     ReplaySource,
+    UploadAdmission,
 )
 from backend.core.ownership import lock_owner
 
@@ -133,6 +134,7 @@ def delete_account(owner, storage=None):
         PlayerGameIdentity.objects.filter(owner=owner).delete()
         Feedback.objects.filter(owner=owner).delete()
         NoticeReceipt.objects.filter(owner=owner).delete()
+        UploadAdmission.objects.filter(owner=owner).delete()
     for asset in ReplayAsset.objects.filter(owner=owner):
         delete_asset(owner, asset.pk, storage)
 

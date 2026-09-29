@@ -45,6 +45,8 @@ def test_session_login_requires_csrf(django_user_model):
 @pytest.mark.skipif(not shutil.which("ffmpeg"), reason="FFmpeg absent")
 def test_upload_queues_worker_analyzes_and_retention_purges(django_user_model, settings, tmp_path):
     settings.LOCAL_OPERATOR_UPLOADS = True
+    settings.DEBUG = True
+    settings.PARSER_BACKEND = "local"  # Trusted synthetic fixture; Docker tested separately.
     settings.PRIVATE_DATA_ROOT = tmp_path / "private"
     owner = django_user_model.objects.create_user("operator", is_staff=True)
     source = tmp_path / "synthetic.mp4"

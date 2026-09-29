@@ -7,7 +7,7 @@ name = "performance-training-platform"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-  "Django>=5.2,<5.3", "djangorestframework>=3.16,<3.17",
+  "Django>=5.2,<5.3", "djangorestframework>=3.17.2,<3.18",
   "psycopg[binary]>=3.2,<4", "numpy>=2,<3", "scipy>=1.14,<2",
   "opencv-python-headless>=4.10,<5", "jsonschema>=4.23,<5", "psutil>=6,<8"
 ]
@@ -22,7 +22,7 @@ include = ["analysis*", "backend*", "tools*", "ingestion*"]
 DJANGO_SETTINGS_MODULE = "backend.config.settings"
 testpaths = ["tests"]
 addopts = "-ra"
-markers = ["postgres: requires PostgreSQL", "media: executes FFmpeg"]
+markers = ["postgres: requires PostgreSQL", "media: executes FFmpeg", "sandbox: opt-in real Docker isolation checks"]
 
 [tool.ruff]
 line-length = 100

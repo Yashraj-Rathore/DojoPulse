@@ -2,7 +2,7 @@ asgiref==3.12.1
 attrs==26.1.0
 colorama==0.4.6
 Django==5.2.17
-djangorestframework==3.16.1
+djangorestframework==3.17.2
 iniconfig==2.3.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1

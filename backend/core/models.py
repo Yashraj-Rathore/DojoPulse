@@ -431,3 +431,24 @@ class ImprovementEvaluation(Owned):
             raise ValidationError("Evaluation results are append-only")
         kwargs["force_insert"] = True
         super().save(*args, **kwargs)
+
+
+class SecurityMutex(models.Model):
+    """Serializes admission across owners; always acquire after the owner lock."""
+
+    key = models.CharField(max_length=40, primary_key=True)
+
+
+class RequestBudget(models.Model):
+    """Short-lived keyed digests, never raw addresses or credentials."""
+
+    key = models.CharField(max_length=64, primary_key=True)
+    expires_at = models.DateTimeField(db_index=True)
+    count = models.PositiveIntegerField(default=0)
+
+
+class UploadAdmission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    expires_at = models.DateTimeField(db_index=True)
+    reserved_bytes = models.PositiveBigIntegerField()

@@ -4,16 +4,22 @@ compose.yaml starts only a loopback PostgreSQL 17 database. It does not deploy t
 CI uses a separate disposable PostgreSQL service. The workspace's native cluster uses port
 55432 instead and is controlled only by tools/dev_postgres.ps1.
 
-Dockerfile.analysis is an offline parser **candidate**, not tested here: Docker Desktop's
-daemon was unavailable. Build from the repository root with:
-`docker build -f infrastructure/Dockerfile.analysis -t ptp-analysis .`
+Dockerfile.analysis supplies the offline media sandbox. Local Docker qualification was
+performed on 2026-09-29; see [M15 evidence](../docs/experiment-results/m15-security.md).
+Build from the repository root with:
+`docker build -f infrastructure/Dockerfile.analysis -t dojopulse-parser:m15 .`
 
-Before hostile input, run as UID 10001 with no network, no credentials, read-only root,
-no extra capabilities, no privilege escalation, bounded PIDs/CPU/memory/time, read-only
-input mount and a separately quota-bounded output volume. Allow a bounded temporary directory.
-Use the orchestrator's hard deadline as well as the Python watchdog. Test maximum-duration,
-maximum-complexity and hostile files on the actual host. The current 20ms RSS watchdog is
-a local development defense, not a hard allocation limit.
+`backend/core/parser.py` enforces UID 10001, no network/credentials, read-only root/input,
+dropped capabilities, no privilege escalation, hard PID/CPU/memory/scratch limits and a
+bounded JSON report. There is no host output mount. Set PARSER_IMAGE to the image's sha256
+ID; do not use a mutable tag. Production still requires an independent orchestrator deadline,
+container/OS vulnerability qualification, complex hostile fixtures and an independent review.
+The host Python RSS watchdog is additional defense, not the kernel allocation limit.
+
+To reproduce local qualification, set PARSER_TEST_IMAGE to that ID, PARSER_MAX_PROFILE=1,
+and run `pytest tests/test_parser_sandbox.py -v`. This generates a 600-second/512-MiB
+synthetic fixture and deliberately tests OOM, PID and scratch exhaustion in disposable
+containers. It does not contact a replay provider or validate gameplay recognition.
 
 The parser container must not receive database/cloud credentials. A coordinator leases work,
 stages one private source, invokes the sandbox, validates its output and publishes with a

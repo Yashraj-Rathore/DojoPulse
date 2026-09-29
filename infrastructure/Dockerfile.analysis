@@ -1,9 +1,9 @@
-# Offline parser candidate. Building this file is not a hostile-media certification.
-FROM python:3.12-slim
+# Offline parser. Requalify this digest and package updates before release.
+FROM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY requirements.lock pyproject.toml /app/
-RUN pip install --no-cache-dir -r requirements.lock
+COPY requirements-analysis.lock /app/
+RUN pip install --no-cache-dir -r requirements-analysis.lock
 COPY analysis /app/analysis
 COPY tools /app/tools
 COPY contracts /app/contracts
@@ -11,4 +11,5 @@ COPY datasets/annotation-schema.json /app/datasets/annotation-schema.json
 RUN useradd --uid 10001 --create-home parser
 USER 10001:10001
 ENV PYTHONDONTWRITEBYTECODE=1
-ENTRYPOINT ["python", "-m", "tools.analyze_capture"]
+ENV OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+ENTRYPOINT ["python", "-m", "tools.sandbox_capture"]

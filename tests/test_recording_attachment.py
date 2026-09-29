@@ -188,7 +188,7 @@ def test_owner_consent_and_local_operator_gates(setup, django_user_model, settin
     assert upload(client, match).status_code == 404
     client.force_authenticate(owner)
     settings.LOCAL_OPERATOR_UPLOADS = False
-    assert upload(client, match).status_code == 403
+    assert upload(client, match).status_code == 503
     settings.LOCAL_OPERATOR_UPLOADS = True
     assert (
         client.post(f"/api/matches/{match.pk}/recordings", {}, format="multipart").status_code
@@ -354,7 +354,9 @@ def test_worker_rejects_changed_source_bytes(setup, monkeypatch):
 
 @pytest.mark.media
 @pytest.mark.skipif(not shutil.which("ffmpeg"), reason="FFmpeg absent")
-def test_attached_media_worker_and_retention_preserve_match(setup, tmp_path):
+def test_attached_media_worker_and_retention_preserve_match(setup, tmp_path, settings):
+    settings.DEBUG = True
+    settings.PARSER_BACKEND = "local"  # Trusted synthetic fixture; Docker tested separately.
     owner, client, match = setup
     source_file = tmp_path / "synthetic.mp4"
     run_bounded(

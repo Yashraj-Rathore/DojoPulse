@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-09-23** · Architecture: **2.4.0** · Current stage: **local research prototype**
+Last updated: **2026-09-29** · Architecture: **2.5.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -20,13 +20,14 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Match acquisition | Player confirmation, consent, queued sync, source history and deletion work with two fictional providers |
 | Recording attribution | Local UI/API attaches video to imported history; media validation and operator attribution precede separate gameplay review; removal retains match metadata |
 | Player experience (M13) | Local onboarding, searchable timeline/history, guided training, export/deletion, feedback and in-app preferences implemented; real-user release acceptance remains open |
+| Security and reliability (M15) | Local engineering implemented across M15.01–M15.07: real Docker isolation, admission/rate limits, ownership/fencing, offline provider guards, dependency fixes and incident procedures; production qualification remains open |
 | Real player IDs / providers | No live identity resolver or match transport enabled; EWGF usage rights, credentials and current authenticated schema unresolved |
 | Gameplay recognition | Bounded media tooling and deterministic rules exist; no released Tekken detector or calibrated templates |
 | Knowledge and drills | One provisional Jin/Jin uf+4 target and one draft drill; expert approval and current-build verification missing |
 | Scientific validation | G1–G6 are all NOT_RUN; no completed real-player improvement study |
 | Hosting and release | Loopback development only; external uploads and paid/cloud production services not enabled |
-| Latest recorded checks | 163 Python tests; 11 headless Edge tests; frontend build/lint/types; Ruff/mypy; Django system/migration checks passed; migration 0006 applied locally |
-| Evidence for those checks | [Software validation](docs/experiment-results/software-validation.md), recorded 2026-09-23; synthetic/local software validation only |
+| Latest recorded checks | 209 PostgreSQL/Python tests passed; seven opt-in sandbox tests passed separately, including 600s/512MiB synthetic media; Ruff/mypy and Django checks passed; migration 0007 applied. Python and npm production advisory scans clear after DRF update. Frontend: prior 11 Edge/build/lint/type checks on 2026-09-23, not rerun for M15 |
+| Evidence for those checks | [M15 local qualification](docs/experiment-results/m15-security.md), 2026-09-29; [earlier software validation](docs/experiment-results/software-validation.md), 2026-09-23; neither establishes real gameplay or production readiness |
 | Published delivery | M13 commit `13209e1` pushed to `origin/main`; [remote CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) frontend and Python/PostgreSQL jobs report success; hosted release remains unqualified |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
@@ -82,7 +83,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M12 | Trustworthy longitudinal evaluation | PARTIAL | Real prospective chronology, comparability and G5/G6 |
 | M13 | Complete player-facing product experience | PARTIAL | Local engineering delivered across M13.01–M13.08; real provider/account/reviewer flows, participant usability, screen readers and real devices remain release dependencies |
 | M14 | Accounts, consent and data ownership | PARTIAL | Hosted identity/account recovery and full user data lifecycle |
-| M15 | Security, privacy and reliability hardening | PARTIAL | Isolation, abuse, deletion/restore and third-party review |
+| M15 | Security, privacy and reliability hardening | PARTIAL | Local controls and Docker qualification delivered; deployment-specific isolation/abuse/restore and independent security/privacy review remain |
 | M16 | Hosted asynchronous delivery and deployment | PARTIAL | Real cloud/storage integrations and release prerequisites |
 | M17 | Operations, performance and unit economics | PARTIAL | Representative load, operational telemetry and actual costs |
 | M18 | Prospective real-player pilot | BLOCKED | Participants, consent, reviewers, expert and accepted measurement |
@@ -290,13 +291,13 @@ Owner: security/backend owner. Exit: the externally exposed workload has tested 
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M15.01 Tenant isolation and nested ownership checks | PARTIAL | Local regression suite passes; hosted object/worker/download boundaries and adversarial review required |
-| M15.02 Isolate hostile media and bound maximum-profile CPU/RAM/scratch/time | BLOCKED | Docker parser is an unvalidated candidate; run sandbox and malicious/maximum-size fixtures |
-| M15.03 Harden provider fetches against SSRF, oversized payloads and schema drift | NOT_STARTED | Validate actual permitted transport with bounded error handling; no arbitrary URLs |
-| M15.04 Secrets, least privilege, dependency maintenance and security logging | PARTIAL | Local configuration/lockfiles exist; production secret management, IAM, rotation and review required |
-| M15.05 Abuse/rate limits, admission quotas and cancellation under load | PARTIAL | Local size/fencing guards exist; hosted abuse/admission enforcement and race tests needed |
-| M15.06 Test provider outages, duplicate deliveries, stale workers and partial failure | PARTIAL | Local fault/concurrency tests exist; deployed integrations need failure injection |
-| M15.07 Security/privacy review, incident response and vulnerability process | NOT_STARTED | Named operational owners, reviewed threat model, remediation criteria and incident rehearsal |
+| M15.01 Tenant isolation and nested ownership checks | PARTIAL | 2026-09-29: worker/asset ownership, recording relations and owner-only operator publication hardened; local regression passes. Hosted object/download boundaries and independent adversarial review remain |
+| M15.02 Isolate hostile media and bound maximum-profile CPU/RAM/scratch/time | PARTIAL | Docker runtime blocker resolved: pinned offline parser tested with actual memory/PID/scratch limits, cancellation/lifetime handler, malformed and exact 600s/512MiB fixtures. [Receipt](docs/experiment-results/m15-security.md). High-complexity/exploit corpus, independent review and hosted kill deadline remain |
+| M15.03 Harden provider fetches against SSRF, oversized payloads and schema drift | PARTIAL | Offline reviewed-target/public-DNS and bounded strict-JSON guards tested; redirects/compression rejected. No network adapter enabled. Actual permitted transport, pinned connections, deadlines and authenticated schema validation remain gated by M04/M05 |
+| M15.04 Secrets, least privilege, dependency maintenance and security logging | PARTIAL | Smaller parser lockfile/base digest, fixed-code security logs, expiring keyed budgets, JSON-only API, DRF advisory patch, clear Python/npm production scans, CI audit/Dependabot configuration. Production secret store/IAM/rotation/log retention and OS image scan remain |
+| M15.05 Abuse/rate limits, admission quotas and cancellation under load | PARTIAL | Durable login/API budgets, early upload reservations, storage/queue/daily/active-worker caps, body limits and PostgreSQL capacity races tested. Hosted ingress/spooling/filesystem limits and distributed load qualification remain |
+| M15.06 Test provider outages, duplicate deliveries, stale workers and partial failure | PARTIAL | Local suite covers synthetic retries/duplicates/partial deletion plus stale atomic hash publication, quota contention, decoder cancellation and cleanup. Real permitted transport, hosted dispatcher/storage outages and restore suppression remain untested |
+| M15.07 Security/privacy review, incident response and vulnerability process | PARTIAL | [Threat model](docs/architecture/security.md), [incident runbook](docs/operations/security-runbook.md), SECURITY.md and automated local incident/failure rehearsal delivered. Named operator/deputy acceptance, private reporting channel and independent security/privacy review remain |
 
 ## M16 — Hosted asynchronous delivery and deployment
 
@@ -362,7 +363,7 @@ Owner: technical/product owner. Exit: real supported users complete the hosted f
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M19.01 Record pilot continuation decision and beta-supported scope | NOT_STARTED | M18 findings and applicable M04–M17 requirements accepted |
-| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | First [Linux CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) report success for M13 commit; actual staging auth/storage/job/provider integrations and permitted real data remain untested |
+| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | First [Linux CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) report success for M13. M15 adds sandbox/advisory jobs and Dependabot configuration, not yet run remotely. Staging auth/storage/job/provider integrations and permitted real data remain untested |
 | M19.03 Test onboarding → import/upload → coaching → practice → later evaluation | NOT_STARTED | Real participant paths and accessible error recovery; no staff-only bypass as user workflow |
 | M19.04 Exercise deletion, consent withdrawal, outage, rollback and restore | NOT_STARTED | Traceable operational evidence and resolved release-blocking defects |
 | M19.05 Measure beta usability, retention, useful decisions and support burden | NOT_STARTED | Predeclared denominators and adverse outcomes; product value beyond native workflow |
@@ -426,7 +427,7 @@ Reconsider them only through an explicit product/architecture decision with supp
 | 1 | Prepare activation of one documented public provider | M04.01–M04.03, M05.01–M05.04 | Product owner obtains applicable usage evidence and privately configures a key; integration owner verifies permitted fixtures; never paste secrets into this tracker |
 | 2 | Acquire first consented captures and expert review | M07.02–M07.05, M08.02–M08.03 | Participants, exact-build evidence, Tekken expert, two reviewers and adjudicator |
 | 3 | Validate observability/practice before promoting recognition | M09, M11, G1/G4 then G2 | Dataset/review findings; select backup/narrow if required |
-| 4 | Qualify the completed local player journey and harden media processing | M13.01–M13.04/M13.06–M13.07, M15.02 | M13 local engineering is delivered. Next: manual screen-reader/real-device and participant checks; rehearse parser isolation when a runtime is available; retain real-provider/account gates |
+| 4 | Qualify the local player journey and complete security release acceptance | M13.01–M13.04/M13.06–M13.07, M15.01–M15.07 | M13/M15 local engineering and Docker qualification delivered. Next: manual accessibility/device/participant checks; independent security/privacy review, complex hostile-media corpus and deployment-specific containment/restore; retain provider/account gates |
 | 5 | Run prospective real loop, then qualify hosting/beta | M12, M16–M19 | Measurement decisions, permitted data and validated security/operational integrations |
 
 The tracker is not authorization to purchase, contact providers, collect new personal data,
@@ -458,3 +459,4 @@ release gates still govern those actions. Do not let one external blocker stop i
 | 2026-09-19 | M01.05; baseline M01–M21 and X01–X12 | Established the comprehensive current-status tracker from Architecture 2.2, the implementation brief, provider addition and recorded work | Documentation/requirement-ID/link checks; software results referenced from the preceding implementation |
 | 2026-09-23 | M06.03/M06.06/M06.07, M13.03 | Delivered local reviewed recording attachment and immutable evidence lineage | 145 Python / 7 browser tests; migration 0005 |
 | 2026-09-23 | M13.01–M13.08, M14.04/M14.05 | Delivered available local M13 product flows; kept external release dependencies explicit | 163 Python / 11 browser tests; migration 0006; build/static/schema checks |
+| 2026-09-29 | M15.01–M15.07, M19.02 | Delivered local security/reliability module, unblocked real Docker qualification, patched DRF advisories; external review/deployment/provider gates retained | 209 PostgreSQL/Python tests; seven Docker checks including 600s/512MiB fixture; migration 0007; static/schema and dependency checks |

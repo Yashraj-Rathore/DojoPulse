@@ -23,6 +23,7 @@ from backend.core.models import (
     ReplaySource,
 )
 from backend.core.ownership import lock_owner
+from backend.core.security import admit_sync
 from ingestion.contracts import ExternalId, ProviderClass, require_aware, select_candidate
 
 LOCAL_PROVIDERS = frozenset({"synthetic-a", "synthetic-b"})
@@ -88,6 +89,11 @@ def start_local_sync(owner, identity_id, provider, start, end):
     identity = PlayerGameIdentity.objects.get(pk=identity_id, owner=owner, deleted_at=None)
     if identity.state != "CLAIMED" or identity.consent_scope != LOCAL_POLICY:
         raise ValidationError("Identity consent unavailable")
+    prior = MatchSync.objects.filter(
+        owner=owner, identity=identity, provider=provider, query_start=start, query_end=end
+    ).first()
+    if prior is None or prior.status == "COMPLETE":
+        admit_sync(owner)
     job, _ = MatchSync.objects.get_or_create(
         owner=owner,
         identity=identity,

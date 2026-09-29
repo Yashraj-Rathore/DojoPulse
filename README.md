@@ -72,9 +72,20 @@ is a reference, not automatically loaded. Do not expose Django's development ser
 In a second terminal, set DATABASE_URL again and run the worker:
 
 ```powershell
+docker build -f infrastructure/Dockerfile.analysis -t dojopulse-parser:m15 .
+$env:PARSER_BACKEND = 'docker'
+$env:PARSER_IMAGE = docker image inspect dojopulse-parser:m15 --format '{{.Id}}'
 .\.venv\Scripts\python.exe manage.py process_runs --once
 # Omit --once for the polling worker.
 ```
+
+The media worker requires an immutable local image ID and fails closed without it. The
+parser receives only the source and capture declarations; samples remain inside bounded
+container scratch storage. See [M15 security controls](docs/architecture/security.md) and
+the [incident runbook](docs/operations/security-runbook.md). Run
+`python manage.py security_maintenance` at least hourly to expire transient request/upload
+budgets. Synthetic-only development can explicitly choose `PARSER_BACKEND=local` with
+DEBUG and LOCAL_OPERATOR_UPLOADS enabled; this is not hostile-media isolation.
 
 In a third terminal:
 

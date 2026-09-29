@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "backend.core.security.PrivateResponseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -85,8 +86,39 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"] if DEBUG else []
 REST_FRAMEWORK = {
+    "DEFAULT_PARSER_CLASSES": [
+        "backend.core.parsers.BoundedJSONParser",
+        "backend.core.parsers.BoundedFormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_THROTTLE_CLASSES": ["backend.core.security.AccountThrottle"],
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
+}
+
+# Local deployment budgets. Hosted ingress also needs body/time/connection limits.
+LOGIN_RATE = 10
+API_READ_RATE = 300
+API_WRITE_RATE = 60
+OWNER_STORAGE_BYTES = 2 * 1024**3
+GLOBAL_STORAGE_BYTES = 16 * 1024**3
+GLOBAL_UPLOAD_SLOTS = 4
+OWNER_PENDING_RUNS = 4
+GLOBAL_PENDING_RUNS = 32
+OWNER_DAILY_RUNS = 20
+GLOBAL_ACTIVE_RUNS = 2
+PARSER_BACKEND = os.getenv("PARSER_BACKEND", "docker")
+PARSER_IMAGE = os.getenv("PARSER_IMAGE", "")  # Immutable sha256 image ID required.
+if not DEBUG and PARSER_BACKEND != "docker":
+    raise ImproperlyConfigured("Only the isolated parser is allowed outside local development")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"security": {"format": "%(message)s"}},
+    "handlers": {"security": {"class": "logging.StreamHandler", "formatter": "security"}},
+    "loggers": {"dojopulse.security": {"handlers": ["security"], "level": "INFO"}},
 }

@@ -7,7 +7,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, RequestDataTooBig, ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.http import JsonResponse
@@ -40,6 +40,7 @@ from backend.core.models import (
     TrainingSession,
 )
 from backend.core.ownership import lock_owner
+from backend.core.security import admit_run, bounded_upload, check_capacity, validate_admission
 from backend.core.storage import delete_asset, private_path
 
 
@@ -52,6 +53,8 @@ def handled(function):
             return Response({"error": "Not found"}, status=404)
         except IntegrityError:
             return Response({"error": "Conflicting or duplicate operation"}, status=409)
+        except RequestDataTooBig:
+            return Response({"error": "Request body exceeds the configured limit"}, status=400)
         except (ValidationError, ValueError, KeyError) as error:
             return Response({"error": str(error)}, status=400)
 
@@ -72,6 +75,11 @@ def session(request):
             return JsonResponse({"error": "Invalid JSON"}, status=400)
         if not isinstance(body, dict):
             return JsonResponse({"error": "JSON object required"}, status=400)
+        if any(
+            not isinstance(body.get(key), str) or not 0 < len(body[key]) <= 256
+            for key in ("username", "password")
+        ):
+            return JsonResponse({"error": "Invalid credentials"}, status=401)
         user = authenticate(request, username=body.get("username"), password=body.get("password"))
         if user is None:
             return JsonResponse({"error": "Invalid credentials"}, status=401)
@@ -170,6 +178,7 @@ def overview(request):
 
 @api_view(["POST"])
 @handled
+@bounded_upload
 def upload(request):
     if not settings.LOCAL_OPERATOR_UPLOADS or not request.user.is_staff:
         return Response(
@@ -211,6 +220,9 @@ def upload(request):
             profile, _ = Profile.objects.select_for_update().get_or_create(user=request.user)
             if profile.deleted_at:
                 raise ValidationError("Deleted account cannot ingest media")
+            validate_admission(request.user)
+            check_capacity(request.user, written)
+            admit_run(request.user)
             asset = ReplayAsset.objects.create(
                 id=asset_id,
                 owner=request.user,

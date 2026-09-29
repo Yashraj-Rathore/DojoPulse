@@ -53,6 +53,8 @@ def publish_annotations(operator, run_id, match_id, annotation):
     if not operator.is_staff or not operator.is_active:
         raise PermissionDenied("Independent review import requires an operator")
     owner_id = AnalysisRun.objects.values_list("owner_id", flat=True).get(pk=run_id)
+    if operator.pk != owner_id:
+        raise PermissionDenied("Operator can publish only within their own workspace")
     locked_owner = lock_owner(owner_id)
     run = AnalysisRun.objects.select_for_update(of=("self",)).select_related("asset").get(pk=run_id)
     if run.status == "PROCESSING":
@@ -62,7 +64,11 @@ def publish_annotations(operator, run_id, match_id, annotation):
         .select_related("asset", "owner")
         .get(pk=match_id)
     )
-    if match.owner_id != run.owner_id or match.asset_id != run.asset_id:
+    if (
+        match.owner_id != run.owner_id
+        or run.asset.owner_id != run.owner_id
+        or match.asset_id != run.asset_id
+    ):
         raise ValidationError("Run/match ownership mismatch")
     if (
         run.asset.metadata.get("attachment")
