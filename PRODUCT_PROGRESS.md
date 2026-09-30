@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-09-29** · Architecture: **2.5.0** · Current stage: **local research prototype**
+Last updated: **2026-09-30** · Architecture: **2.5.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -29,6 +29,8 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Latest recorded checks | 209 PostgreSQL/Python tests passed; seven opt-in sandbox tests passed separately, including 600s/512MiB synthetic media; Ruff/mypy and Django checks passed; migration 0007 applied. Python and npm production advisory scans clear after DRF update. Frontend: prior 11 Edge/build/lint/type checks on 2026-09-23, not rerun for M15 |
 | Evidence for those checks | [M15 local qualification](docs/experiment-results/m15-security.md), 2026-09-29; [earlier software validation](docs/experiment-results/software-validation.md), 2026-09-23; neither establishes real gameplay or production readiness |
 | Published delivery | M13 commit `13209e1` pushed to `origin/main`; [remote CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/35877396459) frontend and Python/PostgreSQL jobs report success; hosted release remains unqualified |
+| M15 publication preflight | Implementation committed as `516b519`; reconciling remote `301ed0b` while excluding its unexpected obfuscated Next config payload. Repository-access review remains outstanding; push/CI receipt follows verification |
+| Publication validation | 2026-09-30 clean frontend: 11 Edge tests, type checks and production build passed. Configuration matches the pre-payload local version; remote CI is checked after pushing |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
 data access and demonstrated player benefit are different kinds of progress.

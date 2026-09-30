@@ -345,3 +345,26 @@ The in-container deadline is not a guarantee against compromised code disabling 
 M15.02 moves BLOCKED → PARTIAL; M15.03/.07 move NOT_STARTED → PARTIAL. M15 stays PARTIAL
 because its exit concerns an externally exposed workload. Next: independent review and
 deployment-specific qualification, alongside the existing permitted-provider and real-data gates.
+
+## M15 publication preflight and remote reconciliation — 2026-09-29
+
+User explicitly authorized pushing M15. Committed the implementation as `516b519`.
+Fetch showed remote `301ed0b` replacing the earlier M13 receipt commit: comparing its tree
+with local `1085c73` showed only `frontend/next.config.ts` differed. It introduced a
+`createRequire` binding and a large obfuscated `eval`/base64 payload after the normal export.
+This code is excluded from the publication tree; the config is restored byte-for-byte
+from the known clean local commit. Remote ancestry is preserved with a normal merge;
+there is no force push or history deletion. Tracker/log conflicts retain the complete
+local M15 implementation record because the earlier receipt contents were already present.
+
+This finding affects M15.04/M15.07 and M19.02. Prior remote run `36370419013` reports Python
+success and frontend failure at its build step; that does not establish whether the payload
+executed or whether any credentials were exposed. Repository access/history and potential
+exposure require owner review. No credentials were rotated and no outside party was contacted.
+Clean-tree frontend validation, final push SHA and CI results are recorded after verification.
+
+Continuation on 2026-09-30: clean configuration confirmed equal to `516b519`; 11 Edge browser
+tests passed in 25.2s, TypeScript checks passed, and a fresh production build exited successfully.
+The preceding lint invocation also completed before the successful build. Generated Next type
+references are restored to the tracked development configuration before committing. Backend and
+sandbox code is unchanged from the recorded 2026-09-29 checks. Publication and remote checks follow.
