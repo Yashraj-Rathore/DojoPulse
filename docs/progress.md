@@ -368,3 +368,18 @@ tests passed in 25.2s, TypeScript checks passed, and a fresh production build ex
 The preceding lint invocation also completed before the successful build. Generated Next type
 references are restored to the tracked development configuration before committing. Backend and
 sandbox code is unchanged from the recorded 2026-09-29 checks. Publication and remote checks follow.
+
+## M15 main publication — 2026-09-30
+
+Pushed implementation `516b519` and clean reconciliation merge `1771eba` to `origin/main`
+under the user's explicit instruction. `git ls-remote` verified
+`1771ebacee4d1cb5141e8c2924ccdf6974431c6b`. No force push; the unexpected payload is absent
+from the published tree, while remote ancestry remains inspectable. Requirements M15.04,
+M15.07 and M19.02 retain their source-integrity review and external release gates.
+
+[GitHub run 36729960773](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36729960773)
+started the four validation jobs. At this receipt, dependency audits succeeded and the
+Python/PostgreSQL, frontend and media-sandbox jobs were still running; overall success is
+not yet claimed. Dependabot update workflows also started; no dependency PR was merged.
+This documentation-only receipt follows the published implementation and does not change
+the code under CI. Local checks remain the dated results above.
