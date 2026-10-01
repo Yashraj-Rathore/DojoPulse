@@ -56,6 +56,9 @@ def publish_annotations(operator, run_id, match_id, annotation):
     if operator.pk != owner_id:
         raise PermissionDenied("Operator can publish only within their own workspace")
     locked_owner = lock_owner(owner_id)
+    from backend.core.consents import require_processing
+
+    require_processing(locked_owner)
     run = AnalysisRun.objects.select_for_update(of=("self",)).select_related("asset").get(pk=run_id)
     if run.status == "PROCESSING":
         raise ValidationError("Wait for processing to finish before review import")

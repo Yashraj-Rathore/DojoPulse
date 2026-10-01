@@ -98,9 +98,11 @@ def accept_finalized_upload(asset_id, storage_key, storage=None):
     return True
 
 
-def delete_account(owner, storage=None):
+def delete_account(owner, storage=None, *, password=None):
     with transaction.atomic():
-        lock_owner(owner.pk)
+        owner = lock_owner(owner.pk)
+        if password is not None and (not owner.is_active or not owner.check_password(password)):
+            raise ValidationError("Current password is incorrect")
         profile, _ = Profile.objects.select_for_update().get_or_create(user=owner)
         profile.deleted_at = timezone.now()
         profile.processing_consent_at = None
@@ -135,6 +137,24 @@ def delete_account(owner, storage=None):
         Feedback.objects.filter(owner=owner).delete()
         NoticeReceipt.objects.filter(owner=owner).delete()
         UploadAdmission.objects.filter(owner=owner).delete()
+        from backend.core.models import (
+            AccountChallenge,
+            AccountEmail,
+            AccountSession,
+            ConsentReceipt,
+            MatchSuppression,
+        )
+
+        AccountChallenge.objects.filter(owner=owner).delete()
+        AccountEmail.objects.filter(owner=owner).delete()
+        AccountSession.objects.filter(owner=owner).delete()
+        ConsentReceipt.objects.filter(owner=owner).delete()
+        MatchSuppression.objects.filter(owner=owner).delete()
+        profile.session_epoch += 1
+        profile.save(update_fields=["session_epoch"])
+    from backend.core.accounts import cleanup_account_mail
+
+    cleanup_account_mail(owner.pk)
     for asset in ReplayAsset.objects.filter(owner=owner):
         delete_asset(owner, asset.pk, storage)
 
@@ -143,8 +163,9 @@ def delete_account(owner, storage=None):
 def delete_metadata_match(owner, match_id):
     """Conservative local suppression: revoke this identity's sync consent on deletion.
 
-    Keep only the revoked link while the local account exists; account deletion removes it.
-    Production per-match suppression/retention needs its own reviewed policy.
+    Known provider match IDs are retained only as owner-keyed HMACs. Explicit re-linking
+    allows new imports while these matches stay suppressed. Account deletion removes
+    both the revoked link and suppression receipts. Production policy remains gated.
     """
     lock_owner(owner.pk)
     match = Match.objects.get(pk=match_id, owner=owner)
@@ -154,6 +175,21 @@ def delete_metadata_match(owner, match_id):
     ):
         raise ValidationError("Remove attached recordings before deleting match metadata")
     now = timezone.now()
+    from backend.core.consents import suppression_digest
+    from backend.core.models import MatchSuppression
+
+    for source in MatchSourceRecord.objects.filter(match=match, owner=owner):
+        MatchSuppression.objects.get_or_create(
+            owner=owner,
+            provider=source.provider,
+            key_digest=suppression_digest(
+                owner.pk,
+                match.game_id,
+                source.provider,
+                source.external_namespace,
+                source.external_id,
+            ),
+        )
     if match.player_identity_id:
         MatchSync.objects.filter(identity_id=match.player_identity_id, owner=owner).update(
             status="CANCELLED",

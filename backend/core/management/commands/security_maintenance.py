@@ -13,4 +13,10 @@ class Command(BaseCommand):
         now = timezone.now()
         budgets, _ = RequestBudget.objects.filter(expires_at__lte=now).delete()
         slots, _ = UploadAdmission.objects.filter(expires_at__lte=now).delete()
+        from backend.core.accounts import cleanup_account_mail
+        from backend.core.models import AccountChallenge, AccountSession
+
+        cleanup_account_mail()
+        AccountChallenge.objects.filter(expires_at__lte=now).delete()
+        AccountSession.objects.filter(expires_at__lte=now).delete()
         self.stdout.write(f"Expired budgets: {budgets}; upload reservations: {slots}")

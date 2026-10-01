@@ -42,6 +42,9 @@ def owned_events(owner, ids):
 
 def require_active(owner):
     current = lock_owner(owner.pk)
+    from backend.core.consents import require_processing
+
+    require_processing(current)
     if (
         not current.is_active
         or Profile.objects.filter(user=owner, deleted_at__isnull=False).exists()

@@ -383,3 +383,71 @@ Python/PostgreSQL, frontend and media-sandbox jobs were still running; overall s
 not yet claimed. Dependabot update workflows also started; no dependency PR was merged.
 This documentation-only receipt follows the published implementation and does not change
 the code under CI. Local checks remain the dated results above.
+
+## M14 account lifecycle module — 2026-09-30 to 2026-10-01
+
+Requirements: M14.01–M14.06 and M13.06; M19.02 receives the completed M15 CI result.
+Implemented local registration with inactive non-staff accounts, verified normalized email,
+one-use purpose/password-bound verification and recovery challenges, current-password email/
+password changes, owned session inventory, per-session revocation and logout-all. Ordinary logout
+also revokes its inventory entry. Login and legacy-session registration use owner-first locking;
+self-service deletion rechecks the current password inside that lock, so a stale User instance
+cannot authorize deletion after a reset. Public transitions enforce CSRF, generic acceptance
+responses and persistent rate budgets. Delivery is a private local test mailbox, disabled unless
+DEBUG and LOCAL_ACCOUNT_SIGNUP are enabled; no external email was sent.
+
+Added version/digest consent receipts, idempotent request UUIDs, independent optional training
+consent and withdrawal controls/history. Migration 0008 preserves old consent times with
+`legacy-unversioned` provenance rather than inventing accepted wording or email verification.
+Processing withdrawal atomically cancels/fences analysis and sync, removes upload admissions and
+revokes player links. New processing/publication is rejected until re-grant. Re-grant alone never
+restarts work. Explicit re-linking permits subsequent imports while owner-keyed HMACs suppress
+known deleted provider-match IDs; unknown cross-provider aliases remain a policy/integration gate.
+The canonical match/event/player model remains provider-independent and every real provider stays off.
+
+Extended private export with verified email and allowlisted consent/suppression receipts, excluding
+credentials, suppression hashes and opponent identifiers. Account deletion erases the new records
+and private mailbox envelopes alongside the existing tombstone-first media lifecycle. Retention
+commands retry mail cleanup even without media. Cleanup serializes with existing owners and gives
+fresh unknown-owner envelopes a 30-minute grace period to protect uncommitted registrations.
+
+Changed files: new `backend/core/accounts.py`, `account_api.py`, `consents.py`, migration 0008;
+models/settings/routes/apps and session, ownership/processing/publication, storage/export, import
+and maintenance services; new frontend `account-access.tsx` and `account-controls.tsx`, page/history
+integration and scoped input spacing; `tests/test_accounts.py`, browser account and history tests.
+Updated `.env.example`, README, account/security/data/ingestion/player architecture, the incident
+runbook, D025, architecture 2.6.0 and PRODUCT_PROGRESS.md. Detailed evidence is in
+[M14 local qualification](experiment-results/m14-accounts.md).
+
+Validation: the final PostgreSQL run passed **232 tests** in 49.03s, including all 23 account
+tests and both final race regressions; seven opt-in Docker tests were skipped. The local JUnit
+receipt is `private_data/m14-pytest.xml` (ignored).
+All 14 Edge tests, production build, frontend lint/types, Ruff lint/format, mypy (23 typed modules),
+Django system and migration-drift checks passed. Migration 0008 is applied to local development
+and test PostgreSQL. Mobile/desktop screenshots were inspected and label/focus spacing corrected.
+Browser API responses are mocked; persistence, cookie sessions, CSRF and concurrency use real
+PostgreSQL/API tests. No real-game or hosted validation is implied. The seven Docker tests and
+advisory scans remain prior M15 evidence, not fresh M14 results; no parser or dependency changes.
+
+Operational notes: restarted only the stopped workspace PostgreSQL cluster on port 55432 and
+cancelled a stalled test invocation before rerunning; the system database was not modified.
+No live credentials, email transport, cloud resources or paid services were configured. M14 is
+uncommitted/unpushed local work. Separately, all four jobs in published M15
+[CI run 36729960773](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36729960773) succeeded,
+confirmed 2026-09-30. This does not clear the repository-access/prior-execution investigation.
+
+Remaining: production mail/recovery/abuse and pending-registration expiry; reviewed terms and
+retention; hosted private downloads/export; stable suppression-key rotation/alias policy;
+backup/provider deletion and restore rehearsal; independent security/privacy review. M14.06
+moves BLOCKED → PARTIAL because local re-linking/suppression is now implemented; M14 as a whole
+remains PARTIAL for its hosted exit. Next independent module: M16 storage/dispatch/reconciliation/
+restore engineering, with hosting region/budget and email-provider decisions before live setup.
+
+## M14 publication preflight — 2026-10-01
+
+The user authorized pushing M14 to main and monitoring CI. Fetched origin and verified that
+remote main remains `88dd14c`, matching the local parent; no merge or history rewrite is needed.
+The publication contains the reviewed M14 implementation and its current tracker/log/evidence.
+Local validation is the dated 232 PostgreSQL/Python and 14 Edge tests above, not a new test run.
+`git diff --check` passed. Private data, test mailbox envelopes, local test receipts and generated
+browser artifacts remain ignored. Publication SHA and remote CI results will follow after verification.

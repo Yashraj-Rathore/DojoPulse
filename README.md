@@ -222,12 +222,36 @@ Endpoints: `POST /api/matches/{id}/recordings` (multipart file, metadata JSON, r
 explicit consent), and `POST /api/matches/{id}/recordings/{source}/reprocess` (request UUID).
 Both are owner-scoped local operator operations. Hosted uploads remain disabled.
 
+## Accounts and consent (M14 local flows)
+
+After migration 0008, set `$env:LOCAL_ACCOUNT_SIGNUP = "1"` in the local API shell and restart
+the API to test registration, verification and password recovery. DEBUG must also be enabled.
+Open the frontend at `http://127.0.0.1:3000`. New accounts are non-staff and must verify an email
+before signing in; existing local operator accounts continue working.
+
+No actual email is sent. The local operator can open the specific test account's JSON envelope
+under `private_data/account-mail/<owner>/<challenge>.json` in a private editor and open its `url`
+in the browser. Treat it as a password-reset secret; do not paste links into logs, commits or
+shared reports. Links expire in 30 minutes and require an explicit confirmation. Run
+`python manage.py security_maintenance` at least hourly to purge expired/consumed mail and
+transient records; `purge_expired` also retries mail cleanup after deletion failures.
+
+**Account security and consent** lets a signed-in user verify a replacement email, change their
+password, revoke sessions and view/change versioned processing and optional training consent.
+Withdrawing processing cancels queued work and revokes player links. Re-enabling consent does
+not restart work: explicitly re-link the player and start an import. Deleted known matches stay
+suppressed. Account export includes consent receipts; account deletion removes them and private
+mail. New accounts do not gain operator uploads, synthetic import privileges or live providers.
+
+See [account architecture and release gates](docs/architecture/accounts-consent.md) for the
+local policy, key/retention limits and the production email, abuse, privacy and backup work.
+
 ## Player workspace (M13 local flows)
 
 **Your workspace** contains the supported-scope setup guide, in-app updates, account preferences,
 JSON export, password-confirmed account deletion and a local feedback/correction queue. Existing
-local accounts are required; signup, recovery and hosted account operations are not enabled.
-No email or external notification service is connected. Staff review feedback at `/admin/`.
+local accounts work, and M14 adds optional local signup and recovery described below.
+No external email or notification service is connected. Staff review feedback at `/admin/`.
 
 Search history by UTC date, character, reviewed situation/outcome or evidence availability.
 **Browse match evidence** opens the timeline for that match. Inspect source windows and provenance,

@@ -159,6 +159,9 @@ def reserve_upload(owner):
     current = lock_owner(owner.pk)
     if not current.is_active or not current.is_staff or not settings.LOCAL_OPERATOR_UPLOADS:
         raise IngestionUnavailable()
+    from backend.core.consents import require_processing
+
+    require_processing(current)
     check_capacity(owner, MAX_UPLOAD)
     slots = UploadAdmission.objects.filter(expires_at__gt=timezone.now())
     if slots.filter(owner=owner).exists() or slots.count() >= settings.GLOBAL_UPLOAD_SLOTS:

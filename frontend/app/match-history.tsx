@@ -45,6 +45,7 @@ export default function MatchHistory({ csrf, zone = "UTC", onEvidence }: { csrf:
   const [selection, setSelection] = useState("");
   const [searched, setSearched] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [relink, setRelink] = useState(false);
   const [identityFilter, setIdentityFilter] = useState("");
   const [offset, setOffset] = useState(0);
   const [reload, setReload] = useState(0);
@@ -84,7 +85,7 @@ export default function MatchHistory({ csrf, zone = "UTC", onEvidence }: { csrf:
     return () => { controller.abort(); clearInterval(timer); };
   }, [csrf, identityFilter, offset, reload, filters]);
 
-  function resetSelection() { setCandidates([]); setSelection(""); setConsent(false); setSearched(false); }
+  function resetSelection() { setCandidates([]); setSelection(""); setConsent(false); setRelink(false); setSearched(false); }
   async function act(work: () => Promise<void>) {
     setBusy(true); setError(""); setMessage("");
     try { await work(); setReload(value => value + 1); }
@@ -129,8 +130,9 @@ export default function MatchHistory({ csrf, zone = "UTC", onEvidence }: { csrf:
             </label>)}
             <p className="muted">Linking a public profile does not verify that you control it.</p>
             <label><input type="checkbox" checked={consent} disabled={busy} onChange={event => setConsent(event.target.checked)} />I consent to storing this player link and importing its match metadata into my workspace.</label>
+            {identities.some(identity => !identity.can_sync) && <label><input type="checkbox" checked={relink} disabled={busy} onChange={event => setRelink(event.target.checked)} />If this profile was revoked, I explicitly want to re-link it. Previously deleted matches remain suppressed.</label>}
             <button disabled={busy || !selection || !consent} onClick={() => void act(async () => {
-              await request(csrf, "player-identities", "POST", { selection_token: selection, processing_consent: consent });
+              await request(csrf, "player-identities", "POST", { selection_token: selection, processing_consent: consent, relink_confirmed: relink });
               resetSelection(); setMessage("Player linked. You can now import matches.");
             })}>Link selected player</button>
           </fieldset>}

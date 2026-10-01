@@ -4,6 +4,8 @@ import MatchHistory from "./match-history";
 import WorkspaceTools from "./workspace-tools";
 import EvidenceBrowser from "./evidence-browser";
 import TrainingJourney from "./training-journey";
+import AccountAccess from "./account-access";
+import AccountControls from "./account-controls";
 
 type Event = {id:string;mode:string;start_us:number;eligibility:string;outcome:string;source_asset_id:string};
 type Counts = {numerator:number;denominator:number;eligible_unknown:number;unknown_eligibility:number;coverage:number|null;rate:number|null;credible_interval?:number[]|null;excluded?:number;sessions?:number;eligibility_coverage?:number|null};
@@ -64,11 +66,13 @@ export default function Home(){
   <div className="intro"><div className="eyebrow">Tekken 8 · One measured situation</div><h1>Practice with a question.<br/>Return with evidence.</h1><p>Observe a defensive response, practice it, and measure the same situation in later matches. An uncertain result is a useful result.</p></div>
   <div className="notice">Gameplay validation is pending. Automated judgments and the draft drill are gated until capture, knowledge and reviewer checks pass.</div>
   {error&&<div role="alert" className="notice error">{error}</div>}
+  {ready&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
   {!ready?<p>Connecting to local API…</p>:!authenticated?
-   <section className="login"><h2>Open your local workspace</h2><p className="muted">Use the operator account created in the development setup.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
+   <section className="login"><h2>Open your local workspace</h2><p className="muted">Sign in with your verified local account or an existing development account.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
    <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a></nav>
    <div className="grid" id="workspace-content" tabIndex={-1}>
     <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
+    <AccountControls csrf={csrf}/>
     <TrainingJourney events={data.event_total??data.events.length} assignments={data.assignments.length} plans={data.plans} practice={data.practice.reduce((sum,p)=>sum+p.attempts,0)} evaluations={data.evaluations.length} zone={zone}/>
     <MatchHistory csrf={csrf} zone={zone} onEvidence={id=>{setMatchEvidence(id);document.getElementById("evidence")?.scrollIntoView();}}/>
     <section id="capture"><h2>01 / Capture one situation</h2><p>Jin defending against Jin’s u/f+4 is the provisional target. Move identity and the response still require expert verification.</p><ol><li>Record Steam PC, English UI, 1920 × 1080 at constant 60 fps.</li><li>Show HUD, both input histories, frame information and battle status. Capture one continuous match or practice block.</li><li>Keep the source uncut, with no pauses, rewinds or missing overlays. Export SDR H.264 MP4, up to 10 minutes / 512 MiB.</li></ol>

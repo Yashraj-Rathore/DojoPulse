@@ -125,9 +125,12 @@ def attach_recording(owner, match_id, upload, claim, request_id):
                 owner=owner, source_sha256=content.hexdigest(), deleted_at=None
             ).exists():
                 raise ValidationError("These exact recording bytes are already in this workspace")
+            from backend.core.consents import POLICY_VERSION, record_consent, require_processing
             from backend.core.security import admit_run, check_capacity, validate_admission
 
             validate_admission(owner)
+            require_processing(owner)
+            record_consent(owner, "PROCESSING", "GRANT", POLICY_VERSION, asset_id, "UPLOAD")
             check_capacity(owner, written)
             admit_run(owner)
             asset = ReplayAsset.objects.create(
@@ -178,6 +181,9 @@ def review_recording(
 ):
     require_local_operator(operator)
     active_owner(operator)
+    from backend.core.consents import require_processing
+
+    require_processing(operator)
     source = ReplaySource.objects.select_related("asset", "match").get(
         pk=source_id, match__owner=operator
     )
@@ -250,6 +256,9 @@ def review_recording(
 def reprocess_recording(owner, match_id, source_id, request_id):
     require_local_operator(owner)
     active_owner(owner)
+    from backend.core.consents import require_processing
+
+    require_processing(owner)
     source = ReplaySource.objects.select_related("asset").get(
         pk=source_id, match_id=match_id, match__owner=owner, match__deleted_at=None
     )

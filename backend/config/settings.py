@@ -30,6 +30,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "backend.core.accounts.AccountSessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 TEMPLATES = [
@@ -74,6 +75,19 @@ STATIC_URL = "/static/"
 PRIVATE_DATA_ROOT = Path(os.getenv("PRIVATE_DATA_ROOT", str(BASE_DIR / "private_data"))).resolve()
 LOCAL_OPERATOR_UPLOADS = DEBUG and os.getenv("LOCAL_OPERATOR_UPLOADS", "0") == "1"
 LOCAL_MATCH_IMPORTS = DEBUG and os.getenv("LOCAL_MATCH_IMPORTS", "0") == "1"
+LOCAL_ACCOUNT_SIGNUP = DEBUG and os.getenv("LOCAL_ACCOUNT_SIGNUP", "0") == "1"
+ACCOUNT_PUBLIC_ORIGIN = "http://127.0.0.1:3000"
+DATA_SUPPRESSION_KEY = os.getenv("DATA_SUPPRESSION_KEY", SECRET_KEY)
+SESSION_COOKIE_AGE = 7 * 24 * 60 * 60
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 EXTERNAL_UPLOADS_ENABLED = False  # Hosted ingestion gate cannot be bypassed with a flag.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024

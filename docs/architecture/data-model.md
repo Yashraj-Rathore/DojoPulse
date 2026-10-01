@@ -54,3 +54,9 @@ unique submission UUIDs and optional event references, and owner/key-unique Noti
 Notices are projections of runs, assignments and plan windows. Account deletion erases feedback/
 receipts and pseudonymizes login fields while retaining audit tombstones. See the
 [player experience contract](player-experience.md).
+
+Migration 0008 adds AccountEmail, purpose-bound AccountChallenge, revocable AccountSession,
+append-only application ConsentReceipt and owner/provider MatchSuppression HMACs. Profile gains
+a session epoch and processing-withdrawal timestamp. Legacy consent is captured with its original
+time and explicitly unknown policy version. The canonical Match/GameplayEvent/player model stays
+provider-independent. See [account lifecycle](accounts-consent.md) for invariants and deletion.

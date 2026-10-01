@@ -232,9 +232,11 @@ failed attempts with a not-before time; live quota coordination remains pending 
 Deletion currently uses conservative identity-wide suppression: removing a metadata-only match
 revokes that identity's local sync consent and fences its jobs, removes the match's assertions,
 participants and replay references, and leaves a deleted canonical UUID. Other imported matches
-remain until separately deleted. Only the revoked namespaced link is retained for suppression
-while the local account exists; relinking is blocked. Account deletion removes all identities,
-sync state and source assertions. A narrower production suppression/retention policy is not
+remain until separately deleted. M14 adds owner-keyed HMAC suppression receipts for known
+provider match IDs. Explicitly confirmed re-linking permits other imports while these known
+matches remain suppressed; granting processing consent alone restarts nothing. Account deletion
+removes identities, suppression receipts, sync state and source assertions. See
+[account lifecycle](accounts-consent.md). A production suppression/retention policy is not
 approved by this local mechanism. New video uploads dual-write USER_UPLOAD ReplaySource;
 attaching a video to an imported match uses the local reviewed attribution workflow described
 in [ADR-014](../adr/ADR-014-recording-attribution.md). Uploaded bytes remain pending until media

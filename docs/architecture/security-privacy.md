@@ -44,3 +44,9 @@ It pseudonymizes login fields and tombstones all assets before filesystem IO; pu
 remain retriable even for assets not yet visited. New feedback and receipts are erased.
 Authenticated range playback preserves private/no-store headers and never accepts arbitrary paths.
 See [player experience](player-experience.md) for export exclusions and local-only limits.
+
+M14 extends this boundary with one-use email verification/reset challenges in a private local
+test mailbox, revocable sessions, current-password account changes and versioned consent receipts.
+Processing withdrawal fences pending work; explicit re-linking preserves known-match suppression.
+Local mail cleanup is retried after account deletion. See [account lifecycle](accounts-consent.md)
+for exact limits; no production email, policy approval or backup/provider erasure is implied.

@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-09-30** · Architecture: **2.5.0** · Current stage: **local research prototype**
+Last updated: **2026-10-01** · Architecture: **2.6.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -20,17 +20,18 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Match acquisition | Player confirmation, consent, queued sync, source history and deletion work with two fictional providers |
 | Recording attribution | Local UI/API attaches video to imported history; media validation and operator attribution precede separate gameplay review; removal retains match metadata |
 | Player experience (M13) | Local onboarding, searchable timeline/history, guided training, export/deletion, feedback and in-app preferences implemented; real-user release acceptance remains open |
+| Accounts and consent (M14) | Local signup/verification/recovery, email/password changes, session revocation, versioned consent and withdrawal, export/deletion extensions and explicit re-linking with known-match suppression implemented. External mail, policy approval and backup/provider erasure remain gated |
 | Security and reliability (M15) | Local engineering implemented across M15.01–M15.07: real Docker isolation, admission/rate limits, ownership/fencing, offline provider guards, dependency fixes and incident procedures; production qualification remains open |
 | Real player IDs / providers | No live identity resolver or match transport enabled; EWGF usage rights, credentials and current authenticated schema unresolved |
 | Gameplay recognition | Bounded media tooling and deterministic rules exist; no released Tekken detector or calibrated templates |
 | Knowledge and drills | One provisional Jin/Jin uf+4 target and one draft drill; expert approval and current-build verification missing |
 | Scientific validation | G1–G6 are all NOT_RUN; no completed real-player improvement study |
 | Hosting and release | Loopback development only; external uploads and paid/cloud production services not enabled |
-| Latest recorded checks | 209 PostgreSQL/Python tests passed; seven opt-in sandbox tests passed separately, including 600s/512MiB synthetic media; Ruff/mypy and Django checks passed; migration 0007 applied. Python and npm production advisory scans clear after DRF update. Frontend: prior 11 Edge/build/lint/type checks on 2026-09-23, not rerun for M15 |
-| Evidence for those checks | [M15 local qualification](docs/experiment-results/m15-security.md), 2026-09-29; [earlier software validation](docs/experiment-results/software-validation.md), 2026-09-23; neither establishes real gameplay or production readiness |
-| Published delivery | M15 implementation `516b519` and reconciliation `1771eba` pushed to `origin/main`, verified by remote SHA on 2026-09-30. [M15 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36729960773): dependency audit passed; other jobs running at receipt time. Hosted release remains unqualified |
+| Latest recorded checks | M14 on 2026-10-01: 232 PostgreSQL/Python tests and 14 Edge tests passed; production build, lint/types, Ruff/mypy and Django system/migration checks passed. Migration 0008 applied. Seven opt-in Docker tests skipped in this run; earlier M15 sandbox/advisory evidence remains separately dated |
+| Evidence for those checks | [M14 account qualification](docs/experiment-results/m14-accounts.md); [M15 local qualification](docs/experiment-results/m15-security.md), 2026-09-29. Neither establishes real gameplay or production readiness |
+| Published delivery | M15 implementation `516b519` and reconciliation `1771eba` pushed to `origin/main`, verified by remote SHA on 2026-09-30. [M15 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36729960773): all four jobs passed. M14 is local and not pushed; hosted release remains unqualified |
 | Source integrity finding | Remote `301ed0b` introduced unexpected obfuscated code into Next config; `1771eba` preserves history while restoring the clean configuration. Repository-access and possible prior-execution review remain outstanding |
-| Publication validation | 2026-09-30 clean frontend: 11 Edge tests, type checks and production build passed. Configuration matches the pre-payload local version; see the linked CI run for ongoing remote results |
+| Publication validation | M15 remote Python/PostgreSQL, frontend, media-sandbox and dependency jobs all passed. M14 local validation is separate and does not imply remote CI or release approval |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
 data access and demonstrated player benefit are different kinds of progress.
@@ -84,7 +85,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M11 | Reviewed drills and measured practice | PARTIAL | Expert-approved drill and G4 |
 | M12 | Trustworthy longitudinal evaluation | PARTIAL | Real prospective chronology, comparability and G5/G6 |
 | M13 | Complete player-facing product experience | PARTIAL | Local engineering delivered across M13.01–M13.08; real provider/account/reviewer flows, participant usability, screen readers and real devices remain release dependencies |
-| M14 | Accounts, consent and data ownership | PARTIAL | Hosted identity/account recovery and full user data lifecycle |
+| M14 | Accounts, consent and data ownership | PARTIAL | Local account module implemented; production mail/abuse/policy, hosted authorization and backup/provider erasure qualification remain |
 | M15 | Security, privacy and reliability hardening | PARTIAL | Local controls and Docker qualification delivered; deployment-specific isolation/abuse/restore and independent security/privacy review remain |
 | M16 | Hosted asynchronous delivery and deployment | PARTIAL | Real cloud/storage integrations and release prerequisites |
 | M17 | Operations, performance and unit economics | PARTIAL | Representative load, operational telemetry and actual costs |
@@ -270,7 +271,7 @@ Owner: frontend/product owner. Exit: supported players can complete the real wor
 | M13.03 Review timestamped evidence and understand corrections/unknowns | PARTIAL | Paginated timeline, authenticated range playback, source provenance, disputed-event exclusion, complete-match selection and correction requests implemented; real media/player/reviewer usability and accessibility validation remain |
 | M13.04 Present weakness, drill, measured practice and follow-up plan coherently | PARTIAL | Ordered journey, measured baseline summaries, frozen-plan details and practice gating implemented; synthetic browser path returns honest insufficient exposure. Real adherence and comparison usefulness remain unvalidated |
 | M13.05 Search/filter supported matches and events | DONE | Current local supported scope: owner/player, UTC dates, character, situation/outcome, purpose/eligibility and history evidence state with typed pagination. Metadata-only records cannot satisfy gameplay filters; backend/browser checks pass |
-| M13.06 Account/privacy controls, export, deletion and understandable support states | PARTIAL | Local private JSON export, password/CSRF-confirmed deletion, purge retry, sign-out, consent explanation, help and correction queue implemented; hosted signup/recovery/provider/backup/export operations remain M14–M16 dependencies |
+| M13.06 Account/privacy controls, export, deletion and understandable support states | PARTIAL | M14 adds local signup/recovery, account-security UI, revocable sessions, consent receipts/withdrawal and mail cleanup to existing export/deletion/support flows. Hosted email/provider/backup/export operations and real-user acceptance remain M14–M16 dependencies |
 | M13.07 Keyboard, screen-reader, mobile, timezone and supported-browser validation | PARTIAL | Skip link/focus, labeled controls, mobile overflow, reduced motion and UTC/America-Toronto checks pass in local Edge and Linux Chromium CI; manual screen-reader, real-device, captions/visual-evidence accessibility and further browser qualification remain |
 | M13.08 User feedback and notification preferences | DONE | Agreed local channel: in-app only. Durable-state analysis/practice/follow-up notices, persistent dismissal/category opt-out, idempotent feedback and operator queue implemented/tested; no external sends. Bounded feed is explicit in [contract](docs/architecture/player-experience.md) |
 
@@ -278,14 +279,17 @@ Owner: frontend/product owner. Exit: supported players can complete the real wor
 
 Owner: backend/security/product owner. Exit: users control their account and permitted data in a hosted environment.
 
+Local implementation and evidence: [account lifecycle](docs/architecture/accounts-consent.md),
+[M14 qualification](docs/experiment-results/m14-accounts.md). Hosted exit is not yet satisfied.
+
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M14.01 Secure sign-up/sign-in, session lifecycle and recovery | PARTIAL | Local Django sessions/CSRF exist; production identity provider or equivalent verified/recovery flow needed |
+| M14.01 Secure sign-up/sign-in, session lifecycle and recovery | PARTIAL | Local verification/recovery, current-password changes, owned session inventory/revocation and logout-all implemented; expiring one-use challenges, CSRF, rate limits and concurrency checked. Production mail transport, abuse/registration-expiry policy, recovery review and hosted HTTPS qualification remain |
 | M14.02 Separate player identity claims from authenticated application ownership | DONE | Owner-scoped claimed links and cross-owner tests; no ID-as-password behavior |
-| M14.03 Version processing consent, optional training consent and withdrawals | PARTIAL | Local consent separation exists; hosted policy versions, receipts and user controls needed |
-| M14.04 Private data access, minimal opponent information and export | PARTIAL | Owner-only range playback and allowlisted JSON export tested locally; private storage/session fields and other people's identity snapshots excluded. Hosted download/export authorization and scale still need verification |
-| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Self-service local password-confirmed deletion pseudonymizes login, clears feedback/receipts and tombstones every asset before purge; failure/retry tested. Provider/backup retention and restore suppression remain unverified |
-| M14.06 Review identity re-linking and per-match suppression retention | BLOCKED | Current local deletion revokes identity-wide sync; approve production policy and narrower suppression if appropriate |
+| M14.03 Version processing consent, optional training consent and withdrawals | PARTIAL | Version/digest receipts, legacy-unversioned backfill, independent optional training control and explicit withdrawal UI implemented. Withdrawal fences analysis/sync and clears upload admissions; re-grant restarts nothing. Legal policy approval, hosted audit/retention and any future real training eligibility enforcement remain |
+| M14.04 Private data access, minimal opponent information and export | PARTIAL | Owner-only media/JSON export now includes verified email and consent/suppression receipts; recovery/session secrets, suppression hashes, storage paths and opponent IDs excluded. Hosted authorization, complete media/provider portability and scale remain |
+| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Existing tombstone/purge flow also erases new account credentials/receipts/suppressions and private test mail; cleanup failure/retry covered even without media. Provider/backup retention, copies outside managed storage and restore suppression remain unverified |
+| M14.06 Review identity re-linking and per-match suppression retention | PARTIAL | D025 implements explicit local re-link confirmation with owner-keyed HMAC suppression of known deleted source IDs. Identity-wide revocation remains the initial deletion stop. Production retention, stable key rotation and unknown cross-provider aliases still need review; local work no longer blocked |
 
 ## M15 — Security, privacy and reliability hardening
 
@@ -365,7 +369,7 @@ Owner: technical/product owner. Exit: real supported users complete the hosted f
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M19.01 Record pilot continuation decision and beta-supported scope | NOT_STARTED | M18 findings and applicable M04–M17 requirements accepted |
-| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | [M15 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36729960773) started for published `1771eba`: dependency audit passed, Python/frontend/sandbox jobs running at receipt time. Staging auth/storage/job/provider integrations and permitted real data remain untested |
+| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | All four [M15 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36729960773) jobs passed for published `1771eba`. M14 is locally checked, not pushed. Staging auth/storage/job/provider integrations and permitted real data remain untested |
 | M19.03 Test onboarding → import/upload → coaching → practice → later evaluation | NOT_STARTED | Real participant paths and accessible error recovery; no staff-only bypass as user workflow |
 | M19.04 Exercise deletion, consent withdrawal, outage, rollback and restore | NOT_STARTED | Traceable operational evidence and resolved release-blocking defects |
 | M19.05 Measure beta usability, retention, useful decisions and support burden | NOT_STARTED | Predeclared denominators and adverse outcomes; product value beyond native workflow |
@@ -429,7 +433,7 @@ Reconsider them only through an explicit product/architecture decision with supp
 | 1 | Prepare activation of one documented public provider | M04.01–M04.03, M05.01–M05.04 | Product owner obtains applicable usage evidence and privately configures a key; integration owner verifies permitted fixtures; never paste secrets into this tracker |
 | 2 | Acquire first consented captures and expert review | M07.02–M07.05, M08.02–M08.03 | Participants, exact-build evidence, Tekken expert, two reviewers and adjudicator |
 | 3 | Validate observability/practice before promoting recognition | M09, M11, G1/G4 then G2 | Dataset/review findings; select backup/narrow if required |
-| 4 | Qualify the local player journey and complete security release acceptance | M13.01–M13.04/M13.06–M13.07, M15.01–M15.07 | M13/M15 local engineering and Docker qualification delivered. Next: manual accessibility/device/participant checks; independent security/privacy review, complex hostile-media corpus and deployment-specific containment/restore; retain provider/account gates |
+| 4 | Qualify account/security release boundaries and prepare M16 deployment engineering | M13.01–M13.04/M13.06–M13.07, M14.01/M14.03–M14.06, M15.01–M15.07, M16 | M13–M15 local engineering delivered. Independent source-integrity/security/privacy review remains; product owner selects hosting region/budget and email delivery provider before live configuration. Continue offline storage/dispatch/reconciliation/restore contracts; do not provision cloud resources from this tracker |
 | 5 | Run prospective real loop, then qualify hosting/beta | M12, M16–M19 | Measurement decisions, permitted data and validated security/operational integrations |
 
 The tracker is not authorization to purchase, contact providers, collect new personal data,
@@ -462,3 +466,4 @@ release gates still govern those actions. Do not let one external blocker stop i
 | 2026-09-23 | M06.03/M06.06/M06.07, M13.03 | Delivered local reviewed recording attachment and immutable evidence lineage | 145 Python / 7 browser tests; migration 0005 |
 | 2026-09-23 | M13.01–M13.08, M14.04/M14.05 | Delivered available local M13 product flows; kept external release dependencies explicit | 163 Python / 11 browser tests; migration 0006; build/static/schema checks |
 | 2026-09-29 | M15.01–M15.07, M19.02 | Delivered local security/reliability module, unblocked real Docker qualification, patched DRF advisories; external review/deployment/provider gates retained | 209 PostgreSQL/Python tests; seven Docker checks including 600s/512MiB fixture; migration 0007; static/schema and dependency checks |
+| 2026-10-01 | M14.01–M14.06, M13.06, M19.02 | Delivered local account/consent module; M14.06 BLOCKED → PARTIAL with explicit re-linking and known-match suppression. M15 remote CI now fully passed; M14 not pushed | 232 PostgreSQL/Python and 14 Edge tests; migration 0008; build/static/schema checks; [M14 evidence](docs/experiment-results/m14-accounts.md) |

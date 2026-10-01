@@ -46,7 +46,7 @@ test("explicit selection, consent, import and removal flow", async ({ page }) =>
   await page.getByLabel("I consent to storing this player link", { exact: false }).check();
   await page.getByRole("button", { name: "Link selected player" }).click();
   await expect(page.getByText("Player linked. You can now import matches.")).toBeVisible();
-  expect(linkBody).toEqual({ selection_token: "signed-fixture", processing_consent: true });
+  expect(linkBody).toEqual({ selection_token: "signed-fixture", processing_consent: true, relink_confirmed: false });
   await page.getByRole("button", { name: "Import matches", exact: true }).click();
   await expect(page.getByText("vs Synthetic Opponent")).toBeVisible();
   await expect(page.getByText("Gameplay evidence needed", { exact: true })).toBeVisible();
@@ -58,6 +58,12 @@ test("explicit selection, consent, import and removal flow", async ({ page }) =>
   await page.getByRole("button", { name: "Confirm removal" }).click();
   await expect(page.getByText("Match removed and player sync consent revoked.")).toBeVisible();
   await expect(page.getByText("vs Synthetic Opponent")).toHaveCount(0);
+  await page.getByRole("button", { name: "Find player" }).click();
+  await page.getByRole("radio").check();
+  await page.getByLabel("I consent to storing this player link", { exact: false }).check();
+  await page.getByLabel("If this profile was revoked", { exact: false }).check();
+  await page.getByRole("button", { name: "Link selected player" }).click();
+  await expect.poll(() => linkBody).toEqual({ selection_token: "signed-fixture", processing_consent: true, relink_confirmed: true });
 });
 
 test("partial history, replay expiry and unknown build remain visible on mobile", async ({ page }) => {

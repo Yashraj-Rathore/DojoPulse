@@ -13,6 +13,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         from django.db.models import Q
 
+        from backend.core.accounts import cleanup_account_mail
+
+        cleanup_account_mail()
         assets = ReplayAsset.objects.filter(
             Q(retain_until__lte=timezone.now()) | Q(deleted_at__isnull=False),
             purge_completed_at__isnull=True,

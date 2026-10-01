@@ -148,6 +148,7 @@ def candidates(request):
 class LinkInput(serializers.Serializer):
     selection_token = serializers.CharField(max_length=2000)
     processing_consent = serializers.BooleanField()
+    relink_confirmed = serializers.BooleanField(default=False)
 
 
 def identity_data(item):
@@ -198,6 +199,7 @@ def identities(request):
         adapter.resolve_player(selection["value"], Operation.RESOLVE_ID),
         ExternalId(selection["namespace"], selection["value"]),
         processing_consent=data.validated_data["processing_consent"],
+        relink_confirmed=data.validated_data["relink_confirmed"],
     )
     return Response(identity_data(item), status=201)
 

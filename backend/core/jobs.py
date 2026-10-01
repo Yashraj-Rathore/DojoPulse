@@ -29,6 +29,7 @@ def claim_run(run_id):
     if (
         not run.owner.is_active
         or Profile.objects.filter(user=run.owner, deleted_at__isnull=False).exists()
+        or Profile.objects.filter(user=run.owner, processing_withdrawn_at__isnull=False).exists()
     ):
         return None
     if (

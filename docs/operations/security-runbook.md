@@ -14,7 +14,7 @@ codes, scope, consent implications, decisions, remediation and verification rece
 
 ## Containment and recovery
 
-1. Keep ingress on loopback. Disable `LOCAL_OPERATOR_UPLOADS` and `LOCAL_MATCH_IMPORTS`
+1. Keep ingress on loopback. Disable `LOCAL_OPERATOR_UPLOADS`, `LOCAL_MATCH_IMPORTS` and `LOCAL_ACCOUNT_SIGNUP`
    in the API environment and restart that API. Stop this project's worker with Ctrl+C;
    cancellation/deletion through the authenticated API remains available. Do not stop other
    Docker containers or the system PostgreSQL service.
@@ -31,7 +31,8 @@ codes, scope, consent implications, decisions, remediation and verification rece
    to count against admission until purge completion. Never restore an old database/media
    snapshot into a serving environment without replaying deletion/suppression records.
 5. Run `python manage.py security_maintenance` to remove expired request budgets and
-   upload reservations. This does not terminate a blocked web request or remove arbitrary
+   upload reservations, expired account challenges/sessions and consumed/expired/orphan local
+   mailbox envelopes. This does not terminate a blocked web request or remove arbitrary
    temp files. Shut down the relevant server first and inspect its specific temp artifacts
    before any manual cleanup.
 6. For suspected secret exposure, revoke/rotate affected credentials through their actual

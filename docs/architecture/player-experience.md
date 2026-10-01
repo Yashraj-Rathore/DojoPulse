@@ -1,6 +1,6 @@
 # M13 player experience — local implementation contract
 
-Updated 2026-09-23; Architecture 2.4.0. Available local M13 engineering is implemented.
+Updated 2026-10-01; Architecture 2.6.0. Available local M13 engineering is implemented.
 M13's release exit still requires permitted real providers, production accounts, validated
 knowledge/measurement and real usability/accessibility studies.
 
@@ -10,7 +10,9 @@ The workspace explains the candidate Jin/Jin scope, capture requirements, unavai
 identity services and the difference between metadata, attribution and reviewed gameplay.
 Onboarding persists acknowledgement; it grants neither processing nor training consent.
 Existing per-operation processing consent remains necessary. Authentication uses existing local
-Django accounts; no self-service signup, recovery service or operator credential is provisioned.
+Django accounts. M14 adds optional local signup/verification/recovery and account-security controls
+using a private test mailbox; no external mail transport or operator credential is provisioned.
+See [account lifecycle](accounts-consent.md) for consent withdrawal and session revocation.
 
 The ordered journey is baseline -> approved drill -> frozen plan -> reviewed practice -> later
 matches -> comparison. Baseline summaries show successes/known eligible outcomes and unknowns;

@@ -29,6 +29,61 @@ class Profile(models.Model):
     analysis_notices = models.BooleanField(default=True)
     practice_notices = models.BooleanField(default=True)
     followup_notices = models.BooleanField(default=True)
+    session_epoch = models.PositiveIntegerField(default=0)
+    processing_withdrawn_at = models.DateTimeField(null=True)
+
+
+class AccountEmail(models.Model):
+    owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    normalized = models.EmailField(unique=True)
+    verified_at = models.DateTimeField(null=True)
+
+
+class AccountChallenge(Owned):
+    activates_account = models.BooleanField(default=False)
+    purpose = models.CharField(max_length=20)
+    token_digest = models.CharField(max_length=64, unique=True)
+    email = models.EmailField()
+    auth_state = models.CharField(max_length=64)
+    expires_at = models.DateTimeField(db_index=True)
+    consumed_at = models.DateTimeField(null=True)
+
+
+class AccountSession(Owned):
+    key_digest = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True)
+
+
+class ConsentReceipt(Owned):
+    scope = models.CharField(max_length=20)
+    action = models.CharField(max_length=12)
+    policy_version = models.CharField(max_length=60)
+    policy_digest = models.CharField(max_length=64)
+    source = models.CharField(max_length=30)
+    request_id = models.UUIDField(default=uuid.uuid4)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="consent_request")
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Consent receipts are append-only")
+        super().save(*args, **kwargs)
+
+
+class MatchSuppression(Owned):
+    provider = models.CharField(max_length=100)
+    key_digest = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "provider", "key_digest"], name="suppressed_source"
+            )
+        ]
 
 
 class Feedback(Owned):

@@ -276,9 +276,19 @@ def notices(request):
 def export_account(request):
     active_owner(request.user)
     user = request.user
+    from backend.core.models import AccountEmail, ConsentReceipt, MatchSuppression
+
     # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
     # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "consent_receipts": (
+            ConsentReceipt.objects.filter(owner=user),
+            ["id", "scope", "action", "policy_version", "policy_digest", "source", "created_at"],
+        ),
+        "suppression_receipts": (
+            MatchSuppression.objects.filter(owner=user),
+            ["id", "provider", "created_at"],
+        ),
         "identities": (
             PlayerGameIdentity.objects.filter(owner=user),
             ["id", "game_id", "namespace", "value", "state", "consent_scope"],
@@ -353,6 +363,9 @@ def export_account(request):
             "schema": "dojopulse-export/1",
             "exported_at": timezone.now(),
             "username": user.username,
+            "verified_email": AccountEmail.objects.filter(owner=user, verified_at__isnull=False)
+            .values_list("normalized", flat=True)
+            .first(),
             "preferences": {field: getattr(profile, field) for field in PREFERENCE_FIELDS},
             "consent": {
                 "processing": profile.processing_consent_at,
@@ -378,11 +391,9 @@ class DeleteInput(serializers.Serializer):
 def remove_account(request):
     data = DeleteInput(data=request.data)
     data.is_valid(raise_exception=True)
-    if not request.user.check_password(data.validated_data["password"]):
-        return Response({"error": "Current password is incorrect"}, status=400)
     pending = False
     try:
-        delete_account(request.user)
+        delete_account(request.user, password=data.validated_data["password"])
     except OSError:
         # Tombstone committed before file IO; purge_expired retries physical cleanup.
         pending = True

@@ -1,11 +1,21 @@
 from django.contrib import admin
 from django.urls import path
 
-from backend.core import api, experience_api, match_api, recording_api
+from backend.core import account_api, api, experience_api, match_api, recording_api
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/session", api.session),
+    path("api/account/policy", account_api.policy),
+    path("api/account/register", account_api.registration),
+    path("api/account/link", account_api.request_link),
+    path("api/account/confirm", account_api.confirm),
+    path("api/account/details", account_api.account_details),
+    path("api/account/password", account_api.password_change),
+    path("api/account/email", account_api.email_change),
+    path("api/account/logout-all", account_api.logout_all),
+    path("api/account/sessions/<uuid:session_id>", account_api.revoke_session),
+    path("api/account/consent", account_api.consent),
     path("api/overview", api.overview),
     path("api/preferences", experience_api.preferences),
     path("api/evidence", experience_api.evidence),

@@ -55,6 +55,8 @@ def handled(function):
             return Response({"error": "Conflicting or duplicate operation"}, status=409)
         except RequestDataTooBig:
             return Response({"error": "Request body exceeds the configured limit"}, status=400)
+        except OSError:
+            return Response({"error": "Private storage is temporarily unavailable"}, status=503)
         except (ValidationError, ValueError, KeyError) as error:
             return Response({"error": str(error)}, status=400)
 
@@ -83,7 +85,14 @@ def session(request):
         user = authenticate(request, username=body.get("username"), password=body.get("password"))
         if user is None:
             return JsonResponse({"error": "Invalid credentials"}, status=401)
-        login(request, user)
+        with transaction.atomic():
+            current = lock_owner(user.pk)
+            if not current.is_active or current.password != user.password:
+                return JsonResponse({"error": "Invalid credentials"}, status=401)
+            login(request, user)
+            from backend.core.accounts import track_session
+
+            track_session(request, authenticating=True)
         token = get_token(request)
     return JsonResponse(
         {
@@ -221,6 +230,10 @@ def upload(request):
             if profile.deleted_at:
                 raise ValidationError("Deleted account cannot ingest media")
             validate_admission(request.user)
+            from backend.core.consents import POLICY_VERSION, record_consent, require_processing
+
+            require_processing(request.user)
+            record_consent(request.user, "PROCESSING", "GRANT", POLICY_VERSION, asset_id, "UPLOAD")
             check_capacity(request.user, written)
             admit_run(request.user)
             asset = ReplayAsset.objects.create(

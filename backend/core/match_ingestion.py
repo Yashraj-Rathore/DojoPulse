@@ -9,6 +9,12 @@ from django.db import transaction
 from django.utils import timezone
 
 from analysis.contracts import digest
+from backend.core.consents import (
+    POLICY_VERSION,
+    record_consent,
+    require_processing,
+    suppression_digest,
+)
 from backend.core.loops import invalidate_for_events
 from backend.core.models import (
     Game,
@@ -16,6 +22,7 @@ from backend.core.models import (
     Match,
     MatchContribution,
     MatchSourceRecord,
+    MatchSuppression,
     MatchSync,
     Participant,
     PlayerGameIdentity,
@@ -55,8 +62,11 @@ def active_owner(owner):
 
 
 @transaction.atomic
-def link_local_identity(owner, game, candidates, selected, *, processing_consent):
+def link_local_identity(
+    owner, game, candidates, selected, *, processing_consent, relink_confirmed=False
+):
     active_owner(owner)
+    require_processing(owner)
     if processing_consent is not True:
         raise ValidationError("Explicit processing consent required")
     candidate = select_candidate(candidates, selected)
@@ -74,13 +84,24 @@ def link_local_identity(owner, game, candidates, selected, *, processing_consent
         },
     )
     if identity.deleted_at or identity.state != "CLAIMED":
-        raise ValidationError("Identity link is revoked or requires review")
+        if not relink_confirmed:
+            raise ValidationError(
+                "Identity is revoked. Explicitly confirm re-linking; deleted matches remain suppressed"
+            )
+        identity.state, identity.deleted_at, identity.consent_scope = "CLAIMED", None, LOCAL_POLICY
+        identity.display_label = candidate.display_name
+        identity.provenance = json_value(asdict(candidate.source))
+        identity.save()
+    import uuid
+
+    record_consent(owner, "PROCESSING", "GRANT", POLICY_VERSION, uuid.uuid4(), "IDENTITY_LINK")
     return identity
 
 
 @transaction.atomic
 def start_local_sync(owner, identity_id, provider, start, end):
     active_owner(owner)
+    require_processing(owner)
     require_local(provider)
     require_aware(start)
     require_aware(end)
@@ -92,7 +113,7 @@ def start_local_sync(owner, identity_id, provider, start, end):
     prior = MatchSync.objects.filter(
         owner=owner, identity=identity, provider=provider, query_start=start, query_end=end
     ).first()
-    if prior is None or prior.status == "COMPLETE":
+    if prior is None or prior.status in {"COMPLETE", "CANCELLED"}:
         admit_sync(owner)
     job, _ = MatchSync.objects.get_or_create(
         owner=owner,
@@ -102,11 +123,22 @@ def start_local_sync(owner, identity_id, provider, start, end):
         query_end=end,
         defaults={"policy_version": LOCAL_POLICY},
     )
-    if job.status == "COMPLETE":
+    if job.status in {"COMPLETE", "CANCELLED"}:
         job.status = "PENDING"
         job.checkpoint = None
         job.attempts = 0
-        job.save(update_fields=["status", "checkpoint", "attempts"])
+        job.next_attempt_at = job.lease_until = None
+        job.stop_reason = ""
+        job.save(
+            update_fields=[
+                "status",
+                "checkpoint",
+                "attempts",
+                "next_attempt_at",
+                "lease_until",
+                "stop_reason",
+            ]
+        )
     return job
 
 
@@ -165,6 +197,18 @@ def fail_local_sync(owner, sync_id, token):
 
 def _import_metadata(job, item):
     require_local(job.provider, item.provenance)
+    if MatchSuppression.objects.filter(
+        owner=job.owner,
+        provider=job.provider,
+        key_digest=suppression_digest(
+            job.owner_id,
+            item.game,
+            job.provider,
+            item.external_id.namespace,
+            item.external_id.value,
+        ),
+    ).exists():
+        return  # A revoked identity can be explicitly re-linked without restoring deleted matches.
     identity = job.identity
     selected = ExternalId(identity.namespace, identity.value)
     if (
