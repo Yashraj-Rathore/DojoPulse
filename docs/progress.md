@@ -451,3 +451,26 @@ The publication contains the reviewed M14 implementation and its current tracker
 Local validation is the dated 232 PostgreSQL/Python and 14 Edge tests above, not a new test run.
 `git diff --check` passed. Private data, test mailbox envelopes, local test receipts and generated
 browser artifacts remain ignored. Publication SHA and remote CI results will follow after verification.
+
+## M14 push and dependency-audit follow-up — 2026-10-01
+
+Pushed `e569bbc687b78c024089b63ee97dfa4de017084a` to `origin/main`; `git ls-remote` matched.
+[Initial CI 36892649492](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36892649492)
+passed Python/PostgreSQL and frontend but failed the npm production audit; media-sandbox was
+still running at this update. The earlier M15 clean audit cannot establish current dependency safety.
+
+The audit identifies [GHSA-vcvr-r3jv-pc5j](https://github.com/advisories/GHSA-vcvr-r3jv-pc5j),
+published to the advisory database on 2026-09-30, affecting Next.js 16.2.0 through 16.3.5.
+The maintainer identifies 16.3.6 as patched. A source search found no `next/og`/`ImageResponse`
+usage in this app; the pinned dependency is still being upgraded to clear the gate. This is
+separate from the earlier removed obfuscated configuration payload and does not close that review.
+Changed scope: frontend package manifest/lockfile, M15.04/M19.02 and M14 delivery evidence.
+Installing the targeted patch with lifecycle scripts disabled; fresh audit/build/lint/type/browser
+validation and the subsequent publication/CI receipt will follow. No audit threshold is weakened.
+
+Patch validation: `next` is now pinned to 16.3.6 in `frontend/package.json`; the lockfile changes
+only Next and its matching env/platform compiler packages. The local install and production audit
+report zero vulnerabilities. ESLint, production build, TypeScript and all 14 Edge tests pass
+(21.5s). No application/backend/parser logic changed, so the existing backend evidence remains
+dated rather than being relabelled as a fresh local run. Committing/pushing this targeted fix and
+monitoring a new complete CI run is the next publication step.

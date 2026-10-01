@@ -54,3 +54,13 @@ and retention, privileged-auth policy, hosted media/export authorization, suppre
 and alias policy, managed backups/restore/provider erasure, independent security/privacy review,
 repository access and possible prior execution of the removed remote config payload. M14 stays
 PARTIAL for its hosted exit condition; available local engineering is implemented.
+
+## Publication follow-up — 2026-10-01
+
+M14 `e569bbc` was pushed to main. The initial remote dependency job caught
+[GHSA-vcvr-r3jv-pc5j](https://github.com/advisories/GHSA-vcvr-r3jv-pc5j) in Next.js 16.3.5;
+Python/PostgreSQL and frontend jobs passed. The targeted fix pins Next.js to patched 16.3.6.
+Fresh local npm install/production audits report zero vulnerabilities, build/lint/type checks pass,
+and 14 Edge tests pass in 21.5s. This dependency change supersedes the earlier statement that no
+dependency changed during the core M14 implementation. The new remote run remains pending;
+this local receipt does not yet claim an entirely green publication pipeline.
