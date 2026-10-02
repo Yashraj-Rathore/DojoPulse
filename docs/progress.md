@@ -812,3 +812,32 @@ were not run locally for this configuration/documentation-only change. Real
 gameplay, live providers, hosting and source-access review gates are unchanged.
 Next: publish main, monitor the six actual jobs, record the results and ensure
 the final documentation receipt also receives normal CI.
+
+## 2026-10-02 — Main-only policy publication and verified checks
+
+Requirements: M01.05/M01.06, M15.04 and M19.02. Published policy/configuration
+commit `c7d60ee9186ce5205c26bb6bc560028316f0e54a` directly to main without
+force and monitored [CI 37045159974](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37045159974)
+through SUCCESS, first attempt, at **18:10:02 UTC**. All six actual jobs passed:
+Python/PostgreSQL, media sandbox, frontend, application containers, dependency
+audits and deployment contracts. GitHub separately passed its Dependabot YAML
+validator, giving seven completed successful check runs on that exact commit.
+No test-count claim here reuses an earlier run as a fresh count.
+
+Also pruned 16 stale local remote-tracking refs, including the previously removed
+Next.js proposal, without changing local main. `git branch --all` now shows
+only local main, origin/main and the symbolic origin/HEAD alias. GitHub API
+again verifies one branch at the qualified commit and automatic security PRs
+disabled. Configuration validation, checked publication, preserved dependency
+audits and branch cleanup satisfy M01.06; M01 is DONE with its continuing
+maintenance obligations. M19 remains PARTIAL because staging/real-data release
+qualification is separate from successful software CI.
+
+Changed files in this receipt: PRODUCT_PROGRESS, this log and D029. Actual
+checks/results above belong to the published policy commit. This documentation
+receipt uses ordinary CI, with no skip marker; its new tip will be monitored
+separately before final handoff. No app/dependency/workflow code changes follow
+the qualified policy tree. Prior source-access review and all scientific/live
+provider/hosted gates remain open. Next: retain weekly dependency review and
+normal latest-tip checks; resume the permitted-provider, real-evidence and
+hosting qualification actions in PRODUCT_PROGRESS when their inputs are ready.

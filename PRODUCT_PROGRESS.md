@@ -29,10 +29,10 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Pilot preparation (M18) | Local consent, pseudonyms, prospective intake/allocation, blinded review/adjudication, canonical links, evidence packs and withdrawal/restore erasure delivered; `135464f`/clean reconciliation `2bbb645` passed all six CI jobs; real studies remain unrun |
 | Operations and economics (M17) | Local resource ledger, fenced measurements, staff dashboard/CLI alerts, time/cost observations, retention and synthetic saturation/outage checks implemented. Objectives are proposed; actual hosted costs, named response, real workloads and payment evidence remain open |
 | Hosting and release | M16 local dispatch/heartbeats/physical-capacity and signed restore controls implemented; Google REST adapters and private Terraform tested with controlled clients/mocks. Native PostgreSQL recovery rehearsed; cloud media runtime, uploads/playback and production services remain gated |
-| Latest recorded checks | M18 CI 2026-10-02 passed all six jobs: 306 PostgreSQL/Python tests in 44.70s, 21 Chromium journeys in 18.5s, seven Docker/max-profile tests in 139.35s, three mocked Terraform plans, native recovery/rollback/pilot erasure/replay, API/web startup, audits and static/schema/build/types. Local full 304-test plus final 24-pilot follow-up, 21 Edge and forward migrations 0013–0015 passed |
+| Latest recorded checks | Main-only policy `c7d60ee` passed all six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37045159974) first attempt at 18:10:02 UTC on 2026-10-02; GitHub additionally passed the Dependabot YAML validator (seven successful check runs). Earlier M18 run on the same date recorded 306 Python/21 Chromium/seven Docker tests and recovery/audit/build checks; those counts belong to the earlier receipt, not a new count here |
 | Evidence for those checks | [M18 pilot-tools qualification](docs/experiment-results/m18-pilot-tools.md), [M17 operations](docs/experiment-results/m17-operations.md), [M16 delivery](docs/experiment-results/m16-delivery.md) and earlier account/security receipts. None establishes real gameplay or production readiness |
-| Published delivery | M18 `135464f` and clean-tree reconciliation `2bbb645` pushed to origin/main 2026-10-02 without force; [M18 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168), first attempt, passed all six jobs at 17:37:02 UTC. M17/M16/M14 receipts remain history. Hosted release remains unqualified |
-| Repository delivery policy | Only `main` remains after closing/deleting all 15 inspected bot dependency proposals. Main-only instructions and disabled version PRs prepared; audits unchanged. Previous docs receipt `e70a83e` skipped CI, so latest-tip publication/checks for this policy are pending |
+| Published delivery | Main-only policy `c7d60ee` pushed without force and [CI verified](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37045159974) 2026-10-02. M18 `135464f`/clean reconciliation `2bbb645` and prior module receipts remain history. This progress receipt uses normal CI and its final publication will also be monitored. Hosted release remains unqualified |
+| Repository delivery policy | Only `main` remains; all 15 inspected bot proposals closed/deleted and 16 stale local tracking entries pruned. Four Dependabot version-PR streams disabled and GitHub validator passed; automatic security PRs already off and unchanged. Audits remain active with weekly reviewed/tested patches directly on main. Previous receipt `e70a83e` skipped CI; current policy requires checks on every published tip, including progress receipts |
 | Source integrity finding | Remote `301ed0b` injected obfuscated Next config code, repaired by `1771eba`. Rewritten receipt `2a20380` reintroduced an obfuscated eval payload; its sole difference from verified `5c1e78c` was Next config. `2bbb645` retains remote ancestry with the qualified clean M18 tree; current main head verified after CI. Repository-access/prior-execution review remains open |
 | Publication validation | M18 passed all six jobs on its first attempt without a retry or weakened gate; downloaded Python/sandbox JUnit corroborates logs. M17/M16 also passed first attempt. M14's prior audit failure/patch/retry remain history. Both pinned Python locks and npm passed M18 audits; reconciliation never executed the injected config |
 
@@ -75,7 +75,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 
 | ID | Milestone | Status | Main dependency / remaining exit |
 |---|---|---|---|
-| M01 | Product architecture and delivery governance | PARTIAL | Existing architecture/tracking complete; new M01.06 single-branch policy prepared and bot cleanup verified, latest publication checks pending |
+| M01 | Product architecture and delivery governance | DONE | Architecture/tracking and main-only checked delivery implemented; maintain decisions, audits and this tracker |
 | M02 | Local canonical domain and evidence lifecycle | DONE | Local scope; hosted equivalents tracked separately |
 | M03 | Local UI, workers and synthetic integration | DONE | Local scope; live providers and real measurements separate |
 | M04 | Permitted real player identity linking | BLOCKED | Approved resolver, identity mapping and permitted fixtures |
@@ -108,7 +108,7 @@ Owner: technical/product owner. Exit: approved narrow architecture, traceable de
 | M01.03 Define provider classes and preserve source-neutral canonical models | DONE | [Match-ingestion architecture](docs/architecture/match-ingestion.md), [ADR-013](docs/adr/ADR-013-provider-neutral-match-ingestion.md) |
 | M01.04 Define experiments, continuation/narrowing/stop rules | DONE | [Experiment plan](docs/architecture/experiment-plan.md), [pilot protocol](docs/pilot-protocol.md) |
 | M01.05 Maintain full requirements and implementation progress | DONE | This tracker, [work log](docs/progress.md), [repository instructions](AGENTS.md); continuing obligation |
-| M01.06 Maintain the requested single-branch delivery and checked publication | PARTIAL | 2026-10-02: all 15 inspected bot PRs closed and corresponding branches deleted; GitHub verifies only unchanged `main`. All four version-update PR streams disabled in prepared YAML; automatic security PRs already disabled and unchanged. Existing audits remain active; manual patches require review/tests on main. Publication and real CI on the latest tip pending; [instructions](AGENTS.md), D029 and [work log](docs/progress.md) |
+| M01.06 Maintain the requested single-branch delivery and checked publication | DONE | 2026-10-02: 15 bot PRs closed/branches deleted, 16 stale local tracking refs pruned, only main remains. Four version-PR streams disabled in published `c7d60ee`; automatic security PRs already off and unchanged. All six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37045159974) plus GitHub YAML validation passed on that exact tip. Existing audits/weekly manual patch review retained; [instructions](AGENTS.md), D029 and [work log](docs/progress.md). Continuing obligation: publish/monitor ordinary receipts with CI enabled |
 
 ## M02 — Local canonical domain and evidence lifecycle
 
@@ -374,7 +374,7 @@ Owner: technical/product owner. Exit: real supported users complete the hosted f
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M19.01 Record pilot continuation decision and beta-supported scope | NOT_STARTED | M18 findings and applicable M04–M17 requirements accepted |
-| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | [M18 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168) for `2bbb645` passed all six jobs on 2026-10-02: 306 Python/21 Chromium/seven Docker tests, synthetic load/native pilot recovery, audits, mocked Terraform and Linux startup. Subsequent docs receipt `e70a83e` skipped CI and has no checks; new main-only policy publication will receive normal CI, pending. Prior receipts preserved. Staging auth/storage/job/provider integrations and permitted real data remain untested |
+| M19.02 Execute remote CI and staging end-to-end tests | PARTIAL | [Main-only policy CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37045159974) for `c7d60ee` passed all six jobs first attempt 2026-10-02; GitHub YAML validation also passed. Previous docs receipt `e70a83e` skipped CI; future receipts use normal checked publication. Earlier [M18 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168) records 306 Python/21 Chromium/seven Docker tests, load/recovery, audits, mocked Terraform and startup. Staging integrations and permitted real data remain untested |
 | M19.03 Test onboarding → import/upload → coaching → practice → later evaluation | NOT_STARTED | Real participant paths and accessible error recovery; no staff-only bypass as user workflow |
 | M19.04 Exercise deletion, consent withdrawal, outage, rollback and restore | NOT_STARTED | Traceable operational evidence and resolved release-blocking defects |
 | M19.05 Measure beta usability, retention, useful decisions and support burden | NOT_STARTED | Predeclared denominators and adverse outcomes; product value beyond native workflow |
@@ -433,11 +433,12 @@ Reconsider them only through an explicit product/architecture decision with supp
 
 ## Immediate next work and blockers
 
-Current repository maintenance (M01.06/M19.02): 15 bot branches/PRs removed and
-`main` preserved; publish the version-PR configuration and monitor ordinary CI
-on the latest tip. The previous docs-only receipt `e70a83e` used `[skip ci]`,
-so it has zero check runs despite successful M18 code CI. Future receipts must
-receive normal CI. This maintenance changes no real-data or hosted release gate.
+Repository maintenance (M01.06/M19.02) is implemented: only `main` remains,
+version PRs are disabled, all six policy CI jobs and GitHub YAML validation
+passed. Publish and monitor this normal-CI progress receipt; thereafter retain
+weekly dependency review and checks on each latest tip. Previous docs-only
+`e70a83e` skipped checks; this policy corrects that delivery practice without
+changing any real-data or hosted release gate.
 
 | Priority | Next concrete outcome | Requirements | Needed input / owner |
 |---|---|---|---|
@@ -484,3 +485,4 @@ release gates still govern those actions. Do not let one external blocker stop i
 | 2026-10-02 | M17.01–M17.07, M14.05, M15.06, M16.05, M19.02 | Implemented and published available M17 engineering as one module, including safe unknown-history migration; retained actual workload/cost/payment and deployment gates | [M17 evidence](docs/experiment-results/m17-operations.md): all six [remote CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37031233040) passed first attempt; 282 Python, 17 Chromium, seven Docker and three Terraform tests, native recovery, audits and container startup |
 | 2026-10-02 | M18.01–M18.07, M08.01/.03/.04/.06, M14.04/.05, M16.05, M19.02 | Delivered coherent local pilot tools, safe source-history reconciliation and progress records; kept real intake/studies and release approval separate | [M18 evidence](docs/experiment-results/m18-pilot-tools.md): all six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168) passed first attempt; 306 Python, 21 Chromium, seven Docker, three Terraform, native recovery, audits and startup |
 | 2026-10-02 | M01.05/M01.06, M15.04, M19.02 | Removed 15 verified Dependabot proposals/branches, prepared main-only/no-skip publication policy and disabled four version-PR streams without merging upgrades or changing audit gates | GitHub verifies one unchanged main branch and zero open PRs; automatic security PRs already off. Dependabot YAML parsed with existing js-yaml; diff check passed. Publication/latest-tip CI pending |
+| 2026-10-02 | M01.05/M01.06, M15.04, M19.02 | Published/qualified main-only delivery and pruned 16 stale local tracking refs; M01.06 and M01 DONE for ongoing delivery policy; retained ordinary CI on progress receipts | `c7d60ee` and all six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37045159974) passed first attempt at 18:10:02 UTC; GitHub configuration validator also passed. API verifies sole main at that head and security PRs off; prior application qualification remains separately dated |
