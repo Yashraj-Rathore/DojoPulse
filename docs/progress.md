@@ -474,3 +474,29 @@ report zero vulnerabilities. ESLint, production build, TypeScript and all 14 Edg
 (21.5s). No application/backend/parser logic changed, so the existing backend evidence remains
 dated rather than being relabelled as a fresh local run. Committing/pushing this targeted fix and
 monitoring a new complete CI run is the next publication step.
+
+Pushed the validated dependency fix as `f17747ffe71485fede93ab079445c002cdad8abd` and verified
+the remote SHA. The original M14 run finished with Python/frontend/sandbox success and only
+the dependency audit failing. Corrected [run 36893320865](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36893320865)
+passed frontend and dependency jobs on its first attempt, while both Python-related runners
+spent more than six minutes installing OS packages. Cancelled that attempt and reran the same
+unchanged commit on fresh runners. The now-available cancelled-job log shows slow downloads
+from `azure.archive.ubuntu.com`, not a test assertion failure. No workflow/test gate was altered.
+Attempt two is being monitored; its final result will be recorded separately.
+
+## M14 publication verified — 2026-10-02
+
+Verified that corrected [CI run 36893320865](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36893320865),
+attempt two, completed successfully on 2026-10-01 for
+`f17747ffe71485fede93ab079445c002cdad8abd`. All four jobs succeeded: 232 PostgreSQL/Python tests
+(seven opt-in Docker cases skipped in that job), 14 Chromium browser tests, seven separately
+executed Docker sandbox tests, and clean Python/npm production audits. Build, lint/type, Django
+system and migration-drift checks also passed. Exact counts/timings are recorded in
+[M14 qualification](experiment-results/m14-accounts.md). No new local tests were run for this receipt.
+
+Fetched origin and confirmed main still matches the tested security-patch commit. Updated
+PRODUCT_PROGRESS.md's current position, M15.04/M19.02 evidence, date and publication record;
+updated the qualification report and this chronological log. The initial audit failure and runner
+retry remain in the history. This documentation-only publication receipt uses `[skip ci]` because
+application, dependency and workflow files are unchanged from the successful run. It is not a
+hosted deployment or a waiver of provider, real-game, privacy, backup or source-integrity gates.

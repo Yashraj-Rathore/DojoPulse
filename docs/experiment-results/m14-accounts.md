@@ -64,3 +64,23 @@ Fresh local npm install/production audits report zero vulnerabilities, build/lin
 and 14 Edge tests pass in 21.5s. This dependency change supersedes the earlier statement that no
 dependency changed during the core M14 implementation. The new remote run remains pending;
 this local receipt does not yet claim an entirely green publication pipeline.
+
+## Verified publication receipt — 2026-10-02
+
+Published implementation `e569bbc687b78c024089b63ee97dfa4de017084a` and security patch
+`f17747ffe71485fede93ab079445c002cdad8abd`. The corrected
+[CI run 36893320865](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/36893320865), attempt
+two, completed successfully on 2026-10-01; all four results were verified on 2026-10-02:
+
+| Job | Observed result |
+|---|---|
+| python-postgres | 232 passed, seven opt-in sandbox tests skipped, 32.34s; static/system/migration checks passed |
+| frontend | 14 Chromium tests passed, 18.8s; lint, production build and type checks passed |
+| media-sandbox | All seven Docker tests passed, 146.23s, including the maximum supported synthetic fixture |
+| dependencies | Python audit reported no known vulnerabilities; npm production audit reported zero vulnerabilities |
+
+The first corrected attempt was cancelled during extended OS-package downloads; logs showed
+slow Ubuntu mirror downloads. Attempt two reran the same commit and all checks without changing
+the workflow or weakening a gate. These are CI software results; hosted release, source-integrity
+review and real-player validation remain the open requirements described above. A documentation-only
+receipt follows with `[skip ci]`; the tested application and workflow remain those of `f17747f`.
