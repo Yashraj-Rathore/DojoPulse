@@ -643,3 +643,163 @@ class UploadAdmission(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     expires_at = models.DateTimeField(db_index=True)
     reserved_bytes = models.PositiveBigIntegerField()
+
+
+class PilotStudy(Owned):
+    title = models.CharField(max_length=80)
+    dataset_kind = models.CharField(max_length=12)
+    protocol = models.JSONField()
+    protocol_digest = models.CharField(max_length=64)
+    state = models.CharField(max_length=12, default="COLLECTING")
+    revision = models.PositiveIntegerField(default=1)
+    request_id = models.UUIDField()
+    deleted_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="pilot_study_request"),
+            models.CheckConstraint(
+                condition=Q(dataset_kind__in=["synthetic", "real"])
+                & Q(state__in=["COLLECTING", "FROZEN", "CLOSED"]),
+                name="pilot_study_valid",
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Study protocol is immutable; use a new study revision")
+        self.protocol_digest = digest(self.protocol)
+        super().save(*args, **kwargs)
+
+
+class PilotEnrollment(Owned):
+    study = models.ForeignKey(PilotStudy, on_delete=models.CASCADE)
+    role = models.CharField(max_length=16)
+    pseudonym = models.UUIDField(default=uuid.uuid4, editable=False)
+    split = models.CharField(max_length=16, default="development")
+    comparison_order = models.CharField(max_length=20, default="UNASSIGNED")
+    state = models.CharField(max_length=12, default="ACTIVE")
+    consent_digest = models.CharField(max_length=64)
+    expires_at = models.DateTimeField()
+    evaluation = models.ForeignKey(ImprovementEvaluation, on_delete=models.SET_NULL, null=True)
+    evaluation_digest = models.CharField(max_length=64, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["study", "owner"], name="pilot_one_role"),
+            models.CheckConstraint(
+                condition=Q(role__in=["PARTICIPANT", "REVIEWER", "ADJUDICATOR", "EXPERT"])
+                & Q(state__in=["ACTIVE", "WITHDRAWN"])
+                & Q(split__in=["development", "validation", "held-out"]),
+                name="pilot_enrollment_valid",
+            ),
+        ]
+
+
+class PilotSession(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    enrollment = models.ForeignKey(PilotEnrollment, on_delete=models.CASCADE)
+    code = models.CharField(max_length=60)
+    phase = models.CharField(max_length=16)
+    played_at = models.DateTimeField()
+    playable_seconds = models.PositiveIntegerField(null=True)
+    state = models.CharField(max_length=20)
+    unaided = models.BooleanField(default=False)
+    setup_seconds = models.PositiveIntegerField(null=True)
+    useful = models.BooleanField(null=True)
+    insight_seconds = models.PositiveIntegerField(null=True)
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["enrollment", "code"], name="pilot_session_code"),
+            models.UniqueConstraint(
+                fields=["enrollment", "request_id"], name="pilot_session_request"
+            ),
+        ]
+
+
+class PilotCapture(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(PilotSession, on_delete=models.CASCADE)
+    asset = models.ForeignKey(ReplayAsset, on_delete=models.SET_NULL, null=True)
+    source_sha256 = models.CharField(max_length=64, blank=True)
+    game_build = models.CharField(max_length=80, blank=True)
+    duration_seconds = models.FloatField()
+    original_retain_until = models.DateTimeField(null=True)
+    withdrawn_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["session", "asset"], name="pilot_capture_source")
+        ]
+
+
+class PilotTask(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    capture = models.ForeignKey(PilotCapture, on_delete=models.CASCADE)
+    kind = models.CharField(max_length=12)
+    start_us = models.PositiveBigIntegerField()
+    end_us = models.PositiveBigIntegerField()
+    reviewer_one = models.ForeignKey(PilotEnrollment, on_delete=models.PROTECT, related_name="+")
+    reviewer_two = models.ForeignKey(PilotEnrollment, on_delete=models.PROTECT, related_name="+")
+    adjudicator = models.ForeignKey(PilotEnrollment, on_delete=models.PROTECT, related_name="+")
+    prediction = models.JSONField(null=True)
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["capture", "request_id"], name="pilot_task_request"),
+            models.CheckConstraint(
+                condition=Q(end_us__gte=F("start_us")) & Q(kind__in=["QC", "TARGET", "TRIAL"]),
+                name="pilot_task_valid",
+            ),
+        ]
+
+
+class PilotReview(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    task = models.ForeignKey(PilotTask, on_delete=models.CASCADE)
+    reviewer = models.ForeignKey(PilotEnrollment, on_delete=models.PROTECT)
+    label = models.JSONField()
+    label_digest = models.CharField(max_length=64)
+    seconds = models.PositiveIntegerField()
+    request_id = models.UUIDField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["task", "reviewer"], name="pilot_independent_review")
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Pilot reviews are immutable")
+        super().save(*args, **kwargs)
+
+
+class PilotGateReport(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    study = models.ForeignKey(PilotStudy, on_delete=models.CASCADE)
+    gate = models.CharField(max_length=2)
+    revision = models.PositiveIntegerField()
+    data = models.JSONField()
+    content_hash = models.CharField(max_length=64)
+    invalidated_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["study", "gate", "revision"], name="pilot_gate_revision"
+            )
+        ]
+
+
+class PilotDecision(models.Model):
+    report = models.OneToOneField(PilotGateReport, on_delete=models.CASCADE)
+    actor = models.ForeignKey(PilotEnrollment, on_delete=models.PROTECT)
+    action = models.CharField(max_length=12)
+    reason = models.CharField(max_length=30)
+    reference = models.CharField(max_length=80)
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-10-02** · Architecture: **2.8.0** · Current stage: **local research prototype**
+Last updated: **2026-10-02** · Architecture: **2.9.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -25,13 +25,14 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Real player IDs / providers | No live identity resolver or match transport enabled; EWGF usage rights, credentials and current authenticated schema unresolved |
 | Gameplay recognition | Bounded media tooling and deterministic rules exist; no released Tekken detector or calibrated templates |
 | Knowledge and drills | One provisional Jin/Jin uf+4 target and one draft drill; expert approval and current-build verification missing |
-| Scientific validation | G1–G6 are all NOT_RUN; no completed real-player improvement study |
+| Scientific validation | G1–G6 are all NOT_RUN; local M18 consent/review/report tools implemented, no completed real-player study |
+| Pilot preparation (M18) | Local consent, pseudonyms, prospective intake/allocation, blinded review/adjudication, canonical links, evidence packs and withdrawal/restore erasure implemented and locally qualified; main publication/CI pending |
 | Operations and economics (M17) | Local resource ledger, fenced measurements, staff dashboard/CLI alerts, time/cost observations, retention and synthetic saturation/outage checks implemented. Objectives are proposed; actual hosted costs, named response, real workloads and payment evidence remain open |
 | Hosting and release | M16 local dispatch/heartbeats/physical-capacity and signed restore controls implemented; Google REST adapters and private Terraform tested with controlled clients/mocks. Native PostgreSQL recovery rehearsed; cloud media runtime, uploads/playback and production services remain gated |
 | Latest recorded checks | M17 remote CI 2026-10-02 passed all six jobs: 282 PostgreSQL/Python tests in 54.02s, 17 Chromium journeys in 15.0s, seven Docker isolation/max-profile tests in 142.71s, three mocked Terraform plans, native recovery/rollback/replay, API/web container startup, both Python/npm audits and frontend/static/system/schema checks. Local full 281-test plus 26-test follow-up, 17 Edge and migrations 0010–0012 remain recorded evidence |
 | Evidence for those checks | [M17 operations qualification](docs/experiment-results/m17-operations.md), [M16 local qualification](docs/experiment-results/m16-delivery.md), [M14 account qualification](docs/experiment-results/m14-accounts.md) and [M15 local qualification](docs/experiment-results/m15-security.md). None establishes real gameplay or production readiness |
 | Published delivery | M17 `f3eb683` pushed to `origin/main` 2026-10-02; [M17 CI](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37031233040), first attempt, passed all six jobs at 16:09:33 UTC. M16 `bbf2704` and M14 `e569bbc`/`f17747f` passed earlier CI and remain recorded history. Hosted release remains unqualified |
-| Source integrity finding | Remote `301ed0b` introduced unexpected obfuscated code into Next config; `1771eba` preserves history while restoring the clean configuration. Repository-access and possible prior-execution review remain outstanding |
+| Source integrity finding | Remote `301ed0b` injected obfuscated Next config code, repaired by `1771eba`. M18 fetch found rewritten receipt `2a20380` reintroducing an obfuscated eval payload; its sole difference from verified local `5c1e78c` is Next config. Retaining the verified clean tree and remote ancestry; repository-access/prior-execution review remains open |
 | Publication validation | M17 passed all six jobs on its first attempt without a retry or weakened gate; downloaded JUnit/load artifacts corroborate logs. M16 also passed on its first attempt. M14's earlier Next.js audit failure, patch 16.3.6 and runner retry remain in history. Both pinned Python locks and npm passed M17 audits |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
@@ -90,7 +91,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M15 | Security, privacy and reliability hardening | PARTIAL | Local controls and Docker qualification delivered; deployment-specific isolation/abuse/restore and independent security/privacy review remain |
 | M16 | Hosted asynchronous delivery and deployment | PARTIAL | Local dispatch/recovery and mocked Google/Terraform preparation delivered; approved region/budget, equivalent hosted media isolation, durable journal and staging integration remain |
 | M17 | Operations, performance and unit economics | PARTIAL | Local engineering module delivered; approved objectives, representative hosted workload, external alert/response ownership, actual costs and recurring payment evidence remain |
-| M18 | Prospective real-player pilot | BLOCKED | Participants, consent, reviewers, expert and accepted measurement |
+| M18 | Prospective real-player pilot | PARTIAL | Local consent/review/report preparation implemented; real participants, approved protocol/rights, expert and G1–G6 observations remain blocked |
 | M19 | Hosted private beta and release qualification | PARTIAL | First remote software CI jobs passed; pilot decisions, staging and operational/security qualification remain |
 | M20 | Public supported release and commercial readiness | NOT_STARTED | Beta evidence, supported scope, support and commercial decisions |
 | M21 | Broader validated Tekken coverage | NOT_STARTED | First complete loop and measured value before expansion |
@@ -200,12 +201,12 @@ Owner: dataset lead + two independent reviewers + adjudicator. Exit: an auditabl
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M08.01 Consent, pseudonyms, manifests, source hashes and private storage | PARTIAL | Schemas/validator/protocol implemented; recruit consented participants and collect real captures |
+| M08.01 Consent, pseudonyms, manifests, source hashes and private storage | PARTIAL | Local M18 self-consent/role pseudonyms, source/retention pins and report manifests implemented; real intake remains code-gated pending reviewed protocol, rights and participants |
 | M08.02 Representative positives, failures, near misses and target-absent controls | BLOCKED | Initial 20 captures and later gate-sized data; include adverse/uncertain contexts rather than selected successes |
-| M08.03 Independent dual labels and third-party adjudication | PARTIAL | Annotation tools and validation exist; reviewers, disagreements and actual review-time records missing |
-| M08.04 Player/session/source-disjoint development, validation and test splits | PARTIAL | Split validator exists; freeze actual manifest revisions and held-out access policy |
+| M08.03 Independent dual labels and third-party adjudication | PARTIAL | Local role-scoped blinded review, immutable measured submissions, third-review adjudication and validated annotation export implemented; real qualified reviewers/adverse labels/review time missing |
+| M08.04 Player/session/source-disjoint development, validation and test splits | PARTIAL | Local split assignment before sessions, source-hash deduplication, frozen inputs/predictions and held-out label blinding implemented; representative real disjoint manifests and external blindness remain unqualified |
 | M08.05 Measure frame/timestamp uncertainty and critical outcome slices | PARTIAL | Harness exists; sufficient success/failure samples, timing audits and uncertainty labels still needed |
-| M08.06 Honor withdrawals, retention and reproducibility constraints | PARTIAL | Local lineage exists; complete dataset/export inventory and deletion audit with real data |
+| M08.06 Honor withdrawals, retention and reproducibility constraints | PARTIAL | Local frozen dataset/protocol hashes, original-retention pins, own study export, expiry/withdrawal erasure and signed restore replay implemented; real dataset/deletion audit, hosted erasure and optional training review remain |
 
 ## M09 — Validated observation/event recognition
 
@@ -288,8 +289,8 @@ Local implementation and evidence: [account lifecycle](docs/architecture/account
 | M14.01 Secure sign-up/sign-in, session lifecycle and recovery | PARTIAL | Local verification/recovery, current-password changes, owned session inventory/revocation and logout-all implemented; expiring one-use challenges, CSRF, rate limits and concurrency checked. Production mail transport, abuse/registration-expiry policy, recovery review and hosted HTTPS qualification remain |
 | M14.02 Separate player identity claims from authenticated application ownership | DONE | Owner-scoped claimed links and cross-owner tests; no ID-as-password behavior |
 | M14.03 Version processing consent, optional training consent and withdrawals | PARTIAL | Version/digest receipts, legacy-unversioned backfill, independent optional training control and explicit withdrawal UI implemented. Withdrawal fences analysis/sync and clears upload admissions; re-grant restarts nothing. Legal policy approval, hosted audit/retention and any future real training eligibility enforcement remain |
-| M14.04 Private data access, minimal opponent information and export | PARTIAL | Owner-only media/JSON export now includes verified email and consent/suppression receipts; recovery/session secrets, suppression hashes, storage paths and opponent IDs excluded. Hosted authorization, complete media/provider portability and scale remain |
-| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Tombstone/purge erases account credentials/receipts/suppressions/private test mail. M16 adds signed intents/checkpoints and synthetic restore replay before reads. M17 export/deletion covers attempt metrics/operator time; minimal numeric safety holds persist until stop/retention. Real provider/backup retention, current hosted controls and retained-copy erasure remain unverified |
+| M14.04 Private data access, minimal opponent information and export | PARTIAL | Own export includes account/consent receipts and own M18 memberships, sessions, source pins and reviews. Assigned study media checks current consent/role/retention/chronology. Secrets/opponent/foreign account identities excluded; hosted access, portability and scale remain |
+| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Tombstone/purge covers account/provider/resource records; M18 consent/source/account deletion and expiry erase study labels, grants and dependent reports. Signed withdrawal/closure restores revoke stale study evidence before reads. Hosted provider/backup retention/current controls and retained-copy erasure remain unverified |
 | M14.06 Review identity re-linking and per-match suppression retention | PARTIAL | D025 implements explicit local re-link confirmation with owner-keyed HMAC suppression of known deleted source IDs. Identity-wide revocation remains the initial deletion stop. Production retention, stable key rotation and unknown cross-provider aliases still need review; local work no longer blocked |
 
 ## M15 — Security, privacy and reliability hardening
@@ -316,7 +317,7 @@ Owner: infrastructure/backend owner. Exit: approved workload operates in a priva
 | M16.02 Deploy web/API, managed PostgreSQL and private object storage | PARTIAL | Unprivileged WSGI/Next standalone images, readiness/quarantine, private SQL/GCS/Tasks/IAM/secret-version templates and bounded generation-pinned GCS adapter implemented. Linux builds/unprivileged quarantine and standalone startup passed remotely. Hosted runtime/TLS/routing, SQL/secrets, durable journal, playback/uploads and live storage acceptance remain; see [M16 evidence](docs/experiment-results/m16-delivery.md) |
 | M16.03 Implement durable dispatch/outbox/reconciler and bounded background execution | PARTIAL | Atomic producer outbox, deterministic Tasks, bounded retry, one worker entry, retained per-owner/global physical slots and official Google control contracts tested locally. Ambiguous launches never blindly retry. Cloud Run cannot host the qualified nested Docker sandbox; equivalent isolation/runtime and live reconciliation remain gates |
 | M16.04 Add worker heartbeats/progress, cancellation and stale-execution recovery | PARTIAL | 30s heartbeats bounded by 420s deadline, coarse progress API, fence/consent/cancellation guards and stop-confirmed stale recovery implemented. Unconfirmed cleanup retains capacity. Hosted total deadline, OIDC/operation fixtures and cancellation/publication fault qualification remain |
-| M16.05 Rehearse backup, restore, migration and rollback | PARTIAL | Native synthetic PostgreSQL dump/restore, migration forward/reverse/forward through M17 migrations 0010–0012, signed controls/repeated purge and HTTP/work quarantine passed. Reverse guards protect active slots/GCS assets, open/current charged budgets and unknown historical dates. Production RPO/RTO, current replicated controls/quota history, old-runtime shutdown, failover and retained-copy erasure remain |
+| M16.05 Rehearse backup, restore, migration and rollback | PARTIAL | Native synthetic PostgreSQL dump/restore/round-trip through 0015, signed pilot withdrawal and erasure/repeated replay before reads passed. Reverse guards protect study history/retention/allocation plus existing slots/budgets/dates. Production RPO/RTO/current controls, runtime shutdown/failover and retained-copy erasure remain |
 | M16.06 Deploy with approved release flags and real-data decisions | PARTIAL | Provisioning precondition/private ingress/quarantine and code-level managed-media gate implemented; external upload/live-provider/recognition gates preserved. No release deployed; applicable scientific/security/privacy/provider decisions and staging evidence still required |
 
 ## M17 — Operations, performance and unit economics
@@ -339,12 +340,13 @@ Owner: product/measurement owner + expert/reviewers. Exit: all G1–G6 have real
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M18.01 Recruit permitted cohort, record consent and assign reviewers/expert | BLOCKED | [Pilot protocol](docs/pilot-protocol.md); no real participant/reviewer assignments recorded |
-| M18.02 Run observability and reviewed-practice studies | BLOCKED | G1/G4; source manifests, denominators, uncertainty, reviewer disagreement and costs |
-| M18.03 Run held-out recognition and unaided-capture studies | BLOCKED | G2/G3; do not tune on held-out outcomes or label a demo as a user study |
-| M18.04 Run natural-frequency and prospective complete-loop study | BLOCKED | G5/G6; include zero-opportunity/missing sessions and adverse results |
-| M18.05 Compare against native replay/training and usual practice | PARTIAL | Comparator protocol prepared; actual usefulness/adherence/time-to-insight evidence missing |
-| M18.06 Record decisions and revise scope from negative evidence | PARTIAL | Result templates/stop rules exist; complete evidence-backed gate decisions before release |
+| M18.01 Recruit permitted cohort, record consent and assign reviewers/expert | PARTIAL | [Local tools](docs/architecture/pilot-tools.md) implement self-consent/pseudonyms, signed invitations, separate roles and prospective allocation; real intake disabled pending rights/protocol/adult-retention review and an actual cohort/expert |
+| M18.02 Run observability and reviewed-practice studies | BLOCKED | G1/G4 evidence packs, independent labels/adjudication, unknown denominators and review time implemented locally; actual 20 captures/10-player trials and expert approval absent |
+| M18.03 Run held-out recognition and unaided-capture studies | BLOCKED | Local G2/G3 harness reports per-outcome exact bounds, frozen predictions, held-out labels and missing/setup data; actual detector/representative negatives/unaided participants remain absent |
+| M18.04 Run natural-frequency and prospective complete-loop study | BLOCKED | Local original chronology/phase logs, missing/zero sessions, known exposure, duration coverage and source-linked canonical evaluation packs implemented; real four-week histories and complete reviewed loop absent |
+| M18.05 Compare against native replay/training and usual practice | PARTIAL | Prospective allocation, native/usual/structured usefulness/time observations and conservative G6 candidate comparison implemented. Utility/group proposal needs real protocol approval; actual adherence/usability/comparator data absent |
+| M18.06 Record decisions and revise scope from negative evidence | PARTIAL | Current revision-scoped independent expert WAIT/CONTINUE/NARROW/STOP decisions implemented, with sparse/stale guards and no release promotion. Real expert decisions/evidence and any scope revision remain unrun |
+| M18.07 Deliver local pilot-management software | PARTIAL | Acceptance: role/consent/source/blinding/frozen-report/annotation/canonical-link and erasure/restore workflow tested, responsive UI and main CI receipt. Local full 304-test plus 24-pilot follow-up, 21 final Edge and native recovery/static/schema checks passed; main publication/CI pending; [evidence](docs/experiment-results/m18-pilot-tools.md), software scope only |
 
 ### Scientific gates — all NOT_RUN
 
@@ -436,7 +438,7 @@ Reconsider them only through an explicit product/architecture decision with supp
 | 3 | Validate observability/practice before promoting recognition | M09, M11, G1/G4 then G2 | Dataset/review findings; select backup/narrow if required |
 | 4 | Qualify M16 hosting and account/security release boundaries | M13.01–M13.04/M13.06–M13.07, M14.01/M14.03–M14.06, M15.01–M15.07, M16 | Google Cloud confirmed; local M16 outbox/recovery and mocked adapters/templates delivered. Select region/budget/recovery objectives; review equivalent media isolation and independent durable controls, then authorize staging provisioning. Hosted routing/email/IAM/storage and source-integrity/privacy/security reviews remain; tracker alone authorizes no resources |
 | 5 | Qualify M17 operations and actual economics | M17.01–M17.07 | Local ledger/telemetry/dashboard/load module implemented. Approve supported workload/objectives and named response; measure real hosting/reviewer/support amounts, qualify alert delivery and current quota recovery, then run an approved actual offer with payment/repeat-use evidence |
-| 6 | Run prospective real loop, then qualify hosting/beta | M12, M16–M19 | Measurement decisions, permitted data and validated security/operational integrations |
+| 6 | Activate a reviewed real pilot using M18 tools, then qualify hosting/beta | M08, M12, M16–M19 | Local tooling implemented; approve rights/adult retention/sampling/comparator protocol, enroll permitted cohort and independent reviewers/expert, then collect real G1–G6 evidence |
 
 The tracker is not authorization to purchase, contact providers, collect new personal data,
 enable undocumented endpoints or deploy externally. Existing user authorization and applicable

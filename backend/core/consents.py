@@ -72,6 +72,9 @@ def record_consent(owner, scope, action, version, request_id, source="ACCOUNT"):
         profile.processing_consent_at = now if action == "GRANT" else None
         profile.processing_withdrawn_at = now if action == "WITHDRAW" else None
         if action == "WITHDRAW":
+            from backend.core.pilots import erase_account
+
+            erase_account(owner.pk)
             AnalysisRun.objects.filter(owner=owner, status__in=["QUEUED", "PROCESSING"]).update(
                 status="CANCELLED", fence=F("fence") + 1, lease_until=None
             )

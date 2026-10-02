@@ -32,6 +32,20 @@ for name in ['recovery-deleted', 'recovery-withdrawn']:
     path.write_bytes(b'fixture')
     enqueue_run(owner=owner, asset=asset, request_key=name)
     Match.objects.create(owner=owner, played_at=timezone.now(), metadata_revision=1, dataset_kind='synthetic')
+from datetime import timedelta
+from backend.core.models import PilotStudy, PilotEnrollment, PilotSession, PilotCapture, PilotTask, PilotReview, PilotGateReport
+manager = get_user_model().objects.create_user('recovery-pilot-manager', is_staff=True)
+study = PilotStudy.objects.create(owner=manager, title='Synthetic recovery', dataset_kind='synthetic', protocol={}, request_id=uuid.uuid4())
+participant = PilotEnrollment.objects.create(owner=owner, study=study, role='PARTICIPANT', consent_digest='fixture', expires_at=timezone.now()+timedelta(days=1))
+session = PilotSession.objects.create(enrollment=participant, code='fixture', phase='BASELINE', played_at=timezone.now(), state='CAPTURED', request_id=uuid.uuid4())
+capture = PilotCapture.objects.create(session=session, asset=asset, source_sha256='f'*64, game_build='synthetic', duration_seconds=1)
+reviewers = []
+for role in ['REVIEWER', 'REVIEWER', 'ADJUDICATOR']:
+    reviewer = get_user_model().objects.create_user('recovery-reviewer-'+uuid.uuid4().hex)
+    reviewers.append(PilotEnrollment.objects.create(owner=reviewer, study=study, role=role, consent_digest='fixture', expires_at=timezone.now()+timedelta(days=1)))
+task = PilotTask.objects.create(capture=capture, kind='TARGET', start_us=0, end_us=1, reviewer_one=reviewers[0], reviewer_two=reviewers[1], adjudicator=reviewers[2], request_id=uuid.uuid4())
+PilotReview.objects.create(task=task, reviewer=reviewers[0], label={'private': 'must-erase'}, label_digest='fixture', seconds=1, request_id=uuid.uuid4())
+PilotGateReport.objects.create(study=study, gate='G1', revision=1, data={'private': 'must-erase'}, content_hash='fixture')
 """
 
 DELETE = """
@@ -42,6 +56,9 @@ from backend.core.models import Match, ReplayAsset
 import uuid
 delete_account(get_user_model().objects.get(username='recovery-deleted'))
 owner = get_user_model().objects.get(username='recovery-withdrawn')
+from backend.core.pilots import withdraw
+from backend.core.models import PilotEnrollment
+withdraw(owner, PilotEnrollment.objects.get(owner=owner).study_id)
 record_consent(owner, 'PROCESSING', 'WITHDRAW', POLICY_VERSION, uuid.uuid4())
 delete_metadata_match(owner, Match.objects.get(owner=owner).pk)
 delete_asset(owner, ReplayAsset.objects.get(owner=owner).pk)
@@ -57,6 +74,11 @@ assert get_user_model().objects.filter(is_active=False).count() == 1
 assert Profile.objects.filter(processing_consent_at__isnull=False).count() == 0
 assert AnalysisRun.objects.exclude(status='CANCELLED').count() == 0
 assert RunDispatch.objects.exclude(status='CANCELLED').count() == 0
+from backend.core.models import PilotEnrollment, PilotReview, PilotGateReport
+assert not PilotEnrollment.objects.filter(state='ACTIVE').exists()
+assert not PilotReview.objects.exists()
+assert not PilotGateReport.objects.filter(invalidated_at=None).exists()
+assert not PilotGateReport.objects.exclude(data={}).exists()
 assert Match.objects.filter(deleted_at=None).count() == 0
 assert ReplayAsset.objects.filter(purge_completed_at=None).count() == 0
 for asset in ReplayAsset.objects.all():

@@ -26,7 +26,14 @@ def record_intent(owner_id, action, **payload):
     """
     if replaying.get():
         return
-    if action not in {"ACCOUNT_DELETE", "ASSET_DELETE", "MATCH_DELETE", "CONSENT_WITHDRAW"}:
+    if action not in {
+        "ACCOUNT_DELETE",
+        "ASSET_DELETE",
+        "MATCH_DELETE",
+        "CONSENT_WITHDRAW",
+        "PILOT_WITHDRAW",
+        "PILOT_CLOSE",
+    }:
         raise ValueError("INVALID_CONTROL_ACTION")
     # Owner -> global mutex is the repository lock order. Serialize the signed
     # completeness checkpoint across owners without relying on filesystem locks.
@@ -115,7 +122,14 @@ def verified_records():
             or record["version"] != 1
             or record["namespace"] != settings.DEPLOYMENT_NAMESPACE
             or record["action"]
-            not in {"ACCOUNT_DELETE", "ASSET_DELETE", "MATCH_DELETE", "CONSENT_WITHDRAW"}
+            not in {
+                "ACCOUNT_DELETE",
+                "ASSET_DELETE",
+                "MATCH_DELETE",
+                "CONSENT_WITHDRAW",
+                "PILOT_WITHDRAW",
+                "PILOT_CLOSE",
+            }
         ):
             raise ValueError("INVALID_CONTROL_JOURNAL")
         records.append(record)

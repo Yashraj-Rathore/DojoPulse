@@ -56,6 +56,14 @@ def apply_restore_controls():
             stop_reason="RESTORE_QUARANTINE",
         )
         PlayerGameIdentity.objects.all().update(state="REVOKED", consent_scope="", deleted_at=now)
+        from backend.core.models import PilotEnrollment
+        from backend.core.pilots import erase_enrollment
+        from backend.core.security import capacity_lock
+
+        capacity_lock()
+        # Restored study consent and blind labels cannot be trusted as current authorization.
+        for member in PilotEnrollment.objects.filter(state="ACTIVE"):
+            erase_enrollment(member)
     token = replaying.set(True)
     try:
         for record in records:
@@ -99,6 +107,24 @@ def apply_restore_controls():
                     else "processing_consent_at"
                 )
                 Profile.objects.filter(user=owner).update(**{field: None})
+            elif owner and action == "PILOT_WITHDRAW":
+                member = PilotEnrollment.objects.filter(
+                    owner=owner, study_id=payload["study"], state="ACTIVE"
+                ).first()
+                if member:
+                    with transaction.atomic():
+                        capacity_lock()
+                        erase_enrollment(member)
+            elif owner and action == "PILOT_CLOSE":
+                from backend.core.models import PilotStudy
+
+                PilotStudy.objects.filter(owner=owner, pk=payload["study"]).update(
+                    deleted_at=now,
+                    state="CLOSED",
+                    title="Closed study",
+                    protocol={},
+                    protocol_digest="",
+                )
         for record in records:
             if record["action"] == "ACCOUNT_DELETE":
                 for item in record["payload"]["assets"]:

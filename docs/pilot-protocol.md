@@ -107,6 +107,13 @@ maximum 60 days or an explicitly agreed extension. Expiry/withdrawal invalidates
 
 ## Current handoff
 
+Local software preparation is available at `/pilots`; see the
+[pilot tools contract](architecture/pilot-tools.md). It implements consent,
+assignments, chronology/source checks, blinded review/adjudication, frozen reports,
+prospective comparator allocation and erasure. G6's utility/group proposal needs
+real protocol review before use. Real intake is disabled and synthetic rehearsal
+never supplies the real G1–G6 results required by this protocol.
+
 Needed now: consented private captures, exact in-game build/settings evidence, pseudonymous
 player/session/played-at logs, two independent reviewers plus adjudicator, and a Tekken expert
 for the single drill. No footage needs to be committed or sent to an external service.

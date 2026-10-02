@@ -10,6 +10,9 @@ and [gate template](gate-template.json) are ready for actual observations.
 Module-specific local evidence: [M14 accounts and consent](m14-accounts.md) and
 [M15 security and reliability](m15-security.md). Hosted release and real-player gates remain open.
 
+[M18 pilot tools](m18-pilot-tools.md) records local synthetic workflow and privacy
+qualification separately from the unrun real participant studies.
+
 To unblock: supply private 1080p60 English SDR normal-speed MP4 recordings with both players'
 inputs, HUD/frame/status displays; a build-confirmation image; Jin/Jin target and negative
 examples; practice blocks; played-at/session metadata; service-processing consent and two

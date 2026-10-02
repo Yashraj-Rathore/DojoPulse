@@ -19,6 +19,11 @@ contracts, the relational cutover, an offline Wavu normalizer and two synthetic 
 are tested. Live transports, name lookup and native replay decoding remain disabled;
 public metadata cannot establish a missed punish.
 
+Local [pilot-management tools](docs/architecture/pilot-tools.md) are available at
+`/pilots`: self-consent, prospective session/source intake, independent review,
+adjudication and G1–G6 evidence packs. Real participant intake remains disabled;
+synthetic reports do not approve scientific gates or gameplay publication.
+
 Start with [Architecture V2](docs/architecture/architecture-v2.md),
 [verification results](docs/experiment-results/software-validation.md),
 [progress](docs/progress.md), and [pilot protocol](docs/pilot-protocol.md).
@@ -330,5 +335,5 @@ G1–G6 are NOT_RUN: human observability, deterministic detection, capture frict
 practice measurement, natural frequency and comparable complete loops.
 [The pilot protocol](docs/pilot-protocol.md) specifies required data and stop decisions.
 Cloud storage/resumable upload adapters and Cloud Run deployment are intentionally not enabled.
-The Docker parser file is an unvalidated isolation candidate; local subprocess limits alone
-do not certify safe external uploads.
+The local Docker parser isolation profile passed the separately recorded M15–M17
+qualification. Equivalent hosted isolation and external upload release remain gated.

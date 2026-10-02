@@ -60,3 +60,10 @@ append-only application ConsentReceipt and owner/provider MatchSuppression HMACs
 a session epoch and processing-withdrawal timestamp. Legacy consent is captured with its original
 time and explicitly unknown policy version. The canonical Match/GameplayEvent/player model stays
 provider-independent. See [account lifecycle](accounts-consent.md) for invariants and deletion.
+
+Migrations 0013–0015 add PilotStudy, PilotEnrollment, PilotSession, PilotCapture,
+PilotTask, PilotReview, PilotGateReport and PilotDecision. Immutable protocol
+digests, role consent, original-retention pins, prospective allocation, source
+hashes, append-only reviews and report revisions are separate from canonical
+GameplayEvents. Export/withdrawal/deletion and signed restore controls cover
+study evidence; see [pilot tools](pilot-tools.md).

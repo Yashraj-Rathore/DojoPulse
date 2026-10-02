@@ -282,12 +282,53 @@ def export_account(request):
         ConsentReceipt,
         MatchSuppression,
         OperatorWork,
+        PilotCapture,
+        PilotEnrollment,
+        PilotReview,
+        PilotSession,
         RunBudget,
     )
 
     # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
     # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "pilot_enrollments": (
+            PilotEnrollment.objects.filter(owner=user),
+            [
+                "id",
+                "study_id",
+                "pseudonym",
+                "role",
+                "split",
+                "comparison_order",
+                "state",
+                "consent_digest",
+                "expires_at",
+            ],
+        ),
+        "pilot_sessions": (
+            PilotSession.objects.filter(enrollment__owner=user),
+            [
+                "id",
+                "code",
+                "phase",
+                "played_at",
+                "state",
+                "playable_seconds",
+                "unaided",
+                "setup_seconds",
+                "useful",
+                "insight_seconds",
+            ],
+        ),
+        "pilot_own_reviews": (
+            PilotReview.objects.filter(reviewer__owner=user),
+            ["id", "task_id", "label", "seconds", "created_at"],
+        ),
+        "pilot_own_captures": (
+            PilotCapture.objects.filter(session__enrollment__owner=user),
+            ["id", "session_id", "source_sha256", "game_build", "duration_seconds", "withdrawn_at"],
+        ),
         "resource_budgets": (
             RunBudget.objects.filter(run__owner=user),
             [

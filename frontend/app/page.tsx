@@ -71,7 +71,7 @@ export default function Home(){
   {ready&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
   {!ready?<p>Connecting to local API…</p>:!authenticated?
    <section className="login"><h2>Open your local workspace</h2><p className="muted">Sign in with your verified local account or an existing development account.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
-   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a>{operator&&<Link href="/operations">Operations</Link>}</nav>
+   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a><Link href="/pilots">Pilot studies</Link>{operator&&<Link href="/operations">Operations</Link>}</nav>
    <div className="grid" id="workspace-content" tabIndex={-1}>
     <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
     <AccountControls csrf={csrf}/>

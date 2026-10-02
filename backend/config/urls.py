@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.urls import path
 
-from backend.core import account_api, api, experience_api, match_api, operations_api, recording_api
+from backend.core import (
+    account_api,
+    api,
+    experience_api,
+    match_api,
+    operations_api,
+    pilot_api,
+    recording_api,
+)
 from backend.core.cloud_api import dispatch_task
 from backend.core.deployment import health
 
@@ -25,6 +33,12 @@ urlpatterns = [
     path("api/operations/work", operations_api.work),
     path("api/operations/cost", operations_api.cost),
     path("api/usage", operations_api.usage),
+    path("api/pilots", pilot_api.studies),
+    path("api/pilot-invitation", pilot_api.inspect_invitation),
+    path("api/pilot-join", pilot_api.join),
+    path("api/pilots/<uuid:study_id>", pilot_api.study_detail),
+    path("api/pilots/<uuid:study_id>/tasks/<uuid:task_id>/media", pilot_api.media),
+    path("api/pilots/<uuid:study_id>/<str:operation>", pilot_api.command),
     path("api/preferences", experience_api.preferences),
     path("api/evidence", experience_api.evidence),
     path("api/feedback", experience_api.feedback),

@@ -668,3 +668,70 @@ alerts, representative workloads, approved objectives and real recurring economi
 Next evidence/decisions remain provider access, captures/expert/reviewers/G1–G6,
 region/budget/equivalent media isolation/current controls and actual-offer pilot.
 Source-integrity and privacy/security release reviews remain open.
+
+## 2026-10-02 — M18 coherent local pilot-management module
+
+Requirements: M18.01–M18.07, M08.01/.03/.04/.06, M14.04/.05, M16.05 and
+M19.02. Implemented study creation, signed role invitations, explicit adult
+self-consent/recording-rights receipts, pseudonyms, split/allocation assignment
+before sessions, prospective missing/zero/invalid logs, retained source pins,
+blinded independent reviews, third-party adjudication, frozen annotation export,
+canonical evaluation links and revisioned G1–G6 packs/independent decisions.
+Real intake is code-gated and synthetic success never changes scientific gates
+or publishes GameplayEvents. Fixed chronology and preserved negative outcomes
+remain separate from provider metadata. No undocumented provider access enabled.
+
+Changed files: pilot models/services/API/report module, settings/routes, migrations
+0013–0015, local `/pilots` UI/navigation/CSS, backend/browser regressions and expiry
+command. Extended consent/asset/account erasure, own export, original private
+retention, signed PILOT_WITHDRAW/PILOT_CLOSE and restore quarantine/rehearsal.
+Study review and cross-account withdrawal serialize under owner-first/global
+locking; delegated streams stop on grant/source removal. Architecture 2.9.0,
+ADR-017/D028, pilot protocol/contract/qualification and PRODUCT_PROGRESS updated
+together. M18 changes BLOCKED → PARTIAL for implemented software; real studies
+M18.02–M18.04 and all G1–G6 remain unrun, without a completion percentage.
+
+Actual checkpoints: 301 PostgreSQL/Python tests passed in 83.86s, then **304 in
+107.67s**, seven local Docker skips. **21 Edge journeys passed in 21.9s**, then
+**21 in 23.9s** after the chronology and lint/selector follow-up; frontend
+lint/build/types passed on that final browser run. Initial development effect
+replay lost an invitation fragment; a retained ref now keeps it after URL scrub.
+A revoked capture during streaming initially raised on disappearance; streams
+now stop cleanly. Follow-up canonical-link/CSRF/rollback tests are being checked.
+No gate was weakened to pass a test.
+
+Native PostgreSQL 17 fresh-database dump/restore/migration round-trip, signed
+pilot withdrawal, erasure of restored grants/labels/private report data before
+reads and repeat replay passed. Final guard/static/schema rehearsal, push and
+all six remote CI jobs remain pending; results will be appended in this work.
+
+Assumptions/blockers: self-attestation is not production age/rights approval;
+reports do not establish honest logging, representative sampling, expertise or
+blindness outside the app. G6 utility/allocation checks are proposed software
+criteria needing real protocol review. Real captures/cohort/expert/knowledge,
+provider rights, hosted scheduling/playback/retention/performance, current
+replicated controls and scientific/commercial/security release decisions remain
+absent. Next: finish checks, push main and monitor; then qualify real-study intake
+and collect permitted evidence rather than label synthetic data as real proof.
+
+Final local follow-up: **24 pilot tests passed in 10.07s** with owned canonical
+event/hash/evaluation pins, nonpositive comparable states, CSRF and three guarded
+reverse migrations. Native PostgreSQL recovery/round-trip/quarantine/repeated
+pilot replay passed again; Ruff check/format, mypy (23 sources), system/schema
+and diff checks passed. **21 final Edge journeys passed in 23.9s**, frontend
+lint/build/types passed and the mobile screenshot was inspected. Real-data and
+hosted gates remain unchanged; final consent follow-up precedes publication.
+
+Remote fetch unexpectedly force-rewrote M17 receipt `5c1e78c` to `2a20380`.
+Tree comparison proves its sole difference from the verified local receipt is
+another obfuscated eval payload in `frontend/next.config.ts`; no local build or
+execution consumed that payload. Preserve the qualified clean tree and remote
+ancestry during reconciliation. This extends the existing source-integrity
+finding; repository-access/prior-execution review remains open. No force push
+or deletion of remote history is needed. Next: main publication and all six CI jobs.
+
+Final consent guard follow-up passed all **24 pilot tests in 10.46s**. Local
+documentation-link verification found no broken targets. No private dataset,
+credential, generated screenshot, dependency change or hosted resource is included
+in this publication. The complete remote Python collection includes the two
+follow-up tests added after the local 304-test full checkpoint.

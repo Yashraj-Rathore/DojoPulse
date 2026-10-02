@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.8.0. Decision date: 2026-10-02. Status: local engineering approved;
+Version: 2.9.0. Decision date: 2026-10-02. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -21,6 +21,12 @@ The [M17 operations/economics contract](operations-economics.md) adds durable me
 budgets, fenced measurements, staff monitoring, retention and explicit cost coverage.
 Service objectives remain proposals; real costs, representative load, hosted alerts and
 actual recurring willingness to pay still require evidence and approval.
+
+The [M18 pilot tools](pilot-tools.md) add self-consent, pseudonyms, prospective
+session logs, independent blinded review, source-linked evaluations and revisioned
+G1–G6 packs. Withdrawal/restore erasure and expert decisions are separate from
+canonical publication. Real intake is code-gated; synthetic success leaves all
+scientific gates NOT_RUN and confers no gameplay or production approval.
 
 ## Product and release boundary
 
