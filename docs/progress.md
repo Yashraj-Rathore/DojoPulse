@@ -554,3 +554,28 @@ after publishing a report, until the remote reconciler observes termination.
 The full suite passed 255 tests in 59.59s with seven local Docker skips. Recovery
 rehearsal and final static/system/migration/doc-link checks passed. Container build
 contexts exclude local environment files, private media and Terraform state.
+
+## 2026-10-02 — M16 main publication and remote monitoring receipt
+
+Requirements: M16.01–M16.06, M14.05, M15.06 and M19.02. Published implementation
+`bbf270411ce6c47e1c5609017bf1c49aa3de38a5` to origin/main and monitored
+[CI run 37023337650](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37023337650)
+through completion. First attempt SUCCESS at 15:00:14 UTC; all six jobs passed.
+
+Actual remote results: 255 PostgreSQL/Python tests passed in 37.41s (seven sandbox
+skips executed separately); 14 Chromium journeys passed in 15.6s; all seven Docker
+sandbox tests passed in 148.54s. Native synthetic PostgreSQL 17 dump/restore,
+migration forward/reverse/forward, deletion/withdrawal controls before reads and
+repeat replay passed. Terraform validation and three mocked plans passed. Both
+API/web Linux images built; startup checks verified unprivileged users, quarantined
+API/503 and standalone web response. Static/build/system/migration checks passed;
+both pinned Python locks had no known vulnerabilities and npm audit found zero.
+
+Updated PRODUCT_PROGRESS current checks/publication/requirements, this log and
+the M16 qualification report. This documentation-only receipt uses `[skip ci]`
+because application/dependency/workflow files are unchanged from the successful
+run. No hosted resource, live integration, production erasure or game recognition
+was qualified. M16 remains PARTIAL for its explicitly hosted exit; next inputs are
+region/budget/recovery/privacy decisions, equivalent media isolation, independent
+durable current controls and authorized staging qualification. Source-integrity
+review remains open. Monitoring completed without a CI retry or code correction.
