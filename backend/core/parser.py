@@ -146,14 +146,17 @@ def analyze_isolated(source, output, metadata):
     finally:
         # Docker processes live outside the CLI process tree. Remove only our unique container.
         try:
-            subprocess.run(
+            cleanup = subprocess.run(
                 ["docker", "rm", "--force", name],
                 timeout=15,
                 capture_output=True,
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
                 check=False,
             )
+            if cleanup.returncode and b"No such container" not in cleanup.stderr:
+                raise ValueError("PARSER_CLEANUP_UNCONFIRMED")
         except (OSError, subprocess.TimeoutExpired):
             from backend.core.security import audit
 
             audit("parser_cleanup", "RUNTIME_UNAVAILABLE")
+            raise ValueError("PARSER_CLEANUP_UNCONFIRMED") from None

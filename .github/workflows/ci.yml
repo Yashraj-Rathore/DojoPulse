@@ -27,6 +27,7 @@ jobs:
           cache: pip
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: python -m pip install -r requirements.lock
+      - run: python -m pip install -r requirements-cloud.lock
       - run: python -m pip install --no-deps -e .
       - run: ruff check .
       - run: ruff format --check .
@@ -36,6 +37,7 @@ jobs:
       - run: python manage.py migrate --noinput
       - run: python manage.py load_contracts
       - run: pytest -q --junitxml=reports/pytest.xml
+      - run: python manage.py rehearse_recovery --confirm-isolated-local --postgres-container-image postgres:17
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -74,6 +76,7 @@ jobs:
           node-version: "22"
       - run: python -m pip install pip-audit==2.10.1
       - run: pip-audit --disable-pip --no-deps -r requirements.lock
+      - run: pip-audit --disable-pip --no-deps -r requirements-cloud.lock
       - run: npm audit --omit=dev --audit-level=moderate
         working-directory: frontend
   frontend:
@@ -101,3 +104,43 @@ jobs:
         with:
           name: browser-results
           path: frontend/test-results
+  deployment-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.16.5"
+      - run: terraform fmt -check -recursive
+        working-directory: infrastructure/google-cloud
+      - run: terraform init -backend=false -input=false -lockfile=readonly
+        working-directory: infrastructure/google-cloud
+      - run: terraform validate
+        working-directory: infrastructure/google-cloud
+      - run: terraform test
+        working-directory: infrastructure/google-cloud
+  application-containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f infrastructure/Dockerfile.api -t dojopulse-api:ci .
+      - run: docker build -f infrastructure/Dockerfile.web -t dojopulse-web:ci .
+      - name: Verify unprivileged API quarantine and standalone web
+        run: |
+          trap 'docker rm -f dojopulse-api-ci dojopulse-web-ci >/dev/null 2>&1 || true' EXIT
+          docker run -d --name dojopulse-api-ci -p 127.0.0.1:8180:8080 \
+            -e DJANGO_SECRET_KEY=ci-only-not-a-deployment-secret \
+            -e DATABASE_URL=postgresql://fixture@127.0.0.1:5432/fixture \
+            -e RESTORE_QUARANTINE=1 dojopulse-api:ci
+          docker run -d --name dojopulse-web-ci -p 127.0.0.1:8181:8080 dojopulse-web:ci
+          test "$(docker exec dojopulse-api-ci id -u)" = "10001"
+          test "$(docker exec dojopulse-web-ci id -u)" != "0"
+          for attempt in $(seq 1 30); do
+            status=$(curl --silent --output /tmp/dojo-health --write-out '%{http_code}' http://127.0.0.1:8180/health/ready || true)
+            if [ "$status" = "503" ]; then break; fi
+            sleep 1
+          done
+          test "$status" = "503"
+          test "$(cat /tmp/dojo-health)" = '{"status": "QUARANTINED"}'
+          curl --fail --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:8181/ >/dev/null

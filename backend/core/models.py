@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q
+from django.utils import timezone
 
 from analysis.contracts import digest
 
@@ -159,6 +160,8 @@ class DefinitionVersion(models.Model):
 
 class ReplayAsset(Owned):
     storage_key = models.CharField(max_length=250)
+    storage_provider = models.CharField(max_length=12, default="LOCAL")
+    storage_generation = models.CharField(max_length=30, blank=True)
     source_sha256 = models.CharField(max_length=64, blank=True)
     bytes = models.PositiveBigIntegerField(default=0)
     metadata = models.JSONField(default=dict)
@@ -345,6 +348,10 @@ class AnalysisRun(Owned):
     attempts = models.PositiveSmallIntegerField(default=0)
     fence = models.PositiveIntegerField(default=0)
     lease_until = models.DateTimeField(null=True)
+    heartbeat_at = models.DateTimeField(null=True)
+    deadline_at = models.DateTimeField(null=True)
+    progress = models.PositiveSmallIntegerField(default=0)
+    phase = models.CharField(max_length=30, default="QUEUED")
     result = models.JSONField(default=dict)
     error_code = models.CharField(max_length=100, blank=True)
 
@@ -352,6 +359,36 @@ class AnalysisRun(Owned):
         constraints = [
             models.UniqueConstraint(fields=["owner", "request_key"], name="run_idempotency")
         ]
+
+
+class RunDispatch(models.Model):
+    """Transactional intent; transport retries cannot create a second execution."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    run = models.OneToOneField(AnalysisRun, on_delete=models.CASCADE)
+    generation = models.PositiveIntegerField(default=1)
+    status = models.CharField(max_length=20, default="PENDING", db_index=True)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    lease_until = models.DateTimeField(null=True)
+    task_name = models.CharField(max_length=500, blank=True)
+    operation_name = models.CharField(max_length=500, blank=True)
+    error_code = models.CharField(max_length=60, blank=True)
+
+
+class ExecutionSlot(models.Model):
+    """Physical capacity remains reserved until the runtime confirms it has stopped."""
+
+    run = models.ForeignKey(AnalysisRun, on_delete=models.CASCADE)
+    fence = models.PositiveIntegerField()
+    runtime = models.CharField(max_length=20, default="LOCAL")
+    execution_name = models.CharField(max_length=500, blank=True)
+    stop_requested_at = models.DateTimeField(null=True)
+    released_at = models.DateTimeField(null=True, db_index=True)
+    started_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["run", "fence"], name="execution_attempt")]
 
 
 class ObservationArtifact(models.Model):

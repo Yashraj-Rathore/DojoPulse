@@ -21,4 +21,8 @@ frontend/out/
 frontend/playwright-report/
 frontend/test-results/
 frontend/tsconfig.tsbuildinfo
-
+.terraform/
+*.tfstate*
+*.tfvars
+!*.tfvars.example
+staticfiles/

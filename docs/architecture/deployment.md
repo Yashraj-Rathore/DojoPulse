@@ -1,5 +1,11 @@
 # Deployment and execution
 
+Current M16 engineering: [delivery/recovery contract](hosted-delivery.md),
+[ADR-015](../adr/ADR-015-hosted-delivery-recovery.md) and
+[local evidence](../experiment-results/m16-delivery.md). Google adapters are
+controlled-client contracts; Terraform is private, approval-gated and quarantined.
+Nested Docker is not available in Cloud Run, so managed media launch remains disabled.
+
 Now: local CLI + Django API + PostgreSQL + Next.js, bound to loopback. Docker Compose supplies
 PostgreSQL when Docker is available. No paid cloud resources are provisioned by this task.
 

@@ -11,7 +11,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "1") == "1"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "local-only-do-not-deploy")
 if not DEBUG and SECRET_KEY == "local-only-do-not-deploy":
     raise ImproperlyConfigured("Set DJANGO_SECRET_KEY for deployment")
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,testserver").split(",")
 ROOT_URLCONF = "backend.config.urls"
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "backend.core",
 ]
 MIDDLEWARE = [
+    "backend.core.deployment.RestoreQuarantineMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "backend.core.security.PrivateResponseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -98,7 +99,17 @@ FILE_UPLOAD_HANDLERS = [
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"] if DEBUG else []
+CSRF_TRUSTED_ORIGINS = (
+    ["http://localhost:3000", "http://127.0.0.1:3000"]
+    if DEBUG
+    else [origin for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin]
+)
+SECURE_PROXY_SSL_HEADER = (
+    ("HTTP_X_FORWARDED_PROTO", "https") if os.getenv("TRUST_MANAGED_PROXY", "0") == "1" else None
+)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_SAMESITE = "Lax"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         "backend.core.parsers.BoundedJSONParser",
@@ -124,6 +135,20 @@ OWNER_PENDING_RUNS = 4
 GLOBAL_PENDING_RUNS = 32
 OWNER_DAILY_RUNS = 20
 GLOBAL_ACTIVE_RUNS = 2
+RUN_LEASE_SECONDS = 30
+RUN_DEADLINE_SECONDS = 420
+RESTORE_QUARANTINE = os.getenv("RESTORE_QUARANTINE", "0") == "1"
+CONTROL_JOURNAL_ROOT = Path(
+    os.getenv("CONTROL_JOURNAL_ROOT", str(PRIVATE_DATA_ROOT / "control-journal"))
+)
+CONTROL_JOURNAL_KEY = os.getenv("CONTROL_JOURNAL_KEY", SECRET_KEY)
+DEPLOYMENT_NAMESPACE = os.getenv("DEPLOYMENT_NAMESPACE", "local")
+CLOUD_MEDIA_RUNTIME_QUALIFIED = False  # Qualification requires a reviewed code/profile change.
+GCS_PRIVATE_BUCKET = os.getenv("GCS_PRIVATE_BUCKET", "")
+GOOGLE_TASK_QUEUE = os.getenv("GOOGLE_TASK_QUEUE", "")
+GOOGLE_ANALYSIS_JOB = os.getenv("GOOGLE_ANALYSIS_JOB", "")
+GOOGLE_TASK_TARGET = os.getenv("GOOGLE_TASK_TARGET", "")
+GOOGLE_TASK_SERVICE_ACCOUNT = os.getenv("GOOGLE_TASK_SERVICE_ACCOUNT", "")
 PARSER_BACKEND = os.getenv("PARSER_BACKEND", "docker")
 PARSER_IMAGE = os.getenv("PARSER_IMAGE", "")  # Immutable sha256 image ID required.
 if not DEBUG and PARSER_BACKEND != "docker":

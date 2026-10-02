@@ -54,6 +54,10 @@ def record_consent(owner, scope, action, version, request_id, source="ACCOUNT"):
     profile, _ = Profile.objects.get_or_create(user=owner)
     if profile.deleted_at:
         raise ValidationError("Account is deleted")
+    if action == "WITHDRAW":
+        from backend.core.control_journal import record_intent
+
+        record_intent(owner.pk, "CONSENT_WITHDRAW", scope=scope)
     receipt = ConsentReceipt.objects.create(
         owner=owner,
         scope=scope,

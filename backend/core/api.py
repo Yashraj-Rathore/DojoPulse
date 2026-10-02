@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from analysis.contracts import aware_time
 from analysis.statistics import summarize
 from backend.core.evidence import as_opportunity
-from backend.core.jobs import cancel_run
+from backend.core.jobs import cancel_run, enqueue_run
 from backend.core.loops import create_assignment, create_plan, evaluate_plan, record_practice
 from backend.core.match_ingestion import register_upload_source
 from backend.core.media_response import video_response
@@ -257,9 +257,7 @@ def upload(request):
                 context="jin/jin",
             )
             register_upload_source(match)
-            run = AnalysisRun.objects.create(
-                owner=request.user, asset=asset, request_key=str(asset_id)
-            )
+            run = enqueue_run(owner=request.user, asset=asset, request_key=str(asset_id))
     except Exception:
         path.unlink(missing_ok=True)
         raise
@@ -274,7 +272,15 @@ def run_detail(request, run_id):
     else:
         run = AnalysisRun.objects.get(pk=run_id, owner=request.user, asset__deleted_at__isnull=True)
     return Response(
-        {"id": run.pk, "status": run.status, "error_code": run.error_code, "result": run.result}
+        {
+            "id": run.pk,
+            "status": run.status,
+            "error_code": run.error_code,
+            "result": run.result,
+            "phase": run.phase,
+            "progress": run.progress,
+            "heartbeat_at": run.heartbeat_at,
+        }
     )
 
 
@@ -289,6 +295,8 @@ def asset_delete(request, asset_id):
 @handled
 def media(request, asset_id):
     asset = ReplayAsset.objects.get(pk=asset_id, owner=request.user, deleted_at__isnull=True)
+    if asset.storage_provider != "LOCAL":
+        return Response({"error": "Hosted playback awaits storage qualification"}, status=503)
     path = private_path(asset.storage_key)
     if not path.is_file():
         return Response({"error": "Media is unavailable"}, status=404)

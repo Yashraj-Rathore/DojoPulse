@@ -1,7 +1,9 @@
 """Private local storage and deletion lifecycle. Cloud adapters remain gated."""
 
 import shutil
+import tempfile
 import uuid
+from contextlib import contextmanager
 from pathlib import Path
 
 from django.conf import settings
@@ -10,6 +12,7 @@ from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
+from backend.core.control_journal import record_intent
 from backend.core.loops import invalidate_for_events
 from backend.core.models import (
     AnalysisRun,
@@ -56,11 +59,43 @@ class LocalStorage:
         private_path(storage_key).unlink(missing_ok=True)
 
 
+def storage_for(asset):
+    if asset.storage_provider == "LOCAL":
+        return LocalStorage()
+    if asset.storage_provider != "GCS" or not settings.GCS_PRIVATE_BUCKET:
+        raise ValueError("STORAGE_PROVIDER_UNCONFIGURED")
+    from backend.core.cloud import GooglePrivateStorage, authorized_session
+
+    return GooglePrivateStorage(
+        authorized_session(), settings.GCS_PRIVATE_BUCKET, asset.owner_id, asset.pk
+    )
+
+
+@contextmanager
+def materialize(asset):
+    if asset.storage_provider == "LOCAL":
+        yield private_path(asset.storage_key)
+        return
+    with tempfile.TemporaryDirectory(prefix="dojopulse-run-") as directory:
+        target = Path(directory) / "source.mp4"
+        storage_for(asset).download(
+            asset.storage_key, asset.storage_generation, target, asset.bytes
+        )
+        yield target
+
+
 def delete_asset(owner, asset_id, storage=None):
-    storage = storage or LocalStorage()
     with transaction.atomic():
         lock_owner(owner.pk)
         asset = ReplayAsset.objects.select_for_update().get(pk=asset_id, owner=owner)
+        record_intent(
+            owner.pk,
+            "ASSET_DELETE",
+            asset=str(asset.pk),
+            storage_key=asset.storage_key,
+            storage_provider=asset.storage_provider,
+            storage_generation=asset.storage_generation,
+        )
         if asset.deleted_at is None:
             asset.deleted_at = timezone.now()
             asset.save(update_fields=["deleted_at"])
@@ -80,6 +115,7 @@ def delete_asset(owner, asset_id, storage=None):
         MatchContribution.objects.filter(run__asset=asset).delete()
         invalidate_for_events(ids)
     # Remote calls outside transaction; failure leaves tombstone and unfinished purge for retry.
+    storage = storage or storage_for(asset)
     storage.cancel_upload(asset.upload_session)
     storage.delete_asset(asset.storage_key)
     ReplayAsset.objects.filter(pk=asset.pk).update(
@@ -88,12 +124,15 @@ def delete_asset(owner, asset_id, storage=None):
 
 
 def accept_finalized_upload(asset_id, storage_key, storage=None):
-    storage = storage or LocalStorage()
     asset = ReplayAsset.objects.select_related("owner").get(pk=asset_id)
+    storage = storage or storage_for(asset)
     if storage_key != asset.storage_key:
         raise ValidationError("Finalized object key mismatch")
     if asset.deleted_at or not asset.owner.is_active:
-        storage.delete_object(storage_key)
+        if asset.storage_provider == "GCS":
+            storage.delete_object(storage_key, asset.storage_generation)
+        else:
+            storage.delete_object(storage_key)
         return False
     return True
 
@@ -103,6 +142,19 @@ def delete_account(owner, storage=None, *, password=None):
         owner = lock_owner(owner.pk)
         if password is not None and (not owner.is_active or not owner.check_password(password)):
             raise ValidationError("Current password is incorrect")
+        record_intent(
+            owner.pk,
+            "ACCOUNT_DELETE",
+            assets=[
+                {
+                    "asset": str(asset.pk),
+                    "storage_key": asset.storage_key,
+                    "storage_provider": asset.storage_provider,
+                    "storage_generation": asset.storage_generation,
+                }
+                for asset in ReplayAsset.objects.filter(owner=owner)
+            ],
+        )
         profile, _ = Profile.objects.select_for_update().get_or_create(user=owner)
         profile.deleted_at = timezone.now()
         profile.processing_consent_at = None
@@ -177,6 +229,21 @@ def delete_metadata_match(owner, match_id):
     now = timezone.now()
     from backend.core.consents import suppression_digest
     from backend.core.models import MatchSuppression
+
+    suppressions = [
+        {
+            "provider": source.provider,
+            "key_digest": suppression_digest(
+                owner.pk,
+                match.game_id,
+                source.provider,
+                source.external_namespace,
+                source.external_id,
+            ),
+        }
+        for source in MatchSourceRecord.objects.filter(match=match, owner=owner)
+    ]
+    record_intent(owner.pk, "MATCH_DELETE", match=str(match.pk), suppressions=suppressions)
 
     for source in MatchSourceRecord.objects.filter(match=match, owner=owner):
         MatchSuppression.objects.get_or_create(

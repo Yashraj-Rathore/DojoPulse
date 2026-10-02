@@ -22,7 +22,10 @@ No broker needed locally; batch must not live inside HTTP.
 
 DB leases/fencing and bounded retries; hosted delivery adapter gated.
 
+2026-10-02: [ADR-015](ADR-015-hosted-delivery-recovery.md) adds the transactional
+outbox, retained physical-capacity slots and controlled Google adapters. Cloud Run
+media activation remains disabled until equivalent isolation is qualified.
+
 ## Reconsideration trigger
 
 Sustained workload or existing operations makes provisioned workers cheaper.
-

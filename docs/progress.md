@@ -500,3 +500,57 @@ updated the qualification report and this chronological log. The initial audit f
 retry remain in the history. This documentation-only publication receipt uses `[skip ci]` because
 application, dependency and workflow files are unchanged from the successful run. It is not a
 hosted deployment or a waiver of provider, real-game, privacy, backup or source-integrity gates.
+
+## 2026-10-02 — M16 asynchronous delivery and recovery engineering
+
+Requirements: M16.01–M16.06, M14.05, M15.06 and M19.02. User confirmed Google
+Cloud and authorized implementation/main publication/monitoring. Region/budget,
+live provisioning and hosted acceptance are still unresolved; no resources created.
+
+Implemented transactional run outbox, official Google Tasks/Run control contracts,
+one fenced worker entry, bounded retries/heartbeats/deadlines, coarse progress and
+physical execution slots that survive lease expiry/cancellation/ambiguous launches.
+Added generation-pinned, owner-prefix GCS download/all-version purge adapter;
+hosted uploads/playback remain gated. Parser cleanup uncertainty now retains
+capacity. Cloud Run's unsupported nested Docker boundary prevents managed media
+activation; no direct credentialed FFmpeg fallback was introduced.
+
+Added independent signed deletion/withdrawal intents and a signed completeness
+checkpoint; writes fail closed before database mutation. Restore invalidates stale
+sessions/work/consent, reapplies deletions/HMAC suppression and purges under HTTP
+and worker quarantine. Native rehearsal uses two new disposable PostgreSQL DBs,
+not the configured source DB. Migration 0009 backfills queued/legacy work and
+guards reverse migration against active slots/nonlocal assets.
+
+Changed backend models/jobs/producers/parser/storage/consent/config, added cloud,
+dispatch, journal, recovery and management commands; added WSGI/Next standalone
+images, pinned optional cloud dependencies, private approval-gated Google
+Terraform and mocked deployment tests. Expanded CI with recovery, cloud audit,
+Terraform and application-container checks. Architecture 2.7.0, ADR-015, D026,
+deployment documentation and this tracker reflect the same boundaries.
+
+Actual checks so far: 253 local PostgreSQL/Python tests passed before final signed
+checkpoint hardening, seven Docker tests skipped locally; 14 Edge journeys passed
+in 22.1s; lint/build/types/static/system/migration checks passed; native PostgreSQL
+dump/restore/rollback/repeated replay and quarantine passed; Terraform validation
+and three mocked plans passed; optional cloud dependency audit reported no known
+vulnerabilities. Final checkpoint/full-suite and remote CI checks pending. See
+[M16 qualification](experiment-results/m16-delivery.md) for exact scope/limitations.
+
+Next: finish final checks, publish to main and monitor all CI jobs. Hosted work then
+needs region/cost/privacy/recovery decisions, equivalent media sandbox, durable
+current controls, actual staging IAM/TLS/routing/storage/job fixtures and existing
+provider/scientific/source-integrity gates. Local/synthetic results do not satisfy
+M16's hosted exit condition.
+
+Final pre-publication validation: 254 PostgreSQL/Python tests passed in 67.22s,
+seven Docker checks skipped locally; mypy passed again. The 22 M16 tests and native
+recovery rehearsal passed after signed-checkpoint hardening. Linux CI now uses the
+official PostgreSQL 17 client container because the runner's host PostgreSQL 16
+client cannot dump a PostgreSQL 17 server. No testing or release gate was weakened.
+
+Final runtime-stop review: managed workers retain their hosting execution slot
+after publishing a report, until the remote reconciler observes termination.
+The full suite passed 255 tests in 59.59s with seven local Docker skips. Recovery
+rehearsal and final static/system/migration/doc-link checks passed. Container build
+contexts exclude local environment files, private media and Terraform state.

@@ -29,3 +29,27 @@ Those dependencies are release-gated in docs/architecture/deployment.md.
 Cloud design remains Cloud Run API, Cloud Run Jobs, Cloud SQL and private Cloud Storage;
 Cloud Tasks can dispatch work after a real need, with explicit job caps and a reconciler.
 A versioned deployment must include backup/restore and deletion rehearsals before public use.
+
+M16 adds `Dockerfile.api` (unprivileged WSGI/control plane), `Dockerfile.web`
+(Next standalone), pinned optional `requirements-cloud.lock`, and
+`google-cloud/` Terraform with a private API/SQL/bucket, bounded Tasks and an
+explicit provisioning precondition. `terraform init -backend=false`, `validate`
+and `test` need no cloud credentials with the supplied mocks. Never apply the
+example variables: no project/region/budget or recovery targets have been approved.
+
+The API defaults to restore quarantine in Terraform. External uploads/hosted
+playback and managed media execution are gated. No media Job is created because
+the qualified nested Docker sandbox cannot run inside Cloud Run. Production
+journal replication, web routing, secret/user creation, VPC/service access and
+live integration qualification remain dependencies. See the
+[M16 contract](../docs/architecture/hosted-delivery.md) for the operator stop and
+restore procedures. Local rehearsal:
+
+```powershell
+python manage.py rehearse_recovery --confirm-isolated-local --postgres-bin 'C:\Program Files\PostgreSQL\17\bin'
+```
+
+On Linux, install native PostgreSQL client binaries and omit `--postgres-bin`.
+With Linux Docker, `--postgres-container-image postgres:17` uses matching clients.
+The command creates/drops only its fresh synthetic databases; it does not restore
+the configured source database. Hosted RPO/RTO are not measured by this rehearsal.

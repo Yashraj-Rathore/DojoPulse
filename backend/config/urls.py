@@ -2,8 +2,12 @@ from django.contrib import admin
 from django.urls import path
 
 from backend.core import account_api, api, experience_api, match_api, recording_api
+from backend.core.cloud_api import dispatch_task
+from backend.core.deployment import health
 
 urlpatterns = [
+    path("health/ready", health),
+    path("internal/dispatch", dispatch_task),
     path("admin/", admin.site.urls),
     path("api/session", api.session),
     path("api/account/policy", account_api.policy),

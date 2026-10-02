@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from backend.core.evidence import as_opportunity, publish_annotations
-from backend.core.jobs import claim_run, finish_run
+from backend.core.jobs import acknowledge_stopped, claim_run, finish_run
 from backend.core.loops import create_assignment, create_plan, evaluate_plan, record_practice
 from backend.core.models import (
     AnalysisRun,
@@ -114,8 +114,10 @@ def test_job_claim_and_stale_fence(owner, capture):
     assert claim_run(run.pk) is None
     assert finish_run(run.pk, token + 1, {"status": "COMPLETED"}) is False
     AnalysisRun.objects.filter(pk=run.pk).update(lease_until=timezone.now() - timedelta(seconds=1))
+    assert claim_run(run.pk) is None  # Lease expiry is not a physical stop acknowledgement.
+    acknowledge_stopped(run.pk, token)
     new_token = claim_run(run.pk)
-    assert new_token == 2
+    assert new_token == 3
     assert finish_run(run.pk, token, {"status": "COMPLETED"}) is False
     assert finish_run(run.pk, new_token, {"status": "REVIEW_REQUIRED"}) is True
 

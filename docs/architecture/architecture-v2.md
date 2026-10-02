@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.6.0. Decision date: 2026-10-01. Status: local engineering approved;
+Version: 2.7.0. Decision date: 2026-10-02. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -12,6 +12,10 @@ remain gated; local qualification is documented separately from production accep
 The [M14 account lifecycle](accounts-consent.md) adds local verification/recovery, session
 revocation, versioned consent receipts, work cancellation on withdrawal and explicit re-linking
 with known-match suppression. Hosted email, reviewed policy and backup/provider erasure remain gates.
+
+The [M16 delivery/recovery contract](hosted-delivery.md) adds transactional dispatch,
+retained physical capacity, bounded heartbeats and independently signed restore controls.
+Google Cloud remains selected; managed media execution awaits a qualified isolation profile.
 
 ## Product and release boundary
 

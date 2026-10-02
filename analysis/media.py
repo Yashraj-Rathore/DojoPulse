@@ -17,6 +17,11 @@ def file_hash(path: Path) -> str:
     result = hashlib.sha256()
     with path.open("rb") as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
+            from analysis.process import execution_check
+
+            check = execution_check.get()
+            if check:
+                check()
             result.update(block)
     return result.hexdigest()
 

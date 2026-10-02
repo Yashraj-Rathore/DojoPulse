@@ -10,6 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from analysis.contracts import aware_time, digest
+from backend.core.jobs import enqueue_run
 from backend.core.match_ingestion import active_owner
 from backend.core.models import (
     AnalysisRun,
@@ -163,7 +164,7 @@ def attach_recording(owner, match_id, upload, claim, request_id):
                     "metadata_revision": match.metadata_revision,
                 },
             )
-            run = AnalysisRun.objects.create(owner=owner, asset=asset, request_key=request_key)
+            run = enqueue_run(owner=owner, asset=asset, request_key=request_key)
             profile, _ = Profile.objects.get_or_create(user=owner)
             profile.processing_consent_at = timezone.now()
             profile.save(update_fields=["processing_consent_at"])
@@ -280,4 +281,4 @@ def reprocess_recording(owner, match_id, source_id, request_id):
     from backend.core.security import admit_run
 
     admit_run(owner)
-    return AnalysisRun.objects.create(owner=owner, asset=source.asset, request_key=key)
+    return enqueue_run(owner=owner, asset=source.asset, request_key=key)

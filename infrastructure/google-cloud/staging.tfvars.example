@@ -1,0 +1,15 @@
+# Fill only after regional privacy/cost review and explicit provisioning approval.
+# Keep state encrypted, access-controlled and separate per project/environment.
+project_id             = "REPLACE"
+region                 = "REPLACE"
+environment            = "staging"
+provisioning_approved  = false
+monthly_budget_usd     = 0
+recovery_rpo_minutes   = 0
+recovery_rto_minutes   = 0
+sql_tier               = "REPLACE"
+private_network        = "REPLACE-existing-private-VPC-with-service-access"
+private_subnetwork     = "REPLACE-existing-private-subnet"
+api_host               = "REPLACE"
+api_image              = "REPLACE@sha256:REPLACE"
+secret_versions        = {}
