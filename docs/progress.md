@@ -635,3 +635,36 @@ locked owner, with a concurrent role-revocation regression test. All 26 operatio
 tests passed in 17.31s after the loader fix; Ruff/diff and documentation-link checks
 passed. Player request errors expose the DRF admission reason. The final remote
 collection adds this regression to the preceding 281-test full local checkpoint.
+
+M17 published to origin/main as `f3eb68301b437678ca49d175ab06cd15d586c086`.
+[CI 37031233040](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37031233040)
+is in progress on its first attempt; dependency and deployment-contract jobs passed
+at the 16:03:49 UTC check. All six jobs are being monitored before final handoff.
+
+## 2026-10-02 — M17 main publication and remote monitoring receipt
+
+Requirements: M17.01–M17.07, M14.05, M15.06, M16.05 and M19.02. Published
+`f3eb68301b437678ca49d175ab06cd15d586c086` to origin/main and monitored
+[CI 37031233040](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37031233040)
+through completion. First attempt SUCCESS at 16:09:33 UTC; all six jobs passed.
+
+Actual remote results: **282 PostgreSQL/Python tests passed in 54.02s**, seven
+skips executed separately; **17 Chromium journeys passed in 15.0s**; all **seven
+Docker isolation tests passed in 142.71s**, including actual 600s/512MiB media.
+Native PostgreSQL 17 dump/restore/migration round-trip through 0012/signed quarantine/
+repeat replay passed. Terraform validation/three mocked plans, API/web Linux builds
+and unprivileged/quarantined/standalone startup, static/system/schema/build/type
+checks passed; both Python locks had no known vulnerabilities and npm audit zero.
+Downloaded JUnit/load artifacts corroborate logs. Remote 2,250-match/nine-owner
+pages measured approximately 33/31/24ms with 22/16/16 queries; synthetic queue,
+physical-capacity and dispatch-outage checks passed. No CI retry or relaxed gate.
+
+Updated PRODUCT_PROGRESS's position/requirements/publication/next work, this log
+and the M17 qualification receipt. This documentation-only receipt uses `[skip ci]`
+because code/dependencies/workflow match the successful run. No cloud, real-data
+provider, reviewed gameplay, invoice, payment or production SLO was qualified.
+M17 engineering is delivered; M17 stays PARTIAL overall for named response/hosted
+alerts, representative workloads, approved objectives and real recurring economics.
+Next evidence/decisions remain provider access, captures/expert/reviewers/G1–G6,
+region/budget/equivalent media isolation/current controls and actual-offer pilot.
+Source-integrity and privacy/security release reviews remain open.
