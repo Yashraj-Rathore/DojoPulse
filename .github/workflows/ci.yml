@@ -38,7 +38,7 @@ jobs:
       - run: python manage.py load_contracts
       - run: pytest -q --junitxml=reports/pytest.xml
       - run: python manage.py rehearse_recovery --confirm-isolated-local --postgres-container-image postgres:17
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: python-results
@@ -59,7 +59,7 @@ jobs:
       - run: docker build -f infrastructure/Dockerfile.analysis -t dojopulse-parser:ci .
       - run: echo "PARSER_TEST_IMAGE=$(docker image inspect dojopulse-parser:ci --format '{{.Id}}')" >> "$GITHUB_ENV"
       - run: pytest tests/test_parser_sandbox.py -v --junitxml=reports/sandbox.xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: sandbox-results
@@ -99,7 +99,7 @@ jobs:
       - run: npm run typecheck
       - run: npx playwright install --with-deps chromium
       - run: npm test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: browser-results
