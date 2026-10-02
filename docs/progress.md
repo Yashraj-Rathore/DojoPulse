@@ -774,3 +774,41 @@ was invented. Source-access/prior-execution review remains open despite clean co
 Next: approved protocol/rights/adult retention/sampling/comparator design, permitted
 cohort and independent expert/reviewers, real captures and scientific decisions;
 qualify hosting/provider/operations before any supported beta release.
+
+## 2026-10-02 — Single-branch repository cleanup and publication checks
+
+Requirements: M01.05/M01.06, M15.04 and M19.02. The owner requested only one
+branch and asked why the latest commit had no green check. All 15 non-main
+branches were inspected as bot-authored Dependabot proposals targeting main;
+no human feature branch was present. Closed PRs #1–#14 and #16 and deleted
+their corresponding `dependabot/` branches without merging dependency upgrades.
+GitHub then verified exactly one branch (`main`), zero open PRs and the same
+main SHA `e70a83eb4e27a5f18fa0ab8c34ef6f761627b7c3` as before cleanup.
+Public branch/head/PR inventory is retained in ignored `reports/single-branch/`.
+
+Changed files: `.github/dependabot.yml` sets all four version-update limits to
+zero; `AGENTS.md` records main-only delivery and normal CI for final receipts;
+`docs/operations/security-runbook.md` retains weekly reviewed/tested dependency
+patching directly on main; D029, PRODUCT_PROGRESS and this log record the policy
+and actual results. Automatic security PRs were already disabled (`enabled:
+false`); vulnerability alerts were already disabled (API 404 with explicit
+disabled message). Neither repository setting was changed. Existing Python
+lockfile/npm audits and all six CI jobs are unchanged.
+
+Actual validation: the configuration parsed with the existing `js-yaml` package
+and verified all four version-PR limits are zero; `git diff --check` passed
+before these final documentation additions. Initial Python YAML validation
+could not run because PyYAML is absent; no dependency was installed to replace
+it. Initial PR-closing CLI invocation rejected a quoted jq expression before
+any mutation; the corrected guarded invocation completed all 15 closures and
+deletions. Main was never deleted, force-pushed or changed by cleanup.
+
+The missing check was caused by the previous documentation receipt's `[skip ci]`
+message, not a failed M18 run: GitHub returned zero checks for that tip, while
+the prior M18 code run passed all six jobs. This publication will use ordinary
+CI. New publication, full remote checks and final latest-tip verification remain
+pending; their actual results will be appended in this work. Application tests
+were not run locally for this configuration/documentation-only change. Real
+gameplay, live providers, hosting and source-access review gates are unchanged.
+Next: publish main, monitor the six actual jobs, record the results and ensure
+the final documentation receipt also receives normal CI.

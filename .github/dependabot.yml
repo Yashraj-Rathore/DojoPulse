@@ -1,20 +1,25 @@
 version: 2
+# The repository owner requested main as the only branch. Keep version-update
+# PRs disabled; dependency audits still run in CI and patches are reviewed on main.
+# Automatic security PRs are a separate GitHub setting and must stay disabled.
 updates:
   - package-ecosystem: pip
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
   - package-ecosystem: docker
     directory: /infrastructure
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0

@@ -1,5 +1,17 @@
 # DojoPulse repository instructions
 
+## Single-branch delivery
+
+The user requires `main` as the only repository branch. Work and publish on `main`;
+do not create feature branches or re-enable automated dependency-update PRs unless
+the user changes this preference. Keep dependency audits active and review/test
+needed patches directly on `main`.
+
+Publish ordinary commits with CI enabled, including final progress receipts. Do
+not add `[skip ci]` or equivalent skip instructions to published commits. Monitor
+the actual latest `main` commit's checks before reporting publication as verified;
+a successful earlier commit does not establish a green check on the current tip.
+
 ## Mandatory progress tracking
 
 The user requires a full product milestone/requirements tracker that is updated after **every

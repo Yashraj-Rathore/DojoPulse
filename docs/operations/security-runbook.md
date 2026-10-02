@@ -52,8 +52,11 @@ Record reproducible synthetic steps privately, patch, add a regression test, and
 independent verification for an external release. Other findings receive severity,
 applicability, owner and a dated remediation decision; no silent scanner suppressions.
 
-Weekly dependency updates should run both lockfile checks, the API regression suite and
-parser image qualification. Production additionally needs an OS/container scanner and
+The owner requires only `main`, so automatic dependency-update PRs are disabled.
+Review dependencies weekly and apply needed patches directly on `main`, running
+both lockfile checks, the API regression suite and parser image qualification.
+Keep CI audits active; disabling version PRs does not replace dependency maintenance.
+Production additionally needs an OS/container scanner and
 managed alert delivery. Current CI definitions do not prove that a deployed system is safe.
 
 ## Local rehearsal and untested operations
