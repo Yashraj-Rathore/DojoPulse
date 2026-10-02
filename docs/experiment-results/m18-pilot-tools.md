@@ -41,6 +41,31 @@ verified local `5c1e78c` is that configuration. No payload was run locally.
 Keep the verified clean tree while retaining remote ancestry; repository access
 and possible prior execution remain an open release finding.
 
+Published M18 implementation `135464f` and ancestry-preserving clean-tree merge
+`2bbb645` to origin/main without force. Reconciliation has exactly the tested
+implementation tree and clean Next config. Remote CI registration/monitoring is
+pending; no hosted resources were provisioned.
+
+## Final remote receipt
+
+[CI 37041450168](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168)
+completed SUCCESS at **17:37:02 UTC**, first attempt, exact head
+`2bbb6457757f9c27236e83ca439e82bf598a45bb`. All six jobs passed.
+**306 PostgreSQL/Python tests passed in 44.70s**, seven skips exercised in the
+separate **seven Docker isolation/max-profile tests in 139.35s**, including the
+actual 600s/512MiB profile. **21 Chromium journeys passed in 18.5s**.
+Three mocked Terraform plans, native PostgreSQL dump/restore/round-trip through
+0015/pilot-grant-label erasure/signed controls/repeat replay, API/web Linux image
+builds and unprivileged/quarantined/standalone startup passed. Static/system/schema,
+frontend lint/build/types and both Python/npm audits passed. Downloaded JUnit
+artifacts corroborate the logs. No CI retry or relaxed gate.
+
+The repository main ref was verified as the qualified clean head after CI.
+M18.07 local software is DONE; M18 remains PARTIAL for actual approved real study
+intake, expert/reviewers/captures/comparator findings and scientific decisions.
+G1–G6 remain NOT_RUN. Production, provider, commercial and repository-access review
+gates remain open. The final receipt changes documentation only and uses `[skip ci]`.
+
 Scientific evidence was not collected. No real reviewer, expert, participant,
 capture, approved game fact, live provider, hosted resource, external message,
 invoice or payment was created. Real intake is hardcoded off; all reports retain

@@ -735,3 +735,42 @@ documentation-link verification found no broken targets. No private dataset,
 credential, generated screenshot, dependency change or hosted resource is included
 in this publication. The complete remote Python collection includes the two
 follow-up tests added after the local 304-test full checkpoint.
+
+M18 implementation committed as `135464f` and clean-tree reconciliation as
+`2bbb645`. The latter is an ancestry-preserving merge with exactly the same tree
+as the qualified implementation; `git diff 135464f HEAD --exit-code` and clean
+Next config inspection passed. Remote `2a20380` is retained as an ancestor, and
+the push `2a20380..2bbb645` to origin/main succeeded without force. M18 CI is
+registering; all six jobs will be monitored before handoff. No hosted deployment.
+
+[M18 CI 37041450168](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168)
+is running on exact head `2bbb6457757f9c27236e83ca439e82bf598a45bb`, first
+attempt. PostgreSQL/recovery, frontend, dependencies, deployment contracts and
+application containers passed; Docker/max-profile isolation is still running.
+
+## 2026-10-02 — M18 main publication and remote monitoring receipt
+
+Requirements: M18.01–M18.07, M08.01/.03/.04/.06, M14.04/.05, M16.05 and
+M19.02. Published implementation `135464f` and clean-tree reconciliation
+`2bbb6457757f9c27236e83ca439e82bf598a45bb` without force and monitored
+[CI 37041450168](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37041450168)
+through SUCCESS at **17:37:02 UTC**, first attempt. All six jobs passed.
+
+Actual remote validation: **306 PostgreSQL/Python tests in 44.70s**, seven local
+skips executed separately; **21 Chromium journeys in 18.5s**; **seven Docker
+isolation/max-profile tests in 139.35s**, including actual 600s/512MiB media.
+Three mocked Terraform plans, native PostgreSQL recovery/round-trip through 0015,
+signed pilot withdrawal/restore erasure/repeat replay, API/web image builds and
+unprivileged/quarantined/standalone startup, static/system/schema/build/type checks
+and Python/npm audits passed. Downloaded Python/sandbox JUnit corroborates logs;
+no retry or weakened gate. Current main ref verified at the qualified clean head.
+
+PRODUCT_PROGRESS records M18.07 DONE for local synthetic software and M18 PARTIAL
+overall. Qualification and this chronological receipt are updated together.
+This documentation-only receipt uses `[skip ci]`; code/dependencies/workflow are
+unchanged from the successful run. Real intake is disabled, all scientific G1–G6
+remain NOT_RUN and no hosted resource/game fact/detector/provider/payment approval
+was invented. Source-access/prior-execution review remains open despite clean config.
+Next: approved protocol/rights/adult retention/sampling/comparator design, permitted
+cohort and independent expert/reviewers, real captures and scientific decisions;
+qualify hosting/provider/operations before any supported beta release.
