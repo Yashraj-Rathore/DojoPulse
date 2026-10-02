@@ -40,7 +40,8 @@ codes, scope, consent implications, decisions, remediation and verification rece
    logs. Production rotation and session-revocation rehearsals remain release gates.
 7. Rebuild a patched image, record its immutable ID, run the regression/sandbox/advisory
    checks, and review impact before resuming trusted local ingestion. Expired analysis leases
-   can be reclaimed with fencing, at most three attempts. Exhausted jobs fail visibly;
+   are fenced and stopped first; only authoritative termination permits a new attempt,
+   at most three attempts under the run's snapshotted policy. Exhausted jobs fail visibly;
    create a deliberate reprocess request only after fixing the cause.
 
 ## Vulnerability handling

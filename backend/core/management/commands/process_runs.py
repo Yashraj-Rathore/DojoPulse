@@ -2,6 +2,7 @@ import json
 import os
 import time
 
+import psutil
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -68,15 +69,20 @@ class Command(BaseCommand):
         last_check = 0.0
 
         def check():
-            nonlocal last_check
+            nonlocal last_check, peak_rss
             if time.monotonic() - last_check < 0.5:
                 return
             last_check = time.monotonic()
+            peak_rss = max(peak_rss, coordinator.memory_info().rss)
             if not heartbeat(run.pk, token):
                 raise ValueError("RUN_REVOKED")
 
         guard = execution_check.set(check)
         stopped = False
+        start = time.monotonic()
+        coordinator = psutil.Process()
+        initial_cpu = sum(coordinator.cpu_times()[:2])
+        peak_rss = coordinator.memory_info().rss
         try:
             try:
                 check()
@@ -119,8 +125,20 @@ class Command(BaseCommand):
                     "issues": [str(error) if str(error) in codes else "PARSER_EXECUTION_FAILED"],
                     "opportunities": [],
                 }
+            from backend.core.telemetry import record_attempt
+
+            record_attempt(
+                run.pk,
+                token,
+                elapsed=time.monotonic() - start,
+                cpu_seconds=max(0, sum(coordinator.cpu_times()[:2]) - initial_cpu),
+                peak_rss=max(peak_rss, coordinator.memory_info().rss),
+                report=report,
+            )
             if finish_run(run.pk, token, report):
-                self.stdout.write(f"{run.pk}: {report['status']}")
+                self.stdout.write(
+                    json.dumps({"event": "analysis_terminal", "reason": report["status"]})
+                )
             elif run.asset.__class__.objects.get(pk=run.asset_id).deleted_at:
                 from backend.core.storage import delete_asset
 

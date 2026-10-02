@@ -6,9 +6,11 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
+from rest_framework.exceptions import Throttled
 
 from backend.core.models import (
     AnalysisRun,
+    AttemptMetric,
     ExecutionSlot,
     Profile,
     ReplayAsset,
@@ -31,7 +33,7 @@ def locked_run(run_id):
 
 @transaction.atomic
 def claim_run(run_id):
-    if settings.RESTORE_QUARANTINE:
+    if settings.RESTORE_QUARANTINE or settings.OPTIONAL_PROCESSING_PAUSED:
         return None
     run = locked_run(run_id)
     now = timezone.now()
@@ -59,9 +61,20 @@ def claim_run(run_id):
         return None
     if run.status == "PROCESSING" and run.lease_until and run.lease_until > now:
         return None
-    if run.attempts >= 3:
+    from backend.core.budgets import reserve_run
+
+    try:
+        budget = reserve_run(run)
+    except Throttled:
+        run.status, run.error_code, run.phase = "FAILED", "RUN_BUDGET_EXHAUSTED", "FAILED"
+        run.save()
+        return None
+    if run.attempts >= budget.max_attempts:
         run.status, run.error_code = "FAILED", "RETRY_BUDGET_EXHAUSTED"
         run.save()
+        from backend.core.budgets import settle_run
+
+        settle_run(run)
         return None
     capacity_lock()
     active = ExecutionSlot.objects.filter(released_at=None)
@@ -73,11 +86,23 @@ def claim_run(run_id):
     run.status = "PROCESSING"
     run.fence += 1
     run.attempts += 1
-    run.deadline_at = now + timedelta(seconds=settings.RUN_DEADLINE_SECONDS)
+    run.deadline_at = now + timedelta(seconds=budget.attempt_seconds)
     run.lease_until = min(now + timedelta(seconds=settings.RUN_LEASE_SECONDS), run.deadline_at)
     run.heartbeat_at, run.phase, run.progress = now, "STARTING", 1
     run.save()
-    ExecutionSlot.objects.create(run=run, fence=run.fence)
+    slot = ExecutionSlot.objects.create(run=run, fence=run.fence, claimed_at=now)
+    last_release = (
+        ExecutionSlot.objects.filter(run=run, released_at__isnull=False)
+        .order_by("-released_at")
+        .values_list("released_at", flat=True)
+        .first()
+    )
+    AttemptMetric.objects.create(
+        slot=slot,
+        attempt_number=run.attempts,
+        queued_seconds=max(0, (now - (last_release or run.created_at)).total_seconds()),
+        source_bytes=run.asset.bytes,
+    )
     RunDispatch.objects.get_or_create(run=run)
     return run.fence
 
@@ -106,6 +131,7 @@ def finish_run(run_id, fence, report):
     run.lease_until = None
     run.phase, run.progress = status, 100
     run.save()
+    AttemptMetric.objects.filter(slot__run=run, slot__fence=fence).update(outcome=status)
     if "source" in report:
         sha = report["source"]["source_sha256"]
         if run.asset.source_sha256 and run.asset.source_sha256 != sha:
@@ -130,13 +156,35 @@ def cancel_run(owner, run_id):
     run.save()
     RunDispatch.objects.filter(run=run).update(status="CANCELLED", lease_until=None)
     ExecutionSlot.objects.filter(run=run, released_at=None).update(stop_requested_at=timezone.now())
+    from backend.core.budgets import settle_run
+
+    settle_run(run)
     return run
 
 
 @transaction.atomic
 def enqueue_run(**fields):
     """Call inside the producer's owner/admission transaction."""
+    current = lock_owner(fields["owner"].pk)
+    from backend.core.budgets import reserve_run
+    from backend.core.consents import require_processing
+
+    if (
+        not current.is_active
+        or fields["asset"].owner_id != current.pk
+        or fields["asset"].deleted_at
+    ):
+        raise ValidationError("Analysis source is unavailable")
+    require_processing(current)
+    prior = AnalysisRun.objects.filter(owner=current, request_key=fields["request_key"]).first()
+    if prior:
+        if prior.asset_id != fields["asset"].pk or prior.pipeline_version != fields.get(
+            "pipeline_version", "local-pipeline/1"
+        ):
+            raise ValidationError("Request key belongs to different evidence")
+        return prior
     run = AnalysisRun.objects.create(**fields)
+    reserve_run(run)
     RunDispatch.objects.create(run=run)
     return run
 
@@ -189,6 +237,9 @@ def acknowledge_stopped(run_id, fence):
         dispatch.save()
     elif run.status != "QUEUED":
         RunDispatch.objects.filter(run=run).update(status="DONE", lease_until=None)
+    from backend.core.budgets import settle_run
+
+    settle_run(run)
 
 
 @transaction.atomic
@@ -226,3 +277,13 @@ def reconcile_runs():
     RunDispatch.objects.filter(run__status="CANCELLED").update(status="CANCELLED", lease_until=None)
     for run in AnalysisRun.objects.filter(status="QUEUED"):
         RunDispatch.objects.get_or_create(run=run)
+    # Deletion and withdrawal can cancel a never-started run outside cancel_run.
+    from backend.core.budgets import settle_run
+
+    for run_id in (
+        AnalysisRun.objects.filter(runbudget__state="OPEN")
+        .exclude(status__in=["QUEUED", "PROCESSING"])
+        .values_list("pk", flat=True)[:100]
+    ):
+        with transaction.atomic():
+            settle_run(locked_run(run_id))

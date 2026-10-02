@@ -112,6 +112,9 @@ def delete_asset(owner, asset_id, storage=None):
             availability="NOT_FOUND", content_hash="", attribution_state="WITHDRAWN", attribution={}
         )
         ReplayAsset.objects.filter(pk=asset.pk).update(metadata={})
+        from backend.core.models import AttemptMetric
+
+        AttemptMetric.objects.filter(slot__run__asset=asset).delete()
         MatchContribution.objects.filter(run__asset=asset).delete()
         invalidate_for_events(ids)
     # Remote calls outside transaction; failure leaves tombstone and unfinished purge for retry.
@@ -189,6 +192,9 @@ def delete_account(owner, storage=None, *, password=None):
         Feedback.objects.filter(owner=owner).delete()
         NoticeReceipt.objects.filter(owner=owner).delete()
         UploadAdmission.objects.filter(owner=owner).delete()
+        from backend.core.models import OperatorWork
+
+        OperatorWork.objects.filter(owner=owner).delete()
         from backend.core.models import (
             AccountChallenge,
             AccountEmail,

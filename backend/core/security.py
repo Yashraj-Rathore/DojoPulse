@@ -162,6 +162,9 @@ def reserve_upload(owner):
     from backend.core.consents import require_processing
 
     require_processing(current)
+    from backend.core.budgets import check_daily_capacity
+
+    check_daily_capacity(current)
     check_capacity(owner, MAX_UPLOAD)
     slots = UploadAdmission.objects.filter(expires_at__gt=timezone.now())
     if slots.filter(owner=owner).exists() or slots.count() >= settings.GLOBAL_UPLOAD_SLOTS:

@@ -579,3 +579,59 @@ was qualified. M16 remains PARTIAL for its explicitly hosted exit; next inputs a
 region/budget/recovery/privacy decisions, equivalent media isolation, independent
 durable current controls and authorized staging qualification. Source-integrity
 review remains open. Monitoring completed without a CI retry or code correction.
+
+## 2026-10-02 — M17 operations, performance and economics engineering
+
+Requirements: M17.01–M17.07, M14.05, M15.06, M16.05 and M19.02. Implemented
+the available module together: atomic RunBudget reservation/physical-stop settlement,
+daily media/time/reanalysis and snapshotted retry policies; fenced allowlisted attempt
+measurements; fixed-route response buckets and fixed-code logs; staff-only operations
+UI/API and owner usage; scoped human work/cost observations, null-safe unit costs and
+latest-revision nonpositive comparison denominators. Export/deletion/retention preserve
+safety holds while erasing private measurements. Added CLI alert status, operations/
+support/patch and actual-offer protocols, budget/date rollback guards and history index.
+
+Changed models/jobs/worker/admission/storage/export/config/URLs; added budgets,
+telemetry/logging/operations service/API/command, migrations 0010–0012, operations
+route/navigation/mobile CSS, backend/load/browser tests and CI load artifact upload.
+Architecture 2.8.0, ADR-016/D027, PRODUCT_PROGRESS and this chronological entry are
+updated together. No dependency, live provider, hosted runtime or payment was enabled.
+
+Actual checkpoints: 274 PostgreSQL/Python tests passed in 101.37s, then 279 in
+93.09s after logging/cost follow-up; seven local Docker skips. Corrected full Edge
+journeys passed 17 in 21.4s, including dashboard denial/mobile/unknowns/CSRF/idempotent
+time retry; lint/build/types/static/system/schema checks passed. Native synthetic
+PostgreSQL dump/restore/forward-reverse-forward, signed controls before reads and repeat
+replay passed. The synthetic load scenario covered 2,250 matches/nine owners,
+100/100/50-row owner pages (initial 22/16/16 queries, approximately 31/32/16ms), indexed
+plan, 32 queued jobs, two physical slots and eight mocked dispatch failures. Actual
+600s/512MiB media remains the separate Linux Docker CI check; no timing extrapolation.
+
+Automatic approval review rejected rolling the existing local schema back/reapplying
+because it could drop budget/metric records. A non-destructive forward migration instead
+keeps records and makes unmeasured historical attempt dates null, with unsafe reverse
+conversion refused. Migration 0012 applied locally; final regression/recovery checks
+after this and retention follow-up, publication and all remote jobs remain pending.
+
+Assumptions/gates: local conservative quotas are not a total-cloud-spend guarantee;
+response availability is not external uptime; sample guards are not SLO approval.
+Real supported workloads, named response/alert delivery, actual invoices/rates/human
+time and an approved actual offer/payment/renewal study are absent. M17 remains
+PARTIAL overall and M17.07 BLOCKED; other provider/game/G1–G6/hosting/privacy/source-
+integrity gates remain. Next: final checks, publish main and monitor all CI jobs,
+then complete the explicit evidence/approval-dependent operational/pilot work.
+
+Final local M17 checks: **281 PostgreSQL/Python tests passed in 84.75s**, seven
+local Docker skips; **17 Edge journeys passed in 21.4s** with the final mobile
+layout. Native PostgreSQL 17 dump/restore/migration round-trip/signed quarantine/
+repeated replay passed again after safe forward migration 0012. Ruff check/format,
+mypy (23 sources), Django system/schema and frontend lint/build/types passed.
+The final load artifact reports about 32/32/31ms and 22/16/16 statements; no claim
+of representative video or hosted throughput is made. No reset of the existing
+database was performed. Publication and six remote CI jobs are the next step.
+
+Final permission follow-up: staff operations read the current staff flag under the
+locked owner, with a concurrent role-revocation regression test. All 26 operations
+tests passed in 17.31s after the loader fix; Ruff/diff and documentation-link checks
+passed. Player request errors expose the DRF admission reason. The final remote
+collection adds this regression to the preceding 281-test full local checkpoint.

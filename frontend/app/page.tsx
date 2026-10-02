@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import MatchHistory from "./match-history";
 import WorkspaceTools from "./workspace-tools";
 import EvidenceBrowser from "./evidence-browser";
@@ -26,6 +27,7 @@ const percent=(n:number|null|undefined)=>n==null?"—":(n*100).toFixed(1)+"%";
 const points=(n:number)=>(n*100).toFixed(1)+" pp";
 export default function Home(){
  const [authenticated,setAuthenticated]=useState(false),[csrf,setCsrf]=useState(""),[ready,setReady]=useState(false);
+ const [operator,setOperator]=useState(false);
  const [localUploads,setLocalUploads]=useState(false),[data,setData]=useState<Data>(empty),[error,setError]=useState("");
  const [busy,setBusy]=useState(false),[selected,setSelected]=useState<string[]>([]);
  const [assignment,setAssignment]=useState(""),[plan,setPlan]=useState(""),[file,setFile]=useState<File|null>(null);
@@ -36,11 +38,11 @@ export default function Home(){
  const request=useCallback(async(path:string,method="GET",body?:object|FormData)=>{
   const response=await fetch("/api/"+path,{method,credentials:"same-origin",headers:{"X-CSRFToken":csrf,...(body instanceof FormData?{}:{"Content-Type":"application/json"})},body:body?(body instanceof FormData?body:JSON.stringify(body)):undefined});
   const json=await response.json();
-  if(!response.ok)throw new Error(json.error||"Request failed");
+  if(!response.ok)throw new Error(json.error||json.detail||"Request failed");
   return json;
  },[csrf]);
  const refresh=useCallback(async()=>{setData(await request("overview"));},[request]);
- useEffect(()=>{fetch("/api/session").then(r=>r.json()).then(s=>{setAuthenticated(s.authenticated);setCsrf(s.csrf);setLocalUploads(s.local_uploads);setReady(true);}).catch(()=>{setError("Start the local API to connect.");setReady(true);});},[]);
+ useEffect(()=>{fetch("/api/session").then(r=>r.json()).then(s=>{setAuthenticated(s.authenticated);setCsrf(s.csrf);setLocalUploads(s.local_uploads);setOperator(!!s.operator);setReady(true);}).catch(()=>{setError("Start the local API to connect.");setReady(true);});},[]);
  useEffect(()=>{
   if(!authenticated)return;
   const load=()=>{if(document.visibilityState==="visible")void refresh().catch(e=>setError(e.message));};
@@ -50,7 +52,7 @@ export default function Home(){
  async function act(work:()=>Promise<void>){setBusy(true);setError("");try{await work();await refresh();}catch(e){setError(e instanceof Error?e.message:"Request failed");}finally{setBusy(false);}}
  async function login(event:React.FormEvent<HTMLFormElement>){
   event.preventDefault();const form=new FormData(event.currentTarget);setError("");
-  try{const session=await request("session","POST",Object.fromEntries(form));setCsrf(session.csrf);setAuthenticated(session.authenticated);setLocalUploads(session.local_uploads);}catch(e){setError(e instanceof Error?e.message:"Login failed");}
+  try{const session=await request("session","POST",Object.fromEntries(form));setCsrf(session.csrf);setAuthenticated(session.authenticated);setLocalUploads(session.local_uploads);setOperator(!!session.operator);}catch(e){setError(e instanceof Error?e.message:"Login failed");}
  }
  function chooseFile(value:File|null){setFile(value);setValidPreview(false);setPreview(value?URL.createObjectURL(value):"");}
  async function upload(event:React.FormEvent<HTMLFormElement>){
@@ -69,7 +71,7 @@ export default function Home(){
   {ready&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
   {!ready?<p>Connecting to local API…</p>:!authenticated?
    <section className="login"><h2>Open your local workspace</h2><p className="muted">Sign in with your verified local account or an existing development account.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
-   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a></nav>
+   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a>{operator&&<Link href="/operations">Operations</Link>}</nav>
    <div className="grid" id="workspace-content" tabIndex={-1}>
     <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
     <AccountControls csrf={csrf}/>

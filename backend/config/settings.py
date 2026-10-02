@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     "backend.core.deployment.RestoreQuarantineMiddleware",
+    "backend.core.telemetry.OperationsMetricsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "backend.core.security.PrivateResponseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -137,6 +138,20 @@ OWNER_DAILY_RUNS = 20
 GLOBAL_ACTIVE_RUNS = 2
 RUN_LEASE_SECONDS = 30
 RUN_DEADLINE_SECONDS = 420
+RUN_MAX_ATTEMPTS = 3
+OWNER_MEDIA_SECONDS_PER_DAY = 7200
+GLOBAL_MEDIA_SECONDS_PER_DAY = 86400
+OWNER_PROCESSING_SECONDS_PER_DAY = 7200
+GLOBAL_PROCESSING_SECONDS_PER_DAY = 86400
+ASSET_RUNS_PER_DAY = 3  # Initial analysis plus two reanalyses; request retries are idempotent.
+OPTIONAL_PROCESSING_PAUSED = os.getenv("OPTIONAL_PROCESSING_PAUSED", "0") == "1"
+OPS_QUEUE_TARGET_SECONDS = 120
+OPS_PROCESSING_TARGET_SECONDS = 390
+OPS_COMPLETION_TARGET = 0.95
+OPS_AVAILABILITY_TARGET = 0.99
+OPS_MIN_SAMPLES = 20
+OPS_RETENTION_DAYS = 30
+OPS_MAX_ATTEMPT_SAMPLES = 20000
 RESTORE_QUARANTINE = os.getenv("RESTORE_QUARANTINE", "0") == "1"
 CONTROL_JOURNAL_ROOT = Path(
     os.getenv("CONTROL_JOURNAL_ROOT", str(PRIVATE_DATA_ROOT / "control-journal"))
@@ -158,6 +173,27 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {"security": {"format": "%(message)s"}},
-    "handlers": {"security": {"class": "logging.StreamHandler", "formatter": "security"}},
-    "loggers": {"dojopulse.security": {"handlers": ["security"], "level": "INFO"}},
+    "filters": {"redacted_request": {"()": "backend.core.logging.RedactedRequestLogFilter"}},
+    "handlers": {
+        "security": {"class": "logging.StreamHandler", "formatter": "security"},
+        "redacted_request": {
+            "class": "logging.StreamHandler",
+            "formatter": "security",
+            "filters": ["redacted_request"],
+        },
+    },
+    "loggers": {
+        "dojopulse.security": {"handlers": ["security"], "level": "INFO"},
+        "django.request": {
+            "handlers": ["redacted_request"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["redacted_request"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.server": {"handlers": ["redacted_request"], "level": "WARNING", "propagate": False},
+    },
 }

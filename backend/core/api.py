@@ -98,6 +98,9 @@ def session(request):
         {
             "authenticated": request.user.is_authenticated,
             "csrf": token,
+            "operator": request.user.is_authenticated
+            and request.user.is_staff
+            and request.user.is_active,
             "username": request.user.get_username() if request.user.is_authenticated else None,
             "local_uploads": settings.LOCAL_OPERATOR_UPLOADS and request.user.is_staff
             if request.user.is_authenticated

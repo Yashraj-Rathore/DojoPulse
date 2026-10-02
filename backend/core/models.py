@@ -205,6 +205,9 @@ class Match(Owned):
     dataset_kind = models.CharField(max_length=20, default="real")
     deleted_at = models.DateTimeField(null=True)
 
+    class Meta:
+        indexes = [models.Index(fields=["owner", "-played_at", "-id"], name="history_owner_played")]
+
 
 class Participant(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="participants")
@@ -386,9 +389,105 @@ class ExecutionSlot(models.Model):
     stop_requested_at = models.DateTimeField(null=True)
     released_at = models.DateTimeField(null=True, db_index=True)
     started_at = models.DateTimeField(null=True)
+    claimed_at = models.DateTimeField(null=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["run", "fence"], name="execution_attempt")]
+
+
+class RunBudget(models.Model):
+    run = models.OneToOneField(AnalysisRun, on_delete=models.CASCADE)
+    day = models.DateField(default=timezone.localdate, db_index=True)
+    state = models.CharField(max_length=10, default="OPEN")
+    reserved_media_seconds = models.PositiveIntegerField(default=600)
+    reserved_processing_seconds = models.PositiveIntegerField()
+    charged_media_seconds = models.PositiveIntegerField(default=0)
+    charged_processing_seconds = models.PositiveIntegerField(default=0)
+    settled_at = models.DateTimeField(null=True)
+    measurement_complete = models.BooleanField(default=False)
+    attempt_seconds = models.PositiveIntegerField(default=420)
+    max_attempts = models.PositiveSmallIntegerField(default=3)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(state__in=["OPEN", "CLOSED"]), name="run_budget_state"
+            )
+        ]
+
+
+class AttemptMetric(models.Model):
+    slot = models.OneToOneField(ExecutionSlot, on_delete=models.CASCADE)
+    attempt_number = models.PositiveSmallIntegerField(default=1)
+    queued_seconds = models.FloatField(null=True)
+    elapsed_seconds = models.FloatField(null=True)
+    coordinator_cpu_seconds = models.FloatField(null=True)
+    coordinator_peak_rss_bytes = models.PositiveBigIntegerField(null=True)
+    decoder_cpu_seconds = models.FloatField(null=True)
+    decoder_peak_rss_bytes = models.PositiveBigIntegerField(null=True)
+    source_bytes = models.PositiveBigIntegerField(null=True)
+    media_seconds = models.FloatField(null=True)
+    derived_bytes = models.PositiveBigIntegerField(null=True)
+    outcome = models.CharField(max_length=30, default="PROCESSING")
+
+
+class RequestMetric(models.Model):
+    minute = models.DateTimeField(db_index=True)
+    route = models.CharField(max_length=20)
+    count = models.PositiveIntegerField(default=0)
+    server_errors = models.PositiveIntegerField(default=0)
+    throttled = models.PositiveIntegerField(default=0)
+    seconds = models.FloatField(default=0)
+    max_seconds = models.FloatField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["minute", "route"], name="request_metric_bucket")
+        ]
+
+
+class OperatorWork(Owned):
+    kind = models.CharField(max_length=12)
+    seconds = models.PositiveIntegerField()
+    scope = models.CharField(max_length=12, default="SYNTHETIC")
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="operator_work_request"),
+            models.CheckConstraint(
+                condition=Q(scope__in=["SYNTHETIC", "OBSERVED"])
+                & Q(kind__in=["REVIEW", "SUPPORT"])
+                & Q(seconds__gt=0, seconds__lte=28800),
+                name="operator_work_valid",
+            ),
+        ]
+
+
+class CostObservation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    component = models.CharField(max_length=20)
+    period_start = models.DateField()
+    period_end = models.DateField()
+    scope = models.CharField(max_length=12)
+    amount_usd = models.DecimalField(max_digits=12, decimal_places=6)
+    reference = models.CharField(max_length=80)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["component", "period_start", "period_end", "scope"],
+                name="cost_observation_period",
+            ),
+            models.CheckConstraint(
+                condition=Q(amount_usd__gte=0)
+                & Q(period_end__gte=F("period_start"))
+                & Q(scope__in=["SYNTHETIC", "OBSERVED"])
+                & Q(component__in=["INFRASTRUCTURE", "PROVIDER", "REVIEW", "SUPPORT"]),
+                name="cost_observation_valid",
+            ),
+        ]
 
 
 class ObservationArtifact(models.Model):

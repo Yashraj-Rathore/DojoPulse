@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-from backend.core import account_api, api, experience_api, match_api, recording_api
+from backend.core import account_api, api, experience_api, match_api, operations_api, recording_api
 from backend.core.cloud_api import dispatch_task
 from backend.core.deployment import health
 
@@ -21,6 +21,10 @@ urlpatterns = [
     path("api/account/sessions/<uuid:session_id>", account_api.revoke_session),
     path("api/account/consent", account_api.consent),
     path("api/overview", api.overview),
+    path("api/operations", operations_api.operations),
+    path("api/operations/work", operations_api.work),
+    path("api/operations/cost", operations_api.cost),
+    path("api/usage", operations_api.usage),
     path("api/preferences", experience_api.preferences),
     path("api/evidence", experience_api.evidence),
     path("api/feedback", experience_api.feedback),

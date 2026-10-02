@@ -42,7 +42,9 @@ jobs:
         if: always()
         with:
           name: python-results
-          path: reports/pytest.xml
+          path: |
+            reports/pytest.xml
+            reports/m17-load.json
   media-sandbox:
     runs-on: ubuntu-latest
     timeout-minutes: 20

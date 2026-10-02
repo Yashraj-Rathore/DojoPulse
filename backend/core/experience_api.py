@@ -276,11 +276,52 @@ def notices(request):
 def export_account(request):
     active_owner(request.user)
     user = request.user
-    from backend.core.models import AccountEmail, ConsentReceipt, MatchSuppression
+    from backend.core.models import (
+        AccountEmail,
+        AttemptMetric,
+        ConsentReceipt,
+        MatchSuppression,
+        OperatorWork,
+        RunBudget,
+    )
 
     # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
     # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "resource_budgets": (
+            RunBudget.objects.filter(run__owner=user),
+            [
+                "run_id",
+                "day",
+                "state",
+                "reserved_media_seconds",
+                "reserved_processing_seconds",
+                "charged_media_seconds",
+                "charged_processing_seconds",
+                "measurement_complete",
+            ],
+        ),
+        "attempt_metrics": (
+            AttemptMetric.objects.filter(slot__run__owner=user),
+            [
+                "slot__run_id",
+                "attempt_number",
+                "queued_seconds",
+                "elapsed_seconds",
+                "coordinator_cpu_seconds",
+                "coordinator_peak_rss_bytes",
+                "decoder_cpu_seconds",
+                "decoder_peak_rss_bytes",
+                "source_bytes",
+                "media_seconds",
+                "derived_bytes",
+                "outcome",
+            ],
+        ),
+        "operator_work": (
+            OperatorWork.objects.filter(owner=user),
+            ["id", "kind", "seconds", "scope", "created_at"],
+        ),
         "consent_receipts": (
             ConsentReceipt.objects.filter(owner=user),
             ["id", "scope", "action", "policy_version", "policy_digest", "source", "created_at"],
