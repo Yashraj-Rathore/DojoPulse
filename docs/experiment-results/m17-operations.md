@@ -59,15 +59,39 @@ Automatic approval review rejected rolling back/reapplying the existing local
 M17 schema because it could drop ledger/metric records. A safe forward migration
 preserves all rows, sets unmeasured historical dates to null and refuses unsafe
 reverse conversion. It applied successfully and passed explicit ledger/date tests.
-No destructive reset was performed. Main publication and six remote jobs remain
-pending; the completed publication/CI receipt will be appended.
+No destructive reset was performed. Publication and completed remote validation
+are recorded in the receipt below.
 
 Final permission follow-up rechecks the current staff flag under the owner lock,
 including a stale authenticated user whose staff permission was revoked concurrently.
 All **26 operations tests passed in 17.31s** after correcting the loader call;
 static/diff checks and documentation links passed. Player requests now show DRF
-budget/rate-limit detail rather than hiding the admission reason. Remote CI will
-run the complete final 282-test backend collection and all browser journeys.
+budget/rate-limit detail rather than hiding the admission reason. Remote CI subsequently
+passed the complete final 282-test backend collection and all browser journeys.
+
+## Main publication and remote monitoring
+
+Published `f3eb68301b437678ca49d175ab06cd15d586c086` to origin/main.
+[CI run 37031233040](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37031233040)
+completed **SUCCESS** at **16:09:33 UTC**, first attempt, all six jobs passed.
+
+| Remote check | Actual result |
+|---|---|
+| Python/PostgreSQL | 282 passed, seven Docker skips, 54.02s; JUnit confirms no failure/error |
+| Browser | 17 Chromium journeys passed in 15.0s; lint/build/types passed |
+| Docker parser | Seven passed in 142.71s, zero skips; actual 600s/512MiB max fixture and offline/mount/UID/cgroup/memory/scratch/PID/lifetime/cancellation checks |
+| Native recovery | PostgreSQL 17 dump/restore, migration round-trip through 0012, signed controls before reads and repeat replay PASS; production RPO/RTO NOT_MEASURED |
+| Terraform | Validation and three mocked plans passed; no credentials/provisioning |
+| Dependencies | Both pinned Python locks have no known vulnerabilities; npm production audit zero |
+| Containers | Linux API/web images built and unprivileged/quarantined API/503 and standalone-web startup checks passed |
+
+Downloaded JUnit/load artifacts corroborate the logs. Remote synthetic history
+pages measured approximately 33/31/24ms, 22/16/16 SQL statements; nine owners,
+2,250 matches, 32 queued jobs and two physical slots. This is synthetic CI timing,
+not concurrent hosted video throughput or permitted source qualification.
+No CI retry, source correction or relaxed gate was needed. The documentation-only
+receipt uses `[skip ci]` because application/workflow/dependency files match the
+successful commit. M17 remains PARTIAL for the external acceptance stated above.
 
 ## Acceptance that remains external
 
