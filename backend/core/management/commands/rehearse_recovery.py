@@ -58,6 +58,27 @@ pending = begin(pending_owner, uuid.uuid4(), len(content), hashlib.sha256(conten
      'source_kind': 'ranked', 'dataset_kind': 'synthetic', 'characters': ['jin', 'jin']})
 write_chunk(pending_owner, pending.pk, 0, content)
 request_completion(pending_owner, pending.pk)
+from backend.core import knowledge
+from backend.core.models import Game, GameBuild, KnowledgeProposal
+settings.DEBUG = True
+owner.is_staff = True
+owner.save(update_fields=['is_staff'])
+game, _ = Game.objects.get_or_create(key='tekken8')
+build = GameBuild.objects.create(key='recovery-fixture', game=game, platform='synthetic')
+asset.metadata = {'game_build': 'recovery-fixture', 'platform': 'synthetic', 'dataset_kind': 'synthetic'}
+asset.source_sha256 = hashlib.sha256(b'fixture').hexdigest()
+asset.retain_until = timezone.now()+timedelta(days=1)
+asset.save(update_fields=['metadata', 'source_sha256', 'retain_until'])
+asset.analysisrun_set.update(status='REVIEW_REQUIRED', result={'source': {'source_sha256': asset.source_sha256, 'duration_seconds': 1}})
+operators = [get_user_model().objects.create_user('knowledge-review-'+str(i), is_staff=True) for i in range(2)]
+proposal = knowledge.propose(owner, key='recovery/build/1', kind='build', build_key=build.pk, dataset_kind='synthetic',
+    payload={'game_build': 'recovery-fixture', 'platform': 'synthetic', 'overlays': ['build', 'frames']},
+    provenance={'reference': 'recovery/1', 'rights': 'OWNED_RECORDING', 'share_with_reviewers': True, 'publish_game_facts': True},
+    asset_ids=[asset.pk], reviewer_one=operators[0].pk, reviewer_two=operators[1].pk, request_id=uuid.uuid4())
+for operator in operators:
+    knowledge.review(operator, proposal.pk, proposal_hash=proposal.content_hash, decision='APPROVE',
+        note='Synthetic restore proof', confirm_reviewed=True, request_id=uuid.uuid4())
+knowledge.publish(owner, proposal.pk)
 """
 
 DELETE = """
@@ -97,6 +118,13 @@ from backend.core.models import UploadSession
 assert UploadSession.objects.count() == 1
 assert not UploadSession.objects.exclude(state='CANCELLED').exists()
 assert not UploadSession.objects.exclude(expected_sha256='', expected_md5='', claim_digest='').exists()
+from backend.core.models import KnowledgeProposal, KnowledgeReview, KnowledgeEvidence, DefinitionVersion
+assert KnowledgeProposal.objects.count() == 1
+assert not KnowledgeProposal.objects.exclude(state='WITHDRAWN', payload={}, provenance={}).exists()
+assert not KnowledgeEvidence.objects.exists()
+assert not KnowledgeReview.objects.exclude(note='').exists()
+assert DefinitionVersion.objects.get(pk='recovery/build/1').status == 'APPROVED'
+# Its immutable historical definition is retained; the restored grant is permanently revoked.
 for asset in ReplayAsset.objects.all():
     assert not private_path(asset.storage_key).exists()
 for run in AnalysisRun.objects.all():

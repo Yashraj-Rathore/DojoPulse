@@ -280,6 +280,9 @@ def export_account(request):
         AccountEmail,
         AttemptMetric,
         ConsentReceipt,
+        KnowledgeProposal,
+        KnowledgeReanalysis,
+        KnowledgeReview,
         MatchSuppression,
         OperatorWork,
         PilotCapture,
@@ -293,6 +296,30 @@ def export_account(request):
     # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
     # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "knowledge_proposals": (
+            KnowledgeProposal.objects.filter(owner=user),
+            [
+                "id",
+                "key",
+                "kind",
+                "game_build_id",
+                "dataset_kind",
+                "payload",
+                "content_hash",
+                "state",
+                "reason",
+                "published_id",
+                "created_at",
+            ],
+        ),
+        "knowledge_own_reviews": (
+            KnowledgeReview.objects.filter(owner=user),
+            ["id", "proposal_id", "decision", "note", "proposal_hash", "created_at"],
+        ),
+        "knowledge_reanalyses": (
+            KnowledgeReanalysis.objects.filter(owner=user),
+            ["id", "match_id", "mapping_id", "target_id", "run_id", "snapshot", "created_at"],
+        ),
         "upload_sessions": (
             UploadSession.objects.filter(owner=user, asset__owner=user),
             ["id", "asset_id", "state", "received_bytes", "expires_at", "created_at"],

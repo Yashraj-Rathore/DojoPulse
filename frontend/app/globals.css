@@ -13,3 +13,10 @@ html{scroll-padding-top:20px}button,input,select,summary,a,textarea{touch-action
 .upload-progress { margin-block: 1rem; padding: 1rem; border: 1px solid #ccd4c8; border-radius: .75rem; }
 .upload-progress progress { display: block; width: 100%; accent-color: #486742; margin-block: .75rem; }
 .upload-progress p { overflow-wrap: anywhere; }
+/* Knowledge evidence and immutable payloads stay readable on narrow review screens. */
+.knowledge-workspace pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; max-height: 28rem; overflow-y: auto; }
+.knowledge-workspace code { overflow-wrap: anywhere; }
+.knowledge-workspace video { width: 100%; max-width: 48rem; }
+.knowledge-workspace textarea { width: 100%; max-width: 100%; }
+.knowledge-workspace select { max-width: 100%; }
+.knowledge-workspace select[multiple] { min-height: 6rem; }

@@ -218,12 +218,25 @@ def review_recording(
     if match.asset_id:
         raise ValidationError("Another recording is already selected")
     knowledge = DefinitionVersion.objects.get(pk=knowledge_revision, kind="knowledge")
-    if knowledge.game_build_id != claim["game_build"]:
-        raise ValidationError("Knowledge build must match the reviewed recording")
-    if match.dataset_kind == "real" and (
-        knowledge.status != "APPROVED" or not knowledge.game_build.verified
+    if (
+        knowledge.game_build_id != claim["game_build"]
+        and knowledge.payload.get("game_build") != claim["game_build"]
     ):
-        raise ValidationError("Real evidence requires approved knowledge and a verified build")
+        raise ValidationError("Knowledge build must match the reviewed recording")
+    from backend.core.knowledge import require_definition
+    from backend.core.models import KnowledgeProposal
+
+    if (
+        match.dataset_kind == "real"
+        or KnowledgeProposal.objects.filter(published=knowledge).exists()
+    ):
+        if match.dataset_kind == "real" and (
+            knowledge.status != "APPROVED" or not knowledge.game_build.verified
+        ):
+            raise ValidationError("Real evidence requires approved knowledge and a verified build")
+        require_definition(knowledge.key, match.dataset_kind, operator.pk, kind="knowledge")
+        if source.asset.metadata.get("platform") != knowledge.game_build.platform:
+            raise ValidationError("Knowledge platform must match the reviewed capture")
     proposed = {
         "game_build": claim["game_build"],
         "mode": claim["source_kind"],

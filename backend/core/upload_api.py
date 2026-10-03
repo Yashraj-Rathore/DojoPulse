@@ -15,6 +15,9 @@ from backend.core.resumable import begin, cancel, request_completion, status, wr
 
 class CaptureInput(serializers.Serializer):
     game_build = serializers.CharField(max_length=80)
+    platform = serializers.ChoiceField(
+        choices=["steam", "ps5", "xbox_series", "synthetic", "unknown"], required=False
+    )
     session_id = serializers.CharField(max_length=100)
     played_at = serializers.DateTimeField()
     source_kind = serializers.ChoiceField(choices=["ranked", "practice", "takeover"])

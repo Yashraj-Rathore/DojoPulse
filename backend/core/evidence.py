@@ -19,6 +19,8 @@ from backend.core.ownership import lock_owner
 
 
 def as_opportunity(event):
+    from backend.core.knowledge import event_available, event_knowledge
+
     match = event.match
     if not event.run_id:
         raise ValidationError("Metadata alone is not gameplay evidence")
@@ -28,6 +30,7 @@ def as_opportunity(event):
     )
     deleted = deleted or match.metadata_state == "REVIEW_REQUIRED"
     deleted = deleted or bool(asset.retain_until and asset.retain_until <= timezone.now())
+    deleted = deleted or not event_available(event)
     return Opportunity(
         id=str(event.pk),
         played_key=f"{match.pk}:{event.played_key}",
@@ -38,7 +41,7 @@ def as_opportunity(event):
         situation=event.situation,
         metric=event.metric,
         game_build=match.game_build,
-        knowledge_revision=match.knowledge_revision,
+        knowledge_revision=event_knowledge(event),
         detector_version=event.detector_version,
         context=match.context,
         eligibility=Eligibility.UNKNOWN if deleted else Eligibility(event.eligibility),
@@ -61,6 +64,9 @@ def publish_annotations(operator, run_id, match_id, annotation):
     from backend.core.consents import require_processing
 
     require_processing(locked_owner)
+    from backend.core.security import capacity_lock
+
+    capacity_lock()
     run = AnalysisRun.objects.select_for_update(of=("self",)).select_related("asset").get(pk=run_id)
     if run.status == "PROCESSING":
         raise ValidationError("Wait for processing to finish before review import")
@@ -92,7 +98,10 @@ def publish_annotations(operator, run_id, match_id, annotation):
         or run.status == "CANCELLED"
     ):
         raise ValidationError("Deleted/cancelled evidence cannot publish")
-    validate_annotations(annotation, run.asset.source_sha256)
+    from backend.core.knowledge import publication_measurement
+
+    measurement = publication_measurement(run, match)
+    validate_annotations(annotation, run.asset.source_sha256, situation=measurement["situation"])
     if (
         annotation["game_build"] != match.game_build
         or annotation["session_id"] != match.session_id
@@ -135,7 +144,7 @@ def publish_annotations(operator, run_id, match_id, annotation):
             match=match,
             played_key=item["id"],
             situation=item["situation"],
-            metric="punish-success/v1",
+            metric=measurement["metric"],
             detector_version="human-adjudication/1",
             start_us=item["start_us"],
             end_us=item["end_us"],
@@ -143,6 +152,7 @@ def publish_annotations(operator, run_id, match_id, annotation):
             outcome=item["outcome"],
             verified=True,
             evidence=item["evidence"],
+            measurement=measurement,
             review={
                 "reviews": item["reviews"],
                 "adjudication": item["adjudication"],
@@ -153,8 +163,9 @@ def publish_annotations(operator, run_id, match_id, annotation):
     events = list(GameplayEvent.objects.filter(run=run, match=match).select_related("match__asset"))
     stats = summarize([as_opportunity(e) for e in events])
     MatchContribution.objects.update_or_create(
-        match=match, metric="punish-success/v1", defaults={"run": run, "summary": stats}
+        match=match, metric=measurement["metric"], defaults={"run": run, "summary": stats}
     )
+    MatchContribution.objects.filter(match=match).exclude(metric=measurement["metric"]).delete()
     if publication:
         publication.run = run
         publication.revision += 1

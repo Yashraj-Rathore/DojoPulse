@@ -50,6 +50,10 @@ def require_active(owner):
         or Profile.objects.filter(user=owner, deleted_at__isnull=False).exists()
     ):
         raise ValidationError("Account is inactive")
+    from backend.core.security import capacity_lock
+
+    # Every loop write reads shared release grants before locking its domain rows.
+    capacity_lock()
 
 
 def require_complete_captures(events):
@@ -69,8 +73,14 @@ def require_complete_captures(events):
 def create_assignment(owner, drill_key):
     require_active(owner)
     drill = DefinitionVersion.objects.get(pk=drill_key, kind="drill")
-    if drill.status != "APPROVED":
-        raise ValidationError("Drill awaits expert review; assignment is gated")
+    from backend.core.knowledge import require_definition
+
+    require_definition(
+        drill_key,
+        "synthetic" if drill.payload.get("synthetic_only") else "real",
+        owner.pk,
+        kind="drill",
+    )
     return DrillAssignment.objects.create(owner=owner, drill=drill)
 
 
@@ -112,8 +122,11 @@ def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start
             first.dataset_kind,
         ):
             raise ValidationError("Baseline definitions are mixed")
-    approved = assignment.drill.status == "APPROVED" and all(
-        DefinitionVersion.objects.filter(pk=key, status="APPROVED").exists()
+    from backend.core.knowledge import effective
+
+    approved = effective(assignment.drill, first.dataset_kind, owner.pk) and all(
+        (definition := DefinitionVersion.objects.filter(pk=key).first())
+        and effective(definition, first.dataset_kind, owner.pk)
         for key in (first.situation, first.metric, first.knowledge_revision)
     )
     specification = EvaluationSpec(
@@ -161,8 +174,14 @@ def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start
 def record_practice(owner, assignment_id, event_ids):
     require_active(owner)
     assignment = DrillAssignment.objects.select_for_update().get(pk=assignment_id, owner=owner)
-    if assignment.drill.status != "APPROVED":
-        raise ValidationError("Unreviewed drill")
+    from backend.core.knowledge import require_definition
+
+    require_definition(
+        assignment.drill_id,
+        "synthetic" if assignment.drill.payload.get("synthetic_only") else "real",
+        owner.pk,
+        kind="drill",
+    )
     events = owned_events(owner, event_ids)
     if not events:
         raise ValidationError("No practice evidence")
@@ -209,6 +228,11 @@ def evaluate_plan(owner, plan_id, followup_ids):
     require_active(owner)
     plan = EvaluationPlan.objects.select_for_update().get(pk=plan_id, owner=owner)
     spec = EvaluationSpec.from_dict(plan.specification)
+    from backend.core.knowledge import require_definition
+
+    require_definition(
+        plan.assignment.drill_id, spec.dataset_kind, owner.pk, kind="drill", historical=True
+    )
     from analysis.contracts import aware_time
 
     if spec.dataset_kind == "real" and timezone.now() < aware_time(spec.followup_end):

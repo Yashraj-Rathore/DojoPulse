@@ -68,6 +68,9 @@ def apply_restore_controls():
         # Restored study consent and blind labels cannot be trusted as current authorization.
         for member in PilotEnrollment.objects.filter(state="ACTIVE"):
             erase_enrollment(member)
+        from backend.core.knowledge import restore_revoke
+
+        restore_revoke()
     token = replaying.set(True)
     try:
         for record in records:

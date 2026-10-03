@@ -194,6 +194,7 @@ def setup_plan(owner, capture):
         payload={
             "situation_definition": "tekken8.jin-vs-jin.blocked-uf4/v1",
             "game_build": "fixture",
+            "synthetic_only": True,
         },
     )
     assignment = create_assignment(owner, drill.pk)

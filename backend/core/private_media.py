@@ -47,7 +47,7 @@ class PrefetchedBody:
         self.chunks.close()
 
 
-def asset_response(asset, range_header):
+def asset_response(asset, range_header, *, authorize=None):
     if asset.retain_until and asset.retain_until <= timezone.now():
         return HttpResponse(status=404)
     if UploadSession.objects.filter(asset=asset).exclude(state="COMPLETE").exists():
@@ -77,6 +77,8 @@ def asset_response(asset, range_header):
         if time.monotonic() - last_check < 0.5:
             return
         last_check = time.monotonic()
+        if authorize is not None and not authorize():
+            raise ValueError("MEDIA_GRANT_REVOKED")
         if not ReplayAsset.objects.filter(
             pk=asset.pk, owner_id=asset.owner_id, owner__is_active=True, deleted_at=None
         ).exists():

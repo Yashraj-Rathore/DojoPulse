@@ -22,7 +22,10 @@ Historical results must resolve the exact knowledge used.
 
 Unverified fields stay null; public references are leads, not release approval.
 
+The local review/publication and compatibility implementation is specified by
+[ADR-019](ADR-019-reviewed-knowledge-releases.md). Immutable APPROVED status is separate
+from a revocable evidence/scope grant; original captures and historical event pins remain.
+
 ## Reconsideration trigger
 
 Only internal storage representation may change; historical pinning remains.
-

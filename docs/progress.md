@@ -964,3 +964,68 @@ scope is locally DONE; actual storage/capture/attribution/production release rem
 PARTIAL and independent scientific/provider/privacy/source-access gates stay open.
 Next implementation follows the tracker with permitted evidence and hosting inputs;
 keep development lint advisory remediation under reviewed dependency maintenance.
+
+
+## 2026-10-03 - M07 local knowledge governance implemented
+
+Requirements: M07.02-M07.07, M06.02/.03, M11.01, M12.02,
+M14.04-M14.06, M15.06, M01.05/.06 and M19.02. User authorized implementation,
+direct publication to main and monitoring. Architecture 2.11.0, ADR-019 and D031.
+Added stable M07.07 for the coherent local module; real M07 remains blocked/partial.
+
+Changed core models/migration 0017, knowledge services/API/routes, private range
+playback, canonical annotation publication, loop/worker lock ordering, recording and
+upload platform attribution, consent/storage/recovery hooks, own-data export/catalog,
+frontend knowledge workspace/navigation/capture forms and scoped regression tests.
+Preserved the existing loader-idempotency test. Updated architecture, ADR-007/019,
+README, decision log, this log and PRODUCT_PROGRESS in the same implementation.
+
+Sealed proposals bind permitted source/dependency hashes and explicit whole-recording
+sharing to two independent operators; decisions stay blind until submission. New
+immutable build/move/situation/metric/knowledge/drill/mapping versions retain drafts.
+Revocable grants enforce workspace, scope, dependencies, evidence/retention and
+lifecycle. Retire stops new use; withdrawal hides active gameplay rows, invalidates
+conclusions and fences dispatch/work. Account/consent/source/restore erasure removes
+private candidate JSON, notes and source grants; permitted historical facts/hashes remain.
+
+Patch impact/reanalysis preserves original capture build and initial knowledge,
+old event hashes and frozen plan memberships. Only reviewed same-capture-build mapping
+can queue bounded canonical media analysis; gameplay replacement still needs reviewed
+annotation import. Cross-build and unknown evidence abstain. No new game facts, expert
+approval, current patch, live provider, detector or production access is claimed.
+
+Validation so far: full PostgreSQL suite 369 passed/seven separate Docker checks skipped
+in 228.16s; after preserving the original loader test and active-view privacy correction,
+30 focused loader/governance tests passed in 115.06s. All 30 Edge journeys passed in
+33.9s with production build, lint/typecheck and inspected 390px screenshot. Ruff/mypy,
+Django/schema, additive migration/idempotent loader, both Python-lock audits and
+production npm audit passed. Native PostgreSQL fresh-database forward/reverse/forward,
+actual pg_dump/restore, repeated signed controls and restored M07 grant/note erasure passed.
+
+Final audit found worker/publication domain-row locks could oppose cross-account review
+revocation at the shared mutex. Standardized owner -> capacity -> domain order and added
+a deterministic PostgreSQL worker-versus-foreign-reviewer withdrawal race. Final full
+regression of that change is pending; exact main publication/CI is also pending.
+No test gate was weakened. Known unpatched dev braces advisory and source-access review
+remain separately tracked. Next: qualified publication, then permitted exact-build
+captures, independent experts/rights and M08 dataset preparation; actual hosting remains gated.
+
+
+M07 final concurrency follow-up (same implementation): the deterministic race exposed a
+PostgreSQL deferred foreign-key check at COMMIT competing with the exclusive owner lock.
+Changed the central owner lock to FOR NO KEY UPDATE on PostgreSQL, preserving serialized
+owner writes without blocking foreign references to unchanged user primary keys. All loop
+writes now acquire capacity before domain rows; revoked dispatches/physical slots receive
+cancellation/stop requests. Both deterministic race tests passed (2 in 7.93s); final full
+regression and native recovery are running. New synthetic account fixtures use a fast
+Django test-only hasher; production password configuration and security gates are unchanged.
+
+
+M07 final local qualification: **371 passed, seven separately gated Docker tests skipped**
+(170.50s) after all worker/loop/owner-lock/privacy corrections. JUnit saved locally at
+reports/m07-python-final.xml. This includes the preserved loader test and deterministic
+worker/foreign-reviewer race. Ruff/format/mypy and diff checks pass; final native recovery
+also passes after lock changes. Earlier 30 Edge/build/TypeScript/lint/audits remain current
+because frontend/dependencies were unchanged after that qualification. M07.07 is DONE in
+its defined local scope; real M07 and hosted review remain gated. Publication on main and
+actual latest-tip CI are the remaining delivery steps; no skip instruction is used.

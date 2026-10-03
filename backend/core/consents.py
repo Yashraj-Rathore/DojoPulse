@@ -89,6 +89,9 @@ def record_consent(owner, scope, action, version, request_id, source="ACCOUNT"):
             from backend.core.pilots import erase_account
 
             erase_account(owner.pk)
+            from backend.core.knowledge import erase_account as erase_knowledge
+
+            erase_knowledge(owner.pk)
             AnalysisRun.objects.filter(owner=owner, status__in=["QUEUED", "PROCESSING"]).update(
                 status="CANCELLED", fence=F("fence") + 1, lease_until=None
             )

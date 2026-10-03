@@ -59,7 +59,7 @@ export default function Home(){
  function chooseFile(value:File|null){setFile(value);setValidPreview(false);setPreview(value?URL.createObjectURL(value):"");}
  async function upload(event:React.FormEvent<HTMLFormElement>){
   event.preventDefault();const form=new FormData(event.currentTarget);if(!file)return;
-  const metadata={game_build:form.get("build"),session_id:form.get("session"),played_at:new Date(String(form.get("played"))).toISOString(),source_kind:sourceKind,characters:["jin","jin"],dataset_kind:form.get("dataset_kind")};
+  const metadata={game_build:form.get("build"),platform:form.get("platform"),session_id:form.get("session"),played_at:new Date(String(form.get("played"))).toISOString(),source_kind:sourceKind,characters:["jin","jin"],dataset_kind:form.get("dataset_kind")};
   const completed=await transfer.start(file,metadata);if(completed){chooseFile(null);await refresh();}
  }
  const picked=selected;
@@ -72,7 +72,7 @@ export default function Home(){
   {ready&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
   {!ready?<p>Connecting to local API…</p>:!authenticated?
    <section className="login"><h2>Open your local workspace</h2><p className="muted">Sign in with your verified local account or an existing development account.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
-   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a><Link href="/pilots">Pilot studies</Link>{operator&&<Link href="/operations">Operations</Link>}</nav>
+   <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a><Link href="/pilots">Pilot studies</Link>{operator&&<><Link href="/knowledge">Knowledge review</Link><Link href="/operations">Operations</Link></>}</nav>
    <div className="grid" id="workspace-content" tabIndex={-1}>
     <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
     <AccountControls csrf={csrf}/>
@@ -84,6 +84,7 @@ export default function Home(){
       {file&&<p className="muted">{validPreview?"Basic dimensions and duration accepted. The worker checks encoding and timing.":"Checking preview, or dimensions/duration exceed the capture profile."}</p>}
       <div className="rows"><div><label htmlFor="build">Exact game build</label><input id="build" name="build" placeholder="Read from the game" required/></div><div><label htmlFor="session">Play session ID</label><input id="session" name="session" placeholder="Your recording session" required/></div></div>
       <label htmlFor="played">Original play time (local)</label><input id="played" name="played" type="datetime-local" required/>
+      <label htmlFor="capture-platform">Recorded platform</label><select id="capture-platform" name="platform" defaultValue="steam"><option value="steam">Steam PC (current capture profile)</option><option value="synthetic">Synthetic test recording</option><option value="unknown">Unknown (cannot verify knowledge)</option></select>
       <label htmlFor="mode">Recording purpose</label><select id="mode" value={sourceKind} onChange={e=>setSourceKind(e.target.value)}><option value="ranked">Ranked baseline / follow-up</option><option value="practice">Recorded practice</option></select>
       <label htmlFor="capture-kind">Recording content</label><select id="capture-kind" name="dataset_kind" required><option value="">Confirm the content</option><option value="real">Real gameplay</option><option value="synthetic">Synthetic test recording</option></select>
       <label><input type="checkbox" required/>This is one continuous, uncut capture without pauses or rewinds.</label>

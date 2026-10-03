@@ -17,6 +17,9 @@ class AttributionInput(serializers.Serializer):
     opponent_namespace = serializers.CharField(max_length=100, trim_whitespace=False)
     opponent_id = serializers.CharField(max_length=200, trim_whitespace=False)
     game_build = serializers.CharField(max_length=80)
+    platform = serializers.ChoiceField(
+        choices=["steam", "ps5", "xbox_series", "synthetic", "unknown"], required=False
+    )
     session_id = serializers.CharField(max_length=100)
     played_at = serializers.DateTimeField()
     source_kind = serializers.ChoiceField(choices=["ranked", "practice", "takeover"])

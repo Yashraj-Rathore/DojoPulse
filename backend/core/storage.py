@@ -126,6 +126,9 @@ def delete_asset(owner, asset_id, storage=None):
         from backend.core.pilots import invalidate_asset
 
         invalidate_asset(asset.pk)
+        from backend.core.knowledge import invalidate_asset as invalidate_knowledge
+
+        invalidate_knowledge(asset.pk)
         from backend.core.models import AttemptMetric
 
         AttemptMetric.objects.filter(slot__run__asset=asset).delete()
@@ -199,6 +202,9 @@ def delete_account(owner, storage=None, *, password=None):
         from backend.core.pilots import erase_account
 
         erase_account(owner.pk)
+        from backend.core.knowledge import erase_account as erase_knowledge
+
+        erase_knowledge(owner.pk)
         profile, _ = Profile.objects.select_for_update().get_or_create(user=owner)
         profile.deleted_at = timezone.now()
         profile.processing_consent_at = None

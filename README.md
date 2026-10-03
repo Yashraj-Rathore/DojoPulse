@@ -345,3 +345,8 @@ Resumable LOCAL upload/private playback engineering and controlled GCS adapters 
 Real GCS operation, external uploads and Cloud Run media deployment remain disabled.
 The local Docker parser isolation profile passed the separately recorded M15–M17
 qualification. Equivalent hosted isolation and external upload release remain gated.
+
+The local operator [knowledge workspace](docs/architecture/knowledge-governance.md) at
+`/knowledge` supports build registration, independent review, immutable synthetic releases
+and reviewed patch reanalysis. Record explicit platform with source evidence. Real knowledge
+publication remains disabled; synthetic approval does not establish Tekken facts or expertise.

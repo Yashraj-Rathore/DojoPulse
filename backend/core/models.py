@@ -135,7 +135,19 @@ class DefinitionVersion(models.Model):
     key = models.CharField(primary_key=True, max_length=160)
     kind = models.CharField(
         max_length=30,
-        choices=[(x, x) for x in ("move", "knowledge", "situation", "metric", "drill", "capture")],
+        choices=[
+            (x, x)
+            for x in (
+                "build",
+                "move",
+                "knowledge",
+                "situation",
+                "metric",
+                "drill",
+                "capture",
+                "compatibility",
+            )
+        ],
     )
     game_build = models.ForeignKey(GameBuild, on_delete=models.PROTECT, null=True)
     status = models.CharField(max_length=30, default="DRAFT")
@@ -514,6 +526,8 @@ class GameplayEvent(Owned):
     verified = models.BooleanField(default=False)
     evidence = models.JSONField(default=list)
     review = models.JSONField(default=dict)
+    # Knowledge revisions vary by analysis, never by rewriting original capture facts.
+    measurement = models.JSONField(default=dict)
     deleted_at = models.DateTimeField(null=True)
 
     def save(self, *args, **kwargs):
@@ -841,3 +855,87 @@ class PilotDecision(models.Model):
     reason = models.CharField(max_length=30)
     reference = models.CharField(max_length=80)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class KnowledgeProposal(Owned):
+    """Sealed candidate and explicitly shared sources; state is a revocable release grant."""
+
+    key = models.CharField(max_length=160, unique=True)
+    kind = models.CharField(max_length=30)
+    game_build = models.ForeignKey(GameBuild, on_delete=models.PROTECT)
+    dataset_kind = models.CharField(max_length=12)
+    payload = models.JSONField()
+    provenance = models.JSONField()
+    content_hash = models.CharField(max_length=64)
+    reviewer_one = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    reviewer_two = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    published = models.OneToOneField(DefinitionVersion, on_delete=models.PROTECT, null=True)
+    state = models.CharField(max_length=12, default="OPEN")
+    reason = models.CharField(max_length=30, blank=True)
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "request_id"], name="knowledge_proposal_request"
+            ),
+            models.CheckConstraint(
+                condition=~Q(reviewer_one=F("reviewer_two"))
+                & ~Q(owner=F("reviewer_one"))
+                & ~Q(owner=F("reviewer_two")),
+                name="knowledge_independent_reviewers",
+            ),
+        ]
+
+
+class KnowledgeEvidence(models.Model):
+    proposal = models.ForeignKey(
+        KnowledgeProposal, on_delete=models.CASCADE, related_name="sources"
+    )
+    asset = models.ForeignKey(ReplayAsset, on_delete=models.PROTECT)
+    snapshot = models.JSONField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["proposal", "asset"], name="knowledge_source")
+        ]
+
+
+class KnowledgeReview(Owned):
+    proposal = models.ForeignKey(
+        KnowledgeProposal, on_delete=models.CASCADE, related_name="reviews"
+    )
+    decision = models.CharField(max_length=12)
+    note = models.TextField(max_length=2000)
+    proposal_hash = models.CharField(max_length=64)
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["proposal", "owner"], name="knowledge_review_once")
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Knowledge reviews are immutable")
+        super().save(*args, **kwargs)
+
+
+class KnowledgeReanalysis(Owned):
+    match = models.ForeignKey(Match, on_delete=models.PROTECT)
+    mapping = models.ForeignKey(DefinitionVersion, on_delete=models.PROTECT, related_name="+")
+    target = models.ForeignKey(DefinitionVersion, on_delete=models.PROTECT, related_name="+")
+    run = models.OneToOneField(AnalysisRun, on_delete=models.PROTECT)
+    snapshot = models.JSONField()
+    request_id = models.UUIDField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "request_id"], name="knowledge_reanalysis_request"
+            )
+        ]

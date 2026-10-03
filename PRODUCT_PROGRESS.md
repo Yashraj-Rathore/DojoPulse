@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-10-03** · Architecture: **2.10.0** · Current stage: **local research prototype**
+Last updated: **2026-10-03** · Architecture: **2.11.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -24,17 +24,17 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Security and reliability (M15) | Local engineering implemented across M15.01–M15.07: real Docker isolation, admission/rate limits, ownership/fencing, offline provider guards, dependency fixes and incident procedures; production qualification remains open |
 | Real player IDs / providers | No live identity resolver or match transport enabled; EWGF usage rights, credentials and current authenticated schema unresolved |
 | Gameplay recognition | Bounded media tooling and deterministic rules exist; no released Tekken detector or calibrated templates |
-| Knowledge and drills | One provisional Jin/Jin uf+4 target and one draft drill; expert approval and current-build verification missing |
+| Knowledge and drills | M07 local evidence/independent review/publication/lifecycle/patch module implemented; real current-build facts, response and expert approval remain missing |
 | Scientific validation | G1–G6 are all NOT_RUN; local M18 consent/review/report tools implemented, no completed real-player study |
 | Pilot preparation (M18) | Local consent, pseudonyms, prospective intake/allocation, blinded review/adjudication, canonical links, evidence packs and withdrawal/restore erasure delivered; `135464f`/clean reconciliation `2bbb645` passed all six CI jobs; real studies remain unrun |
 | Operations and economics (M17) | Local resource ledger, fenced measurements, staff dashboard/CLI alerts, time/cost observations, retention and synthetic saturation/outage checks implemented. Objectives are proposed; actual hosted costs, named response, real workloads and payment evidence remain open |
 | Hosting and release | M06 resumable/private storage engineering and M16 dispatch/recovery are implemented locally with controlled GCS/Terraform contracts. Native PostgreSQL recovery now includes pending upload erasure. Actual GCS, cloud media isolation, region/budget/IAM/CORS and production release remain gated |
-| Latest recorded checks | Final M06 code 1d56929 passed all six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37135447719) first attempt at 16:07:03 UTC on 2026-10-03: 341 Python, 25 Chromium, seven Docker tests; three Terraform mock tests, recovery/audits/build/static/startup. Earlier 0588ce4 counts are separately dated in the [receipt](docs/experiment-results/m06-storage.md) |
-| Evidence for those checks | [M06 storage qualification](docs/experiment-results/m06-storage.md), plus separately dated M18/M17/M16/account/security receipts. Local software evidence does not establish real gameplay or production readiness |
-| Published delivery | M06 final code/fix 1d56929 pushed directly to main without force and all six checks verified 2026-10-03. This documentation-only final receipt retains ordinary CI and requires its actual latest tip green before handoff. Only main exists; no hosted deployment or live integration enabled |
+| Latest recorded checks | Final M07 local: 371 PostgreSQL/Python passes (170.50s), seven separate Docker checks deferred to CI; 30 Edge journeys (33.9s), build/static/audits, schema/loader and native recovery passed. [Qualification](docs/experiment-results/m07-knowledge.md); exact main publication/CI pending |
+| Evidence for those checks | [M07 knowledge qualification](docs/experiment-results/m07-knowledge.md), with earlier M06/M18/M17/M16 receipts separately scoped; synthetic software does not establish real gameplay or production readiness |
+| Published delivery | Preparing M07 directly on main with ordinary CI; publication/latest-tip checks pending. Prior M06 final receipt 14c2799 passed all six jobs on 2026-10-03. No hosted deployment or live integration enabled |
 | Repository delivery policy | Only `main` remains; all 15 inspected bot proposals closed/deleted and 16 stale local tracking entries pruned. Four Dependabot version-PR streams disabled and GitHub validator passed; automatic security PRs already off and unchanged. Audits remain active with weekly reviewed/tested patches directly on main. Previous receipt `e70a83e` skipped CI; current policy requires checks on every published tip, including progress receipts |
 | Source integrity finding | Remote `301ed0b` injected obfuscated Next config code, repaired by `1771eba`. Rewritten receipt `2a20380` reintroduced an obfuscated eval payload; its sole difference from verified `5c1e78c` was Next config. `2bbb645` retains remote ancestry with the qualified clean M18 tree; current main head verified after CI. Repository-access/prior-execution review remains open |
-| Publication validation | Both M06 implementation and final revocation fix passed all six jobs first attempt; latest code receipt records 341 Python/25 Chromium/seven Docker. Logs/JUnit substantiate their exact scopes. Final docs retain normal checks; development lint advisory remains tracked without suppression |
+| Publication validation | Final M07 local regression, forced worker/reviewer and review/deletion races, build/browser/recovery/audits passed. Remote implementation/latest-tip CI pending; previous M06 success does not establish the new tip |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
 data access and demonstrated player benefit are different kinds of progress.
@@ -81,7 +81,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M04 | Permitted real player identity linking | BLOCKED | Approved resolver, identity mapping and permitted fixtures |
 | M05 | Live provider-neutral match discovery/import | BLOCKED | M04 plus provider usage rights, credential and response schema |
 | M06 | Production video fallback and evidence attribution | PARTIAL | Coherent M06 local/controlled storage engineering delivered (M06.08 DONE); actual hosted IAM/CORS/erasure, real captures and attribution remain release gates |
-| M07 | Reviewed game knowledge and supported situation | BLOCKED | Current-build evidence and Tekken expert |
+| M07 | Reviewed game knowledge and supported situation | BLOCKED | Local governance module implemented; real current-build footage, permitted facts and independent Tekken experts still required |
 | M08 | Consented golden dataset and annotation operations | PARTIAL | Real captures, independent reviewers and held-out labels |
 | M09 | Validated observation/event recognition | PARTIAL | M07–M08 and G1/G2; no released automatic detector yet |
 | M10 | Player model and weakness prioritization | PARTIAL | Real event validation and useful evidence-backed diagnosis |
@@ -177,7 +177,7 @@ Owner: media/backend owner. Exit: permitted recordings can safely supply evidenc
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M06.01 Strict capture profile, preview and media validation | PARTIAL | Local preview and parser enforce 1080p60 SDR H.264 MP4, <=10 min/512 MiB; resumable UI requires consent and continuous-capture declaration. Declaration is not automatic cut/rewind detection; real capture support still needs G1/G3 |
-| M06.02 Secure direct/resumable upload, completion verification and quotas | PARTIAL | Durable owner/idempotency sessions, declared-byte reservations, bounded local chunks, official GCS create-only/observed-offset contracts and background exact size/SHA-256/MD5/generation checks implemented. Actual GCS/IAM/CORS and hosted load qualification remain; [M06 receipt](docs/experiment-results/m06-storage.md) |
+| M06.02 Secure direct/resumable upload, completion verification and quotas | PARTIAL | Durable owner/idempotency sessions, declared-byte reservations, bounded local chunks, official GCS create-only/observed-offset contracts and background exact size/SHA-256/MD5/generation checks implemented. Actual GCS/IAM/CORS and hosted load qualification remain; [M06 receipt](docs/experiment-results/m06-storage.md) M07 adds explicit capture platform for governed build evidence. |
 | M06.03 Attach a reviewed recording to an existing canonical match | PARTIAL | Legacy/resumable transfer share pending-attribution source creation; identity/slot/time/build/mode/revision checks are repeated after byte verification. Imported UUID/history remain and no gameplay is auto-approved. Stale claims, deletion, status-probe revocation and duplicate races checked; actual attribution/hosted flow remain. [ADR-014](docs/adr/ADR-014-recording-attribution.md), [ADR-018](docs/adr/ADR-018-resumable-private-evidence.md) |
 | M06.04 Separate played match, viewing pass, round, rewind and practice/takeover | PARTIAL | Local purpose/segment contracts and explicit supported continuous uncut capture declaration implemented. No automatic multi-segment/rewind detection or real-input rejection qualification claimed; unsupported-input observation/review remains |
 | M06.05 Retain original timestamps and bounded evidence clips/artifacts | PARTIAL | Native-PTS tooling and authenticated local/suffix/open range playback implemented; controlled GCS generation-pinned range headers/byte bounds/stream closure checked. Real timestamp/clip support, storage CORS and hosted artifact retention remain |
@@ -192,11 +192,12 @@ Owner: Tekken expert + analysis owner. Exit: one current-build situation and val
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M07.01 Select target based on importance, observability, frequency and trainability | PARTIAL | Jin/Jin uf+4 provisional ranking exists; confirm with G1/G5 or choose the documented backup |
-| M07.02 Verify exact build/platform and capture overlays in-game | BLOCKED | Actual build evidence; do not inherit the research date's patch as a capture's build |
-| M07.03 Verify move identity, frame facts, response reach and timing | BLOCKED | Expert-reviewed permitted evidence; current draft intentionally contains unverified facts |
-| M07.04 Define trigger, actors, eligibility, response window and unknown/exclusion rules | PARTIAL | Draft contract exists; validate wall/axis/stance/resources/reach and outcome observability |
-| M07.05 Publish approved knowledge/situation/metric/drill versions | BLOCKED | Independent review recorded; new immutable versions rather than editing draft approval flags |
-| M07.06 Manage patch mappings, incompatible evidence and targeted reanalysis | PARTIAL | Version fields/checks exist; actual patch-change/release workflow remains to be exercised |
+| M07.02 Verify exact build/platform and capture overlays in-game | BLOCKED | Local unverified registration, canonical version/platform checks and pinned source/overlay review implemented; actual in-game build evidence remains missing |
+| M07.03 Verify move identity, frame facts, response reach and timing | BLOCKED | Local bounded fact/reach/timing candidate and dual-review trail implemented; expert-reviewed permitted actual evidence missing; draft facts stay unverified |
+| M07.04 Define trigger, actors, eligibility, response window and unknown/exclusion rules | PARTIAL | Local versioned bounded Jin semantics, mandatory observations and unknown/exclusion gates implemented; real wall/axis/stance/resources/reach/outcome validation remains |
+| M07.05 Publish approved knowledge/situation/metric/drill versions | BLOCKED | Local two-reviewer publication creates new immutable versions, rechecks dependency/build/scope grants, and supports retirement/withdrawal. Actual current-build expert/rights release is code-gated; synthetic approval cannot promote real evidence |
+| M07.06 Manage patch mappings, incompatible evidence and targeted reanalysis | PARTIAL | Local immutable three-disposition mapping, impact preview, budgeted owner-requested canonical reanalysis and reviewed replacement implemented; source build/original event hashes/frozen plans preserved. Actual patch compatibility remains unvalidated |
+| M07.07 Complete local knowledge governance module | DONE | Local API/UI, sealed source/dependency review, independent decisions, immutable scoped publication, lifecycle/privacy/restore and reviewed reanalysis delivered; 371 Python/30 Edge, guarded migrations/native recovery, static/schema/audits and forced PostgreSQL races pass. [Contract](docs/architecture/knowledge-governance.md), [qualification](docs/experiment-results/m07-knowledge.md). Real M07 and hosted review remain gated; publication CI pending |
 
 ## M08 — Consented golden dataset and annotation operations
 
@@ -244,7 +245,7 @@ Owner: Tekken expert + product/analysis owner. Exit: one approved drill produces
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M11.01 Version drill setup, valid response, alternatives and success criteria | PARTIAL | Exactly one draft exists; expert review and current-build reproducibility required |
+| M11.01 Version drill setup, valid response, alternatives and success criteria | PARTIAL | Draft plus local evidence-pinned dual-review/new-version publication and scope/lifecycle checks implemented; actual expert-approved current-build response/setup/reproducibility required |
 | M11.02 Assign the appropriate drill to an evidenced weakness | PARTIAL | Local approved-definition gate exists; release a genuinely reviewed drill and validate assignment behavior |
 | M11.03 Provide usable native training instructions without requiring a mod | PARTIAL | Draft local UI/instructions; player trial must show correct setup and completion |
 | M11.04 Record sessions/attempts and separate self-report from verified outcomes | PARTIAL | Reviewed local attempts implemented; real practice capture and G4 validation pending |
@@ -258,7 +259,7 @@ Owner: measurement/analysis owner. Exit: real baseline and later-match compariso
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
 | M12.01 Freeze baseline, metric, versions, windows and stop policy | DONE | Immutable EvaluationPlan and complete-selected-capture checks |
-| M12.02 Freeze follow-up and practice memberships per result revision | DONE | Append-only results, canonical hashes, lineage/invalidation tests |
+| M12.02 Freeze follow-up and practice memberships per result revision | DONE | Append-only results, hashes/lineage/invalidation; M07 synthetic reanalysis preserves old event knowledge hashes and frozen plans, withdrawal invalidates dependent results |
 | M12.03 Enforce exposure, independent sessions, coverage and compatibility | PARTIAL | Local gates implemented; validate real play logs/sessionization and missing-source coverage |
 | M12.04 Return all six legitimate outcomes with uncertainty and next actions | DONE | Local statistical engine; observed improvement is not a causal assertion |
 | M12.05 Run prospective real baseline → practice → follow-up comparisons | BLOCKED | Consented cohort, approved measurement/drill and G5/G6 |
@@ -292,9 +293,9 @@ Local implementation and evidence: [account lifecycle](docs/architecture/account
 | M14.01 Secure sign-up/sign-in, session lifecycle and recovery | PARTIAL | Local verification/recovery, current-password changes, owned session inventory/revocation and logout-all implemented; expiring one-use challenges, CSRF, rate limits and concurrency checked. Production mail transport, abuse/registration-expiry policy, recovery review and hosted HTTPS qualification remain |
 | M14.02 Separate player identity claims from authenticated application ownership | DONE | Owner-scoped claimed links and cross-owner tests; no ID-as-password behavior |
 | M14.03 Version processing consent, optional training consent and withdrawals | PARTIAL | Version/digest receipts, legacy-unversioned backfill, independent optional training control and explicit withdrawal UI implemented. Withdrawal fences analysis/sync and clears upload admissions; re-grant restarts nothing. Legal policy approval, hosted audit/retention and any future real training eligibility enforcement remain M06 withdrawal also revokes/tombstones pending sessions for physical cleanup. |
-| M14.04 Private data access, minimal opponent information and export | PARTIAL | Own export includes account/consent receipts and own M18 memberships, sessions, source pins and reviews. Assigned study media checks current consent/role/retention/chronology. Secrets/opponent/foreign account identities excluded; hosted access, portability and scale remain M06 own export adds allowlisted session IDs/state/offset/expiry and excludes capability URLs and expected checksums. |
-| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Tombstone/purge covers account/provider/resource records; M18 consent/source/account deletion and expiry erase study labels, grants and dependent reports. Signed withdrawal/closure restores revoke stale study evidence before reads. Hosted provider/backup retention/current controls and retained-copy erasure remain unverified M06 pending uploads retain durable cleanup state/quota; native restore erases pending files and controls preserve unknown upstream deadlines. |
-| M14.06 Review identity re-linking and per-match suppression retention | PARTIAL | D025 implements explicit local re-link confirmation with owner-keyed HMAC suppression of known deleted source IDs. Identity-wide revocation remains the initial deletion stop. Production retention, stable key rotation and unknown cross-provider aliases still need review; local work no longer blocked |
+| M14.04 Private data access, minimal opponent information and export | PARTIAL | Own export includes account/consent receipts and own M18 memberships, sessions, source pins and reviews. Assigned study media checks current consent/role/retention/chronology. Secrets/opponent/foreign account identities excluded; hosted access, portability and scale remain M06 own export adds allowlisted session IDs/state/offset/expiry and excludes capability URLs and expected checksums. M07 adds own proposals/reviews/reanalysis export and assigned-only grant-checked source playback; foreign review notes/identifiers excluded. |
+| M14.05 Account deletion across media, metadata, caches, backups and providers | PARTIAL | Tombstone/purge covers account/provider/resource records; M18 consent/source/account deletion and expiry erase study labels, grants and dependent reports. Signed withdrawal/closure restores revoke stale study evidence before reads. Hosted provider/backup retention/current controls and retained-copy erasure remain unverified M06 pending uploads retain durable cleanup state/quota; native restore erases pending files and controls preserve unknown upstream deadlines. M07 erases private candidates/notes/source grants on account, processing consent and source withdrawal; restores permanently revoke managed grants before reads. |
+| M14.06 Review identity re-linking and per-match suppression retention | PARTIAL | D025 implements explicit local re-link confirmation with owner-keyed HMAC suppression of known deleted source IDs. Identity-wide revocation remains the initial deletion stop. Production retention, stable key rotation and unknown cross-provider aliases still need review; local work no longer blocked M07 erases private candidates/notes/source grants on account, processing consent and source withdrawal; restores permanently revoke managed grants before reads. |
 
 ## M15 — Security, privacy and reliability hardening
 
@@ -307,7 +308,7 @@ Owner: security/backend owner. Exit: the externally exposed workload has tested 
 | M15.03 Harden provider fetches against SSRF, oversized payloads and schema drift | PARTIAL | Offline reviewed-target/public-DNS and bounded strict-JSON guards tested; redirects/compression rejected. No network adapter enabled. Actual permitted transport, pinned connections, deadlines and authenticated schema validation remain gated by M04/M05 |
 | M15.04 Secrets, least privilege, dependency maintenance and security logging | PARTIAL | Local least-privilege/logging/budget controls and DRF patch implemented. M14 publication audit found Next.js GHSA-vcvr-r3jv-pc5j; patch 16.3.6 passed local and remote audits/build/browser checks. 2026-10-02 owner-requested single-branch policy disables automatic version PRs; dependency audits unchanged, weekly patches reviewed/tested directly on main. Repository-access/exposure review, production secret store/IAM/rotation/log retention and OS image scan remain 2026-10-03: both Python locks and production npm audit pass; streaming hash dependency pinned. Full npm dev audit has five high findings through unpatched braces GHSA-vfj7-8cjw-p6xm in trusted lint globs; upstream patch remains tracked in the security runbook, with no suppression or force downgrade. |
 | M15.05 Abuse/rate limits, admission quotas and cancellation under load | PARTIAL | Durable login/API budgets, early upload reservations, storage/queue/daily/active-worker caps, body limits and PostgreSQL capacity races tested. Hosted ingress/spooling/filesystem limits and distributed load qualification remain M06 shared upload slots and physical byte reservations remain through failed cleanup; bounded chunks and resumed offsets checked. |
-| M15.06 Test provider outages, duplicate deliveries, stale workers and partial failure | PARTIAL | M16 controlled-client ambiguous launch/delivery/outage/storage, retained capacity, cancellation and signed recovery tests remain. M17 adds nine-owner/32-job saturation, eight-retry dispatch outage, atomic quotas, midnight/unknown settlement, permission revocation and measurement deletion checks. Real permitted transport and hosted failures remain untested M06 adds bounded verification crash/transport retries, malformed object metadata/range rejection and cancellation/restore failure cases. |
+| M15.06 Test provider outages, duplicate deliveries, stale workers and partial failure | PARTIAL | M16 controlled-client ambiguous launch/delivery/outage/storage, retained capacity, cancellation and signed recovery tests remain. M17 adds nine-owner/32-job saturation, eight-retry dispatch outage, atomic quotas, midnight/unknown settlement, permission revocation and measurement deletion checks. Real permitted transport and hosted failures remain untested M06 adds bounded verification crash/transport retries, malformed object metadata/range rejection and cancellation/restore failure cases. M07 covers review/source publication races, streamed revocation and worker-versus-foreign-reviewer lock ordering; actual hosting remains separate. |
 | M15.07 Security/privacy review, incident response and vulnerability process | PARTIAL | [Threat model](docs/architecture/security.md), [incident runbook](docs/operations/security-runbook.md), SECURITY.md and automated local incident/failure rehearsal delivered. Named operator/deputy acceptance, private reporting channel and independent security/privacy review remain |
 
 ## M16 — Hosted asynchronous delivery and deployment
@@ -434,11 +435,13 @@ Reconsider them only through an explicit product/architecture decision with supp
 
 ## Immediate next work and blockers
 
-M06 local/controlled storage engineering is implemented (M06.08 DONE); the M06
-release milestone remains PARTIAL. M06 final code publication passed all six jobs. Maintain normal latest-tip CI, then qualify the actual storage/hosted boundary and acquire permitted provider/real
-capture evidence. Maintain one branch, weekly reviewed dependency patches and checks
-on each latest tip. Track the unpatched development lint advisory separately from
-successful production audits. No resource purchase or external activation is implied.
+M06 local/controlled storage engineering is delivered. M07 local knowledge governance is
+locally qualified (M07.07 DONE); real M07 remains BLOCKED by current-build
+footage and independent experts. Push ordinary CI on main and verify the actual latest tip.
+Then use the reviewed evidence workflow to acquire permitted real facts/data, or prepare
+M08 dataset operations that do not require external activation. Hosting/provider gates below
+remain separate. Maintain weekly reviewed dependency patches and the tracked development
+lint advisory. No purchase, external contact or activation is implied.
 
 | Priority | Next concrete outcome | Requirements | Needed input / owner |
 |---|---|---|---|
@@ -492,3 +495,5 @@ release gates still govern those actions. Do not let one external blocker stop i
 | 2026-10-03 | M06.02/.06/.08, M01.05/.06, M15.01/.04/.06, M19.02 | Qualified M06 main implementation and added current-state recheck after status-probe revocation; preserved independent gates and ordinary checked receipt | 0588ce4 all six CI jobs first attempt, downloaded JUnit; 35 focused local upload tests for final privacy fix; no live GCS |
 
 | 2026-10-03 | M01.05/.06, M06.08, M19.02 | Verified final M06 revocation fix on main; recorded exact-head remote results and retained normal CI on this documentation receipt | 1d56929 all six jobs first attempt at 16:07:03 UTC; 341 Python/25 Chromium/seven Docker plus recovery/audits/build/static/startup and three Terraform mocks |
+
+| 2026-10-03 | M07.02-M07.07, M06.02/.03, M11.01, M12.02, M14.04-M14.06, M15.06, M01.05/.06, M19.02 | Delivered coherent M07 local governance, scoped publication/lifecycle, reviewed patch reanalysis, active-view withdrawal and owner/capacity/domain/FK-safe concurrency; architecture 2.11.0 and migration 0017; M07.07 DONE, real M07 remains gated | 371 PostgreSQL/Python, 30 Edge, production build/static/schema/loader/audits and native guarded migration/dump/restore pass; exact main publication/CI pending; [M07 evidence](docs/experiment-results/m07-knowledge.md) |

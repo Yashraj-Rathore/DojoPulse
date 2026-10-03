@@ -24,6 +24,9 @@ from backend.core.security import capacity_lock
 def locked_run(run_id):
     owner_id = AnalysisRun.objects.values_list("owner_id", flat=True).get(pk=run_id)
     lock_owner(owner_id)
+    # Cross-account reviewer withdrawal also revokes shared knowledge jobs. Take the
+    # shared mutex before domain rows so it cannot deadlock with a worker holding a run.
+    capacity_lock()
     return (
         AnalysisRun.objects.select_for_update(of=("self",))
         .select_related("asset", "owner")
@@ -148,6 +151,7 @@ def finish_run(run_id, fence, report):
 @transaction.atomic
 def cancel_run(owner, run_id):
     lock_owner(owner.pk)
+    capacity_lock()
     run = AnalysisRun.objects.select_for_update().get(pk=run_id, owner=owner)
     if run.status == "CANCELLED":
         return run

@@ -12,8 +12,13 @@ from analysis.rules import judge
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def validate_annotations(value: dict[str, Any], source_hash: str | None = None) -> None:
+def validate_annotations(
+    value: dict[str, Any], source_hash: str | None = None, *, situation: str | None = None
+) -> None:
     schema = json.loads((ROOT / "datasets/annotation-schema.json").read_text(encoding="utf-8"))
+    if situation is not None:
+        # The caller has checked a governed release of the same bounded rule semantics.
+        schema["properties"]["examples"]["items"]["properties"]["situation"]["const"] = situation
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(value)
     if source_hash is not None and value["source_sha256"] != source_hash:
         raise ValueError("Annotation source hash mismatch")

@@ -27,7 +27,6 @@ from backend.core.loops import create_assignment, create_plan, evaluate_plan, re
 from backend.core.match_ingestion import register_upload_source
 from backend.core.models import (
     AnalysisRun,
-    DefinitionVersion,
     DrillAssignment,
     EvaluationPlan,
     GameplayEvent,
@@ -111,6 +110,8 @@ def session(request):
 @api_view(["GET"])
 def overview(request):
     user = request.user
+    from backend.core.knowledge import visible_drills
+
     events = (
         GameplayEvent.objects.filter(
             owner=user,
@@ -146,9 +147,7 @@ def overview(request):
                 }
                 for e in events.order_by("-created_at")[:500]
             ],
-            "drills": list(
-                DefinitionVersion.objects.filter(kind="drill").values("key", "status", "payload")
-            ),
+            "drills": visible_drills(user),
             "assignments": list(
                 DrillAssignment.objects.filter(owner=user).values("id", "drill_id", "status")
             ),

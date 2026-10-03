@@ -166,7 +166,7 @@ def test_drill_baseline_mismatch(django_user_model):
         key="wrong",
         kind="drill",
         status="APPROVED",
-        payload={"situation_definition": "other", "game_build": "fixture"},
+        payload={"situation_definition": "other", "game_build": "fixture", "synthetic_only": True},
     )
     assignment = create_assignment(owner, wrong.pk)
     with pytest.raises(ValidationError, match="does not match"):

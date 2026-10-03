@@ -29,7 +29,7 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
     const metadata = {
       ...match.recording_target, opponent_ids: undefined,
       player_id: form.get("player_id"), opponent_namespace: opponent?.namespace, opponent_id: form.get("opponent_id"),
-      game_build: form.get("game_build"), played_at: match.played_at, source_kind: form.get("source_kind"),
+      game_build: form.get("game_build"), platform: form.get("platform"), played_at: match.played_at, source_kind: form.get("source_kind"),
       session_id: form.get("session_id"), dataset_kind: form.get("dataset_kind"), characters: ["jin", "jin"], attribution_confirmed: true,
     };
     try {
@@ -50,6 +50,7 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
           <div><label htmlFor="recorded-player">Player ID visible in recording</label><input id="recorded-player" name="player_id" defaultValue={match.recording_target.player_id} required maxLength={200} /></div>
           <div><label htmlFor="recorded-opponent">Opponent ID visible in recording</label><input id="recorded-opponent" name="opponent_id" defaultValue={opponent?.value || ""} required maxLength={200} /></div>
           <div><label htmlFor="recorded-build">Recorded game build</label><input id="recorded-build" name="game_build" defaultValue={match.game_build || ""} placeholder="Exact build shown in the game" required maxLength={80} /></div>
+          <div><label htmlFor="recorded-platform">Recorded platform</label><select id="recorded-platform" name="platform" defaultValue="steam"><option value="steam">Steam PC (current capture profile)</option><option value="synthetic">Synthetic test recording</option><option value="unknown">Unknown (cannot verify knowledge)</option></select></div>
           <div><label htmlFor="recorded-session">Recording session ID</label><input id="recorded-session" name="session_id" required maxLength={100} /></div>
           <div><label htmlFor="recorded-purpose">Recorded purpose</label><select id="recorded-purpose" name="source_kind" defaultValue={["ranked", "practice", "takeover"].includes(match.mode) ? match.mode : ""} required><option value="">Confirm the purpose</option><option value="ranked">Ranked match</option><option value="practice">Practice</option><option value="takeover">Replay takeover</option></select></div>
           <div><label htmlFor="recorded-kind">Recording content</label><select id="recorded-kind" name="dataset_kind" defaultValue="" required><option value="">Confirm the content</option><option value="real">Real gameplay</option><option value="synthetic">Synthetic test recording</option></select></div>
