@@ -287,11 +287,16 @@ def export_account(request):
         PilotReview,
         PilotSession,
         RunBudget,
+        UploadSession,
     )
 
     # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
     # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "upload_sessions": (
+            UploadSession.objects.filter(owner=user, asset__owner=user),
+            ["id", "asset_id", "state", "received_bytes", "expires_at", "created_at"],
+        ),
         "pilot_enrollments": (
             PilotEnrollment.objects.filter(owner=user),
             [

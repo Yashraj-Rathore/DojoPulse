@@ -91,6 +91,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 EXTERNAL_UPLOADS_ENABLED = False  # Hosted ingestion gate cannot be bypassed with a flag.
+RESUMABLE_STORAGE_PROVIDER = "LOCAL"
+GCS_STORAGE_QUALIFIED = False  # Reviewed IAM/CORS/transport/erasure activation is still required.
+UPLOAD_SESSION_SECONDS = 3600
+UPLOAD_CHUNK_BYTES = 8 * 1024**2
+UPLOAD_VERIFICATION_SECONDS = 180
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_HANDLERS = [

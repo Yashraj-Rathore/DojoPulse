@@ -72,13 +72,13 @@ def storage_for(asset):
 
 
 @contextmanager
-def materialize(asset):
+def materialize(asset, storage=None):
     if asset.storage_provider == "LOCAL":
         yield private_path(asset.storage_key)
         return
     with tempfile.TemporaryDirectory(prefix="dojopulse-run-") as directory:
         target = Path(directory) / "source.mp4"
-        storage_for(asset).download(
+        (storage or storage_for(asset)).download(
             asset.storage_key, asset.storage_generation, target, asset.bytes
         )
         yield target
@@ -95,6 +95,10 @@ def delete_asset(owner, asset_id, storage=None):
             storage_key=asset.storage_key,
             storage_provider=asset.storage_provider,
             storage_generation=asset.storage_generation,
+            upload_expires_at=asset.upload_expires_at.isoformat()
+            if asset.upload_expires_at
+            else None,
+            bytes=asset.bytes,
         )
         if asset.deleted_at is None:
             asset.deleted_at = timezone.now()
@@ -112,6 +116,13 @@ def delete_asset(owner, asset_id, storage=None):
             availability="NOT_FOUND", content_hash="", attribution_state="WITHDRAWN", attribution={}
         )
         ReplayAsset.objects.filter(pk=asset.pk).update(metadata={})
+        from backend.core.models import UploadSession
+
+        UploadSession.objects.filter(asset=asset).update(
+            state="PURGING",
+            fence=F("fence") + 1,
+            verification_lease=None,
+        )
         from backend.core.pilots import invalidate_asset
 
         invalidate_asset(asset.pk)
@@ -124,8 +135,28 @@ def delete_asset(owner, asset_id, storage=None):
     storage = storage or storage_for(asset)
     storage.cancel_upload(asset.upload_session)
     storage.delete_asset(asset.storage_key)
+    if (
+        asset.storage_provider == "GCS"
+        and not asset.upload_session
+        and asset.upload_expires_at
+        and asset.upload_expires_at > timezone.now()
+    ):
+        from backend.core.cloud import CloudFailure
+
+        # A post-backup session capability may survive a restore without its URI.
+        # Re-sweep its prefix until the documented upstream capability deadline.
+        raise CloudFailure("UPLOAD_SESSION_EXPIRY_PENDING")
     ReplayAsset.objects.filter(pk=asset.pk).update(
-        upload_cancelled=True, upload_session="", purge_completed_at=timezone.now()
+        upload_cancelled=True,
+        upload_session="",
+        upload_expires_at=None,
+        purge_completed_at=timezone.now(),
+    )
+    UploadSession.objects.filter(asset=asset).update(
+        state="CANCELLED",
+        expected_sha256="",
+        expected_md5="",
+        claim_digest="",
     )
 
 
@@ -157,6 +188,10 @@ def delete_account(owner, storage=None, *, password=None):
                     "storage_key": asset.storage_key,
                     "storage_provider": asset.storage_provider,
                     "storage_generation": asset.storage_generation,
+                    "upload_expires_at": asset.upload_expires_at.isoformat()
+                    if asset.upload_expires_at
+                    else None,
+                    "bytes": asset.bytes,
                 }
                 for asset in ReplayAsset.objects.filter(owner=owner)
             ],
@@ -256,6 +291,35 @@ def delete_metadata_match(owner, match_id):
         for source in MatchSourceRecord.objects.filter(match=match, owner=owner)
     ]
     record_intent(owner.pk, "MATCH_DELETE", match=str(match.pk), suppressions=suppressions)
+    from backend.core.models import UploadSession
+
+    pending = UploadSession.objects.filter(match=match, owner=owner).exclude(
+        state__in=["COMPLETE", "CANCELLED"]
+    )
+    for session in pending.select_related("asset"):
+        asset = session.asset
+        record_intent(
+            owner.pk,
+            "ASSET_DELETE",
+            asset=str(asset.pk),
+            storage_key=asset.storage_key,
+            storage_provider=asset.storage_provider,
+            storage_generation=asset.storage_generation,
+            upload_expires_at=asset.upload_expires_at.isoformat()
+            if asset.upload_expires_at
+            else None,
+            bytes=asset.bytes,
+        )
+    ReplayAsset.objects.filter(owner=owner, uploadsession__in=pending).update(
+        deleted_at=now, metadata={}
+    )
+    pending.update(
+        state="PURGING",
+        fence=F("fence") + 1,
+        verification_lease=None,
+        next_attempt_at=None,
+        error_code="MATCH_DELETED",
+    )
 
     for source in MatchSourceRecord.objects.filter(match=match, owner=owner):
         MatchSuppression.objects.get_or_create(

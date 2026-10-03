@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.9.0. Decision date: 2026-10-02. Status: local engineering approved;
+Version: 2.10.0. Decision date: 2026-10-03. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -27,6 +27,12 @@ session logs, independent blinded review, source-linked evaluations and revision
 G1–G6 packs. Withdrawal/restore erasure and expert decisions are separate from
 canonical publication. Real intake is code-gated; synthetic success leaves all
 scientific gates NOT_RUN and confers no gameplay or production approval.
+
+The [M06 evidence-storage contract](evidence-storage.md) adds durable resumable
+uploads, background full-byte integrity verification, private range playback and
+cancellation/expiry/restore cleanup. LOCAL operator flows and controlled GCS adapters
+are implemented; actual GCS and external uploads remain gated. Canonical metadata,
+reviewed attribution and gameplay publication stay provider-independent.
 
 ## Product and release boundary
 

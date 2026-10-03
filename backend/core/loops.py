@@ -174,6 +174,7 @@ def record_practice(owner, assignment_id, event_ids):
         or e.match.deleted_at
         or not e.match.asset_id
         or e.match.asset.deleted_at
+        or (e.match.asset.retain_until and e.match.asset.retain_until <= timezone.now())
         or e.match.metadata_state == "REVIEW_REQUIRED"
         or e.situation != situation
         or not e.match.chronology_verified

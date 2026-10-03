@@ -20,6 +20,7 @@ from backend.core.models import (
     ReplayAsset,
     RunDispatch,
     UploadAdmission,
+    UploadSession,
 )
 from backend.core.storage import delete_account, delete_asset, delete_metadata_match, storage_for
 
@@ -34,6 +35,9 @@ def apply_restore_controls():
         AccountSession.objects.all().delete()
         AccountChallenge.objects.all().delete()
         UploadAdmission.objects.all().delete()
+        pending = UploadSession.objects.exclude(state__in=["COMPLETE", "CANCELLED"])
+        ReplayAsset.objects.filter(uploadsession__in=pending).update(deleted_at=now, metadata={})
+        pending.update(state="PURGING", fence=F("fence") + 1, verification_lease=None)
         Profile.objects.all().update(
             processing_consent_at=None,
             training_consent_at=None,
@@ -76,14 +80,7 @@ def apply_restore_controls():
                 if asset:
                     delete_asset(owner, asset.pk)
                 else:
-                    orphan = ReplayAsset(
-                        id=payload["asset"],
-                        owner_id=record["owner"],
-                        storage_key=payload["storage_key"],
-                        storage_provider=payload["storage_provider"],
-                        storage_generation=payload["storage_generation"],
-                    )
-                    storage_for(orphan).delete_asset(orphan.storage_key)
+                    purge_orphan(record["owner"], payload)
             elif owner and action == "MATCH_DELETE":
                 match = Match.objects.filter(pk=payload["match"], owner=owner).first()
                 if match:
@@ -128,14 +125,7 @@ def apply_restore_controls():
         for record in records:
             if record["action"] == "ACCOUNT_DELETE":
                 for item in record["payload"]["assets"]:
-                    orphan = ReplayAsset(
-                        id=item["asset"],
-                        owner_id=record["owner"],
-                        storage_key=item["storage_key"],
-                        storage_provider=item["storage_provider"],
-                        storage_generation=item["storage_generation"],
-                    )
-                    storage_for(orphan).delete_asset(orphan.storage_key)
+                    purge_orphan(record["owner"], item)
                 owner = get_user_model().objects.filter(pk=record["owner"]).first()
                 if owner:
                     delete_account(owner)
@@ -148,3 +138,32 @@ def apply_restore_controls():
     if ReplayAsset.objects.filter(deleted_at__isnull=False, purge_completed_at=None).exists():
         raise ValueError("RESTORE_PURGE_INCOMPLETE")
     return len(records)
+
+
+def purge_orphan(owner_id, item):
+    """Retain post-backup upload deadlines without putting capability URLs in controls."""
+    from django.utils.dateparse import parse_datetime
+
+    from backend.core.cloud import CloudFailure
+
+    owner = get_user_model().objects.filter(pk=owner_id).first()
+    defaults = {
+        "storage_key": item["storage_key"],
+        "storage_provider": item["storage_provider"],
+        "storage_generation": item["storage_generation"],
+        "deleted_at": timezone.now(),
+        "bytes": item.get("bytes", 536870912 if item["storage_provider"] == "GCS" else 0),
+        "upload_expires_at": parse_datetime(item["upload_expires_at"])
+        if item.get("upload_expires_at")
+        else None,
+    }
+    if owner:
+        asset, _ = ReplayAsset.objects.get_or_create(
+            pk=item["asset"], owner=owner, defaults=defaults
+        )
+        delete_asset(owner, asset.pk)
+    else:
+        orphan = ReplayAsset(id=item["asset"], owner_id=owner_id, **defaults)
+        storage_for(orphan).delete_asset(orphan.storage_key)
+        if orphan.upload_expires_at and orphan.upload_expires_at > timezone.now():
+            raise CloudFailure("UPLOAD_SESSION_EXPIRY_PENDING")

@@ -841,3 +841,74 @@ the qualified policy tree. Prior source-access review and all scientific/live
 provider/hosted gates remain open. Next: retain weekly dependency review and
 normal latest-tip checks; resume the permitted-provider, real-evidence and
 hosting qualification actions in PRODUCT_PROGRESS when their inputs are ready.
+
+## 2026-10-03 — M06 resumable upload and evidence-storage implementation in progress
+
+Requirements: M06.01–M06.08, M13.03, M14.04/.05, M15.01/.04/.05,
+M16.02/.05 and M19.02. User authorized coherent M06 engineering, publication
+on main and CI monitoring. Added durable upload sessions, private GCS session
+contracts, bounded local chunks, background full-byte verification, private
+range playback and cancellation/retention/restore integration. Browser flow,
+regression checks and qualification records are in progress; no passing test
+result or hosted activation is claimed yet. Existing external-upload and
+managed-media gates remain closed. Canonical gameplay still requires its
+existing media validation, attribution and independent gameplay review.
+
+Changed files so far: core models/storage/cloud/security/consent/recovery/API,
+new resumable/upload/private-media modules and upload worker, process/purge
+worker integration, URL/settings, recording-source helper, browser dependency
+manifest/lock and both progress files. Streaming browser hashing uses the
+reviewed noble-hashes dependency rather than buffering a 512 MiB file at once.
+Actual validation pending; npm installation reports advisory findings which
+will be inspected and resolved for the applicable audited scope before handoff.
+Next: complete UI, migrations, concurrency/failure/privacy/adapter/browser tests,
+update architecture and evidence, then publish and monitor the latest main tip.
+
+
+## 2026-10-03 - M06 local storage engineering completed and qualified
+
+Requirements: M06.01-M06.08, M13.03, M14.03-.05, M15.01/.04-.06,
+M16.02/.05 and M19.02. Completed the coherent engineering scope with durable
+owner/idempotency/byte reservations, exact-offset resumable LOCAL transfer, fixed
+GCS session/generation/range contracts, fenced bounded background byte integrity,
+private playback, pause/resume/refresh/cancel UI and consent/account/target-match/
+expiry/restore cleanup. Failed purge holds quota; unknown post-backup capabilities
+hold erasure/quarantine until their upstream deadline and a successful sweep.
+Imported recording attribution remains separately PENDING_REVIEW; no metadata-only
+gameplay promotion. Added pre-purge expiry guards to execution and evidence use.
+
+Changed files: models/migration 0016, settings/URLs, API/upload/private-media,
+resumable/cloud/storage/security/consent/recovery/jobs/evidence/loops/recording
+services, own export, upload/process/purge workers, native recovery rehearsal,
+frontend capture/attachment/progress/styles, pinned hash manifest/lock, backend/
+browser tests, README/env reference, architecture/security/delivery, ADR-018/D030,
+runbook, M06 receipt and both progress files. Existing legacy recording upload
+shares source construction with resumable completion.
+
+Actual validation: 336 PostgreSQL/Python tests, seven local Docker skips; final
+34 upload tests include four added drift/crash cases (two teardown warnings,
+final complete run pending). 25 Edge journeys, lint/build/types, both Python locks
+and production npm audit pass. Native PostgreSQL recovery including pending uploads
+and migration round-trip pass; system/schema/draft contracts, Ruff and mypy pass.
+Initial header/browser selector/BOM failures were fixed without weaker checks.
+The local test database was restarted, then migrated; no source data was removed.
+Mobile integrity-progress screenshot inspected. Detailed dates/scopes/final results
+are in docs/experiment-results/m06-storage.md.
+
+M06.08 is DONE for local/controlled-client engineering; M06 remains PARTIAL for
+actual hosting and real capture/attribution. Full dev npm audit has five high
+findings through unpatched braces in the trusted lint chain; M15.04/runbook track
+upstream remediation separately from clean production audits. No live provider,
+GCS activation, deployment, purchase or additional branch. Remote main remains the
+sole branch at c5b553a. Next: complete final full suite, publish ordinary main commit,
+monitor all six exact-head CI jobs, publish a normal checked progress receipt;
+then qualify actual storage/hosted boundary and permitted real evidence inputs.
+
+
+Final pre-publication validation: the complete final suite passed **340 PostgreSQL/
+Python tests in 92.29s**, with seven Docker checks deferred to remote CI and no
+teardown warnings. The earlier selected collection warnings did not recur.
+Frontend final 25 Edge journeys/build/lint/types and native migration/recovery
+checks described above remain the final relevant UI/recovery checks. Both progress
+files and architecture now reflect completed local M06.08, retained M06 release
+gates and the development-only advisory. Normal main push/CI monitoring follows.

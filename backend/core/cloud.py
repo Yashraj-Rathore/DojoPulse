@@ -7,7 +7,7 @@ runtime is deliberately gated until its isolation profile is qualified.
 import base64
 import json
 import re
-from urllib.parse import quote, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 from django.conf import settings
 
@@ -181,23 +181,126 @@ class GooglePrivateStorage:
             raise ValueError("OBJECT_OWNERSHIP_MISMATCH")
         return f"https://storage.googleapis.com/storage/v1/b/{self.bucket}/o/{quote(key, safe='')}"
 
-    def call(self, method, url, **kwargs):
+    def call(self, method, url, *, accepted=(200, 201, 204, 404), **kwargs):
         try:
             response = self.session.request(
                 method, url, timeout=(5, 20), allow_redirects=False, **kwargs
             )
         except Exception as error:
             raise CloudFailure("STORAGE_TRANSPORT_FAILURE") from error
-        if response.status_code not in {200, 201, 204, 404}:
+        if response.status_code not in accepted:
+            response.close()
             raise CloudFailure(
                 "STORAGE_REQUEST_REJECTED", retryable=response.status_code in {429, 500, 503}
             )
         return response
 
+    def session_url(self, value):
+        try:
+            if not isinstance(value, str) or len(value) > 8192:
+                raise ValueError
+            parsed = urlparse(value)
+            query = parse_qs(parsed.query, strict_parsing=True)
+        except ValueError:
+            raise CloudFailure("INVALID_UPLOAD_SESSION", retryable=False) from None
+        if (
+            parsed.scheme != "https"
+            or parsed.netloc != "storage.googleapis.com"
+            or parsed.path != f"/upload/storage/v1/b/{self.bucket}/o"
+            or parsed.fragment
+            or set(query) - {"uploadType", "name", "upload_id", "ifGenerationMatch"}
+            or any(len(values) != 1 for values in query.values())
+            or query.get("uploadType") != ["resumable"]
+            or query.get("name") != [self.prefix + "source.mp4"]
+            or not re.fullmatch(r"[A-Za-z0-9_-]{1,2048}", query.get("upload_id", [""])[0])
+            or query.get("ifGenerationMatch", ["0"]) != ["0"]
+        ):
+            raise CloudFailure("INVALID_UPLOAD_SESSION", retryable=False)
+        return value
+
+    def begin_upload(self, key, size, md5_hash, session_id):
+        self.object_url(key)
+        if key != self.prefix + "source.mp4" or not 0 < size <= 536870912:
+            raise ValueError("INVALID_UPLOAD_OBJECT")
+        response = self.call(
+            "POST",
+            f"https://storage.googleapis.com/upload/storage/v1/b/{self.bucket}/o",
+            params={"uploadType": "resumable", "name": key, "ifGenerationMatch": "0"},
+            headers={"X-Upload-Content-Length": str(size), "X-Upload-Content-Type": "video/mp4"},
+            json={
+                "name": key,
+                "contentType": "video/mp4",
+                "md5Hash": md5_hash,
+                "metadata": {"upload_session_id": str(session_id)},
+            },
+            accepted=(200, 201),
+        )
+        return self.session_url(response.headers.get("Location", ""))
+
+    def upload_status(self, session, size):
+        response = self.call(
+            "PUT",
+            self.session_url(session),
+            data=b"",
+            headers={"Content-Length": "0", "Content-Range": f"bytes */{size}"},
+            accepted=(200, 201, 308, 404, 410),
+        )
+        if response.status_code in {404, 410}:
+            raise CloudFailure("UPLOAD_SESSION_EXPIRED", retryable=False)
+        if response.status_code in {200, 201}:
+            return size
+        header = response.headers.get("Range", "")
+        if not header:
+            return 0
+        match = re.fullmatch(r"bytes=0-([0-9]{1,12})", header)
+        if not match or not 0 < int(match[1]) + 1 <= size:
+            raise CloudFailure("INVALID_UPLOAD_OFFSET", retryable=False)
+        return int(match[1]) + 1
+
     def cancel_upload(self, session):
-        # No arbitrary resumable-session URL is ever fetched. Hosted upload remains disabled.
         if session:
-            raise CloudFailure("RESUMABLE_UPLOAD_NOT_QUALIFIED", retryable=False)
+            self.call(
+                "DELETE",
+                self.session_url(session),
+                headers={"Content-Length": "0"},
+                accepted=(204, 404, 410, 499),
+            )
+
+    def inspect_object(self, key):
+        response = self.call("GET", self.object_url(key), accepted=(200, 404))
+        if response.status_code == 404:
+            raise CloudFailure("OBJECT_UNAVAILABLE", retryable=False)
+        body = response.json()
+        resource(str(body.get("generation", "")), r"[1-9][0-9]{0,29}")
+        return body
+
+    def range_stream(self, key, generation, start, end, size, check):
+        resource(str(generation), r"[1-9][0-9]{0,29}")
+        response = self.call(
+            "GET",
+            self.object_url(key),
+            params={"alt": "media", "generation": generation, "ifGenerationMatch": generation},
+            headers={"Range": f"bytes={start}-{end}", "Accept-Encoding": "identity"},
+            stream=True,
+            accepted=(206,),
+        )
+        try:
+            if (
+                response.headers.get("Content-Range") != f"bytes {start}-{end}/{size}"
+                or response.headers.get("Content-Encoding", "identity") != "identity"
+            ):
+                raise CloudFailure("INVALID_MEDIA_RANGE", retryable=False)
+            remaining = end - start + 1
+            for block in response.iter_content(chunk_size=65536):
+                check()
+                if len(block) > remaining:
+                    raise CloudFailure("INVALID_MEDIA_LENGTH", retryable=False)
+                remaining -= len(block)
+                yield block
+            if remaining:
+                raise CloudFailure("INVALID_MEDIA_LENGTH", retryable=False)
+        finally:
+            response.close()
 
     def delete_object(self, key, generation):
         resource(str(generation), r"[1-9][0-9]{0,29}")

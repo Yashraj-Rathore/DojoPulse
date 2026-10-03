@@ -10,3 +10,6 @@ html{scroll-padding-top:20px}button,input,select,summary,a,textarea{touch-action
 .pilots textarea, .pilots dd, .pilots li { max-width: 100%; overflow-wrap: anywhere; }
 .pilots textarea { min-height: 6rem; width: 100%; }
 .pilot-conditions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .75rem; }
+.upload-progress { margin-block: 1rem; padding: 1rem; border: 1px solid #ccd4c8; border-radius: .75rem; }
+.upload-progress progress { display: block; width: 100%; accent-color: #486742; margin-block: .75rem; }
+.upload-progress p { overflow-wrap: anywhere; }

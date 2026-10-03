@@ -23,6 +23,7 @@ from backend.core.models import (
     RequestBudget,
     SecurityMutex,
     UploadAdmission,
+    UploadSession,
 )
 from backend.core.ownership import lock_owner
 
@@ -167,7 +168,14 @@ def reserve_upload(owner):
     check_daily_capacity(current)
     check_capacity(owner, MAX_UPLOAD)
     slots = UploadAdmission.objects.filter(expires_at__gt=timezone.now())
-    if slots.filter(owner=owner).exists() or slots.count() >= settings.GLOBAL_UPLOAD_SLOTS:
+    sessions = UploadSession.objects.filter(
+        state__in=["INITIALIZING", "UPLOADING", "VERIFYING", "PURGING"]
+    )
+    if (
+        slots.filter(owner=owner).exists()
+        or sessions.filter(owner=owner).exists()
+        or slots.count() + sessions.count() >= settings.GLOBAL_UPLOAD_SLOTS
+    ):
         raise Throttled(wait=60, detail="Upload already in progress or capacity reached.")
     admit_run(owner)
     return UploadAdmission.objects.create(

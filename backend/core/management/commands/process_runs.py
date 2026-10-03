@@ -52,6 +52,9 @@ class Command(BaseCommand):
             time.sleep(2)
 
     def process_batch(self):
+        from backend.core.resumable import reconcile_uploads
+
+        reconcile_uploads()
         reconcile_runs()
         runs = (
             AnalysisRun.objects.filter(status="QUEUED")

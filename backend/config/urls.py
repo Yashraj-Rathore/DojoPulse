@@ -9,6 +9,7 @@ from backend.core import (
     operations_api,
     pilot_api,
     recording_api,
+    upload_api,
 )
 from backend.core.cloud_api import dispatch_task
 from backend.core.deployment import health
@@ -58,6 +59,10 @@ urlpatterns = [
         "api/matches/<uuid:match_id>/recordings/<uuid:source_id>/reprocess", recording_api.reprocess
     ),
     path("api/uploads", api.upload),
+    path("api/upload-sessions", upload_api.sessions),
+    path("api/upload-sessions/<uuid:session_id>", upload_api.session_detail),
+    path("api/upload-sessions/<uuid:session_id>/chunk", upload_api.chunk),
+    path("api/upload-sessions/<uuid:session_id>/complete", upload_api.complete),
     path("api/runs/<uuid:run_id>", api.run_detail),
     path("api/assets/<uuid:asset_id>", api.asset_delete),
     path("api/assets/<uuid:asset_id>/media", api.media),

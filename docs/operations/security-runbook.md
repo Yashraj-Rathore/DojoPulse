@@ -67,3 +67,28 @@ upload, stale completion rejection, source-hash integrity, request throttling, a
 partial-purge/deletion retry and synthetic-provider failure tests. See the dated evidence
 file for actual results. Human incident ownership, notification, production restore,
 secret rotation and live-provider failure injection have **not** been rehearsed.
+
+
+## M06 upload cleanup and dependency follow-up (2026-10-03)
+
+Run `process_uploads` regularly and `purge_expired` at least hourly; normal polling
+`process_runs` also performs verification/cleanup. An incomplete upload remains
+unreadable and creates no canonical analysis until its actual bytes verify. Stop
+admission while investigating repeated PURGING/initialization failures; retained
+bytes/capacity are deliberate. Never print session URLs or retry an ambiguous GCS
+session initialization. Inspect nonsecret state/deadline/error codes instead.
+
+A missing capability URI with a future upstream deadline cannot establish erasure.
+Keep tombstones/quota and restore quarantine, retry prefix cleanup after the deadline,
+and verify actual generations. Migration 0016 reversal requires completed physical
+erasure of every upload session. Follow the existing independent-controls restore
+procedure, including storage outside the database snapshot.
+
+Both Python locks and production npm dependencies were audited on 2026-10-03.
+The full npm development audit separately reports the unpatched
+[braces GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+through the trusted ESLint/Next lint glob chain (five high findings). No application
+user input enters those globs. A patched braces version was not available at review;
+track upstream remediation, keep lint/config inputs trusted, and review/test its
+patch on main. Do not suppress the finding or downgrade Next/ESLint with force-fix.
+Production audit success does not close this development dependency finding.

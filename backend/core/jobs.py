@@ -46,6 +46,7 @@ def claim_run(run_id):
     if (
         run.asset.owner_id != run.owner_id
         or run.asset.deleted_at
+        or (run.asset.retain_until and run.asset.retain_until <= now)
         or run.status
         in {
             "CANCELLED",
@@ -114,6 +115,7 @@ def finish_run(run_id, fence, report):
         run.fence != fence
         or run.status != "PROCESSING"
         or run.asset.deleted_at
+        or (run.asset.retain_until and run.asset.retain_until <= timezone.now())
         or run.asset.owner_id != run.owner_id
         or not run.owner.is_active
         or not run.lease_until
@@ -173,6 +175,7 @@ def enqueue_run(**fields):
         not current.is_active
         or fields["asset"].owner_id != current.pk
         or fields["asset"].deleted_at
+        or (fields["asset"].retain_until and fields["asset"].retain_until <= timezone.now())
     ):
         raise ValidationError("Analysis source is unavailable")
     require_processing(current)
@@ -199,6 +202,8 @@ def heartbeat(run_id, fence, *, phase="ANALYZING", progress=10):
         run.fence != fence
         or run.status != "PROCESSING"
         or run.asset.deleted_at
+        or run.asset.owner_id != run.owner_id
+        or (run.asset.retain_until and run.asset.retain_until <= now)
         or not run.owner.is_active
         or not run.lease_until
         or run.lease_until <= now

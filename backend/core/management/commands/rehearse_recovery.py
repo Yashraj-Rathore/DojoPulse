@@ -46,6 +46,18 @@ for role in ['REVIEWER', 'REVIEWER', 'ADJUDICATOR']:
 task = PilotTask.objects.create(capture=capture, kind='TARGET', start_us=0, end_us=1, reviewer_one=reviewers[0], reviewer_two=reviewers[1], adjudicator=reviewers[2], request_id=uuid.uuid4())
 PilotReview.objects.create(task=task, reviewer=reviewers[0], label={'private': 'must-erase'}, label_digest='fixture', seconds=1, request_id=uuid.uuid4())
 PilotGateReport.objects.create(study=study, gate='G1', revision=1, data={'private': 'must-erase'}, content_hash='fixture')
+from django.conf import settings
+from backend.core.resumable import begin, write_chunk, request_completion
+import base64, hashlib
+settings.LOCAL_OPERATOR_UPLOADS = True
+pending_owner = get_user_model().objects.create_user('recovery-pending-upload', is_staff=True)
+content = b'pending-synthetic-upload'
+pending = begin(pending_owner, uuid.uuid4(), len(content), hashlib.sha256(content).hexdigest(),
+    base64.b64encode(hashlib.md5(content, usedforsecurity=False).digest()).decode(),
+    {'game_build': 'fixture', 'session_id': 'recovery-pending', 'played_at': timezone.now().isoformat(),
+     'source_kind': 'ranked', 'dataset_kind': 'synthetic', 'characters': ['jin', 'jin']})
+write_chunk(pending_owner, pending.pk, 0, content)
+request_completion(pending_owner, pending.pk)
 """
 
 DELETE = """
@@ -81,6 +93,10 @@ assert not PilotGateReport.objects.filter(invalidated_at=None).exists()
 assert not PilotGateReport.objects.exclude(data={}).exists()
 assert Match.objects.filter(deleted_at=None).count() == 0
 assert ReplayAsset.objects.filter(purge_completed_at=None).count() == 0
+from backend.core.models import UploadSession
+assert UploadSession.objects.count() == 1
+assert not UploadSession.objects.exclude(state='CANCELLED').exists()
+assert not UploadSession.objects.exclude(expected_sha256='', expected_md5='', claim_digest='').exists()
 for asset in ReplayAsset.objects.all():
     assert not private_path(asset.storage_key).exists()
 for run in AnalysisRun.objects.all():
@@ -229,6 +245,7 @@ class Command(BaseCommand):
                             "migration_forward_reverse_forward": "PASS",
                             "controls_before_reads": "PASS",
                             "repeat_replay": "PASS",
+                            "pending_upload_erasure": "PASS",
                             "production_rpo_rto": "NOT_MEASURED",
                         }
                     )

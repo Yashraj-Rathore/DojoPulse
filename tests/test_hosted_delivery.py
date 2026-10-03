@@ -349,7 +349,7 @@ def test_private_storage_pins_generation_and_purges_versions():
     ]
     with pytest.raises(ValueError, match="OWNERSHIP"):
         store.delete_asset("8/other/source.mp4")
-    with pytest.raises(CloudFailure, match="NOT_QUALIFIED"):
+    with pytest.raises(CloudFailure, match="INVALID_UPLOAD_SESSION"):
         store.cancel_upload("https://untrusted.example/session")
 
 

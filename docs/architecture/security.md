@@ -50,6 +50,15 @@ these are not physical disk quotas. Expired/stalled requests may retain temporar
 the web server terminates them. Run `security_maintenance` hourly. Dedicated ingress/temp
 quotas and process timeouts are mandatory for deployment.
 
+M06 resumable sessions reserve declared bytes before transfer for one hour and share
+the four global/one owner upload slots with multipart requests. LOCAL chunks are
+bounded to 8 MiB with exact offsets; cancelled/failed sessions retain quota until
+physical purge. Background integrity verification has fenced leases, deadlines and
+bounded retries. GCS bearer session URIs are owner-scoped and excluded from logs,
+exports, browser storage and signed recovery controls. Upstream-expiry metadata
+prevents false erasure acknowledgements after a lost capability. See
+[evidence storage](evidence-storage.md); actual GCS/ingress isolation remains gated.
+
 Analysis admission allows four pending/processing jobs per owner, 32 globally, 20 new runs
 per owner per rolling day; execution allows one active per owner, two globally. Synthetic
 match-sync admission uses four/32 outstanding limits. Existing idempotent requests do not

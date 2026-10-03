@@ -27,6 +27,31 @@ from backend.core.storage import private_path
 MAX_BYTES = 536870912
 
 
+def create_recording_source(match, asset, claim):
+    """Both legacy and resumable uploads retain exactly the same attribution boundary."""
+    return ReplaySource.objects.create(
+        match=match,
+        asset=asset,
+        source_record=match.source_records.order_by("-revision").first(),
+        provider="user-video",
+        access_class="USER_UPLOAD",
+        representation="VIDEO",
+        availability="AVAILABLE",
+        checked_at=timezone.now(),
+        local_retain_until=asset.retain_until,
+        content_hash=asset.source_sha256,
+        canonical_build=claim["game_build"],
+        attribution_state="PENDING_REVIEW",
+        attribution={
+            "claim": claim,
+            "claim_digest": digest(claim),
+            "submitted_by": asset.owner_id,
+            "submitted_at": timezone.now().isoformat(),
+            "metadata_revision": match.metadata_revision,
+        },
+    )
+
+
 def require_local_operator(owner):
     if not settings.LOCAL_OPERATOR_UPLOADS or not owner.is_staff or not owner.is_active:
         raise PermissionDenied("Local operator uploads must be enabled")
@@ -143,27 +168,7 @@ def attach_recording(owner, match_id, upload, claim, request_id):
                 metadata={**claim, "attachment": True},
                 retain_until=timezone.now() + timedelta(days=60),
             )
-            source = ReplaySource.objects.create(
-                match=match,
-                asset=asset,
-                source_record=match.source_records.order_by("-revision").first(),
-                provider="user-video",
-                access_class="USER_UPLOAD",
-                representation="VIDEO",
-                availability="AVAILABLE",
-                checked_at=timezone.now(),
-                local_retain_until=asset.retain_until,
-                content_hash=asset.source_sha256,
-                canonical_build=claim["game_build"],
-                attribution_state="PENDING_REVIEW",
-                attribution={
-                    "claim": claim,
-                    "claim_digest": digest(claim),
-                    "submitted_by": owner.pk,
-                    "submitted_at": timezone.now().isoformat(),
-                    "metadata_revision": match.metadata_revision,
-                },
-            )
+            source = create_recording_source(match, asset, claim)
             run = enqueue_run(owner=owner, asset=asset, request_key=request_key)
             profile, _ = Profile.objects.get_or_create(user=owner)
             profile.processing_consent_at = timezone.now()
@@ -195,6 +200,7 @@ def review_recording(
         not source.asset_id
         or source.asset.owner_id != operator.pk
         or source.asset.deleted_at
+        or (source.asset.retain_until and source.asset.retain_until <= timezone.now())
         or source.attribution_state != "PENDING_REVIEW"
     ):
         raise ValidationError("Recording is unavailable or attribution was already decided")

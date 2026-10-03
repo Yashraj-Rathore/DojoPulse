@@ -72,6 +72,20 @@ def record_consent(owner, scope, action, version, request_id, source="ACCOUNT"):
         profile.processing_consent_at = now if action == "GRANT" else None
         profile.processing_withdrawn_at = now if action == "WITHDRAW" else None
         if action == "WITHDRAW":
+            from backend.core.models import ReplayAsset, UploadSession
+
+            pending = UploadSession.objects.filter(
+                owner=owner, state__in=["INITIALIZING", "UPLOADING", "VERIFYING", "PURGING"]
+            )
+            ReplayAsset.objects.filter(uploadsession__in=pending).update(
+                deleted_at=now, metadata={}
+            )
+            pending.update(
+                state="PURGING",
+                fence=F("fence") + 1,
+                verification_lease=None,
+                error_code="CONSENT_WITHDRAWN",
+            )
             from backend.core.pilots import erase_account
 
             erase_account(owner.pk)

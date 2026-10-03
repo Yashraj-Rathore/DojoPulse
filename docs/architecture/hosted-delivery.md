@@ -76,9 +76,11 @@ downloads and generation-preconditioned deletion of all versions under that exac
 prefix. Repeated 404 deletes are harmless; failed listings, pagination loops or
 unfinished purges remain failures. Temporary worker copies are removed on exit.
 
-Resumable upload sessions are rejected, not fetched as arbitrary URLs. External
-uploads and hosted playback remain disabled pending actual IAM, generation,
-ownership, cancellation, late-finalization, range and erasure tests. No live GCS
+[M06 resumable sessions](evidence-storage.md) now use durable reservations, validated
+fixed GCS session URLs and background full-byte verification. Private generation-pinned
+range playback and cleanup contracts are tested with controlled clients. External
+uploads and real GCS operation remain disabled pending actual IAM/CORS, generation,
+ownership, cancellation, late-finalization, range and erasure qualification. No live GCS
 object, signed URL or credential was obtained during implementation. The template
 enforces uniform bucket access, public-access prevention and no retention lock;
 soft delete is disabled so generation deletion can meet the proposed erasure

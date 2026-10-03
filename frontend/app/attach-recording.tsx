@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { displayTime } from "./workspace-api";
+import { useResumableUpload, UploadProgress } from "./resumable-upload";
 
 export type RecordingTarget = {
   metadata_revision: number; player_namespace: string; player_id: string; player_slot: number;
@@ -14,34 +15,26 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
   onComplete: () => void; onCancel: () => void;
   zone?: string;
 }) {
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [requestId, setRequestId] = useState(() => crypto.randomUUID());
+  const transfer = useResumableUpload(csrf);
+  const busy = transfer.busy;
   const opponent = match.recording_target.opponent_ids[0];
   async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault(); setError("");
     const form = new FormData(event.currentTarget);
     const file = form.get("file") as File | null;
     if (!file || !file.name.toLowerCase().endsWith(".mp4") || file.size === 0 || file.size > 536870912) {
-      setError("Choose an MP4 recording up to 512 MiB."); setBusy(false); return;
+      setError("Choose an MP4 recording up to 512 MiB."); return;
     }
-    const body = new FormData();
-    body.set("file", file); body.set("request_id", requestId); body.set("processing_consent", "true");
-    body.set("metadata", JSON.stringify({
+    const metadata = {
       ...match.recording_target, opponent_ids: undefined,
       player_id: form.get("player_id"), opponent_namespace: opponent?.namespace, opponent_id: form.get("opponent_id"),
       game_build: form.get("game_build"), played_at: match.played_at, source_kind: form.get("source_kind"),
       session_id: form.get("session_id"), dataset_kind: form.get("dataset_kind"), characters: ["jin", "jin"], attribution_confirmed: true,
-    }));
+    };
     try {
-      const response = await fetch(`/api/matches/${match.id}/recordings`, {
-        method: "POST", credentials: "same-origin", headers: { "X-CSRFToken": csrf }, body,
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(typeof result.error === "string" ? result.error : "Check the recording details and try again.");
-      onComplete();
+      if (await transfer.start(file, metadata, match.id)) onComplete();
     } catch (problem) { setError(problem instanceof Error ? problem.message : "Upload failed."); }
-    finally { setBusy(false); }
   }
 
   return <div className="recording-panel" role="region" aria-label="Attach recording form">
@@ -50,7 +43,7 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
     <p className="muted">Current capture support: Jin vs Jin, 1080p, constant 60 fps, SDR H.264 MP4; one continuous match or practice block, up to 10 minutes / 512 MiB.</p>
     <p>Original match time: {displayTime(match.played_at, zone)}. Player slot: {match.recording_target.player_slot}. Match data is {match.dataset_kind}.</p>
     {error && <p className="notice error" role="alert">{error}</p>}
-    <form onSubmit={submit} onChange={() => { if (!busy) setRequestId(crypto.randomUUID()); }}>
+    <form onSubmit={submit}>
       <fieldset disabled={busy}>
         <label htmlFor="attached-file">Gameplay recording</label><input id="attached-file" type="file" name="file" accept="video/mp4" required />
         <div className="rows">
@@ -63,9 +56,11 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
         </div>
         <label><input type="checkbox" required />I checked both players, their slots, the original play time, build and purpose. This recording shows Jin vs Jin and belongs to this match.</label>
         <label><input type="checkbox" required />I consent to processing and storing this recording for evidence review.</label>
-        <button>{busy ? "Uploading recording…" : "Upload for attribution review"}</button>
+        <label><input type="checkbox" required />This is one continuous, uncut capture without pauses or rewinds.</label>
+        <button>{["Upload paused", "Upload interrupted"].includes(transfer.phase) ? "Resume upload" : "Upload for attribution review"}</button>
         <button type="button" className="secondary" onClick={onCancel}>Cancel attachment</button>
       </fieldset>
     </form>
+    <UploadProgress upload={transfer}/>
   </div>;
 }

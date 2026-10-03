@@ -167,8 +167,11 @@ class ReplayAsset(Owned):
     metadata = models.JSONField(default=dict)
     deleted_at = models.DateTimeField(null=True)
     purge_completed_at = models.DateTimeField(null=True)
-    upload_session = models.TextField(blank=True)  # secret; never serialized or logged
+    upload_session = models.TextField(
+        blank=True
+    )  # Secret: scoped transfer only; no logs/exports/controls.
     upload_cancelled = models.BooleanField(default=False)
+    upload_expires_at = models.DateTimeField(null=True)  # Non-secret upstream capability deadline.
     retain_until = models.DateTimeField(null=True)
 
 
@@ -643,6 +646,41 @@ class UploadAdmission(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     expires_at = models.DateTimeField(db_index=True)
     reserved_bytes = models.PositiveBigIntegerField()
+
+
+class UploadSession(Owned):
+    asset = models.OneToOneField(ReplayAsset, on_delete=models.PROTECT)
+    match = models.ForeignKey(Match, on_delete=models.PROTECT, null=True)
+    request_id = models.UUIDField()
+    claim_digest = models.CharField(max_length=64)
+    expected_sha256 = models.CharField(max_length=64)
+    expected_md5 = models.CharField(max_length=24)
+    received_bytes = models.PositiveBigIntegerField(default=0)
+    expires_at = models.DateTimeField(db_index=True)
+    state = models.CharField(max_length=20, default="INITIALIZING")
+    fence = models.PositiveIntegerField(default=0)
+    verification_lease = models.DateTimeField(null=True)
+    verification_attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(null=True)
+    error_code = models.CharField(max_length=60, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="upload_session_request"),
+            models.CheckConstraint(
+                condition=Q(
+                    state__in=[
+                        "INITIALIZING",
+                        "UPLOADING",
+                        "VERIFYING",
+                        "COMPLETE",
+                        "PURGING",
+                        "CANCELLED",
+                    ]
+                ),
+                name="upload_session_state",
+            ),
+        ]
 
 
 class PilotStudy(Owned):

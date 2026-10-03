@@ -117,13 +117,18 @@ for (const reject of [false, true]) {
       else if (path === "/api/overview") body = overview;
       else if (path === "/api/match-providers") body = { providers };
       else if (path === "/api/player-identities") body = { identities: [identity] };
-      else if (path === "/api/matches/match-1/recordings" && method === "POST") {
+      else if (path === "/api/upload-sessions" && method === "POST") {
         expect(route.request().headers()["x-csrftoken"]).toBe("fixture");
-        expect(route.request().headers()["content-type"]).toContain("multipart/form-data");
-        expect(route.request().postData()).toContain('"metadata_revision":1');
+        expect(route.request().headers()["content-type"]).toContain("application/json");
+        expect(route.request().postDataJSON().metadata.metadata_revision).toBe(1);
+        expect(route.request().postDataJSON().match_id).toBe("match-1");
         if (reject) return route.fulfill({ status: 400, json: { error: "Match metadata changed. Refresh and review the match again" } });
-        attached = true; body = { match_id: match.id, status: "QUEUED", attribution_state: "PENDING_REVIEW" };
-      } else if (path === "/api/assets/asset-1" && method === "DELETE") { attached = false; body = { status: "DELETED" }; }
+        body = { id: "upload-1", state: "UPLOADING", received_bytes: 0, bytes: 24, storage_provider: "LOCAL", chunk_bytes: 8388608 };
+      } else if (path === "/api/upload-sessions/upload-1/chunk") body = { received_bytes: 24 };
+      else if (path === "/api/upload-sessions/upload-1/complete") {
+        attached = true; body = { id: "upload-1", state: "COMPLETE", run_id: "run-1" };
+      } else if (path === "/api/upload-sessions/upload-1") body = { id: "upload-1", state: "UPLOADING", received_bytes: 24, bytes: 24, storage_provider: "LOCAL", chunk_bytes: 8388608 };
+      else if (path === "/api/assets/asset-1" && method === "DELETE") { attached = false; body = { status: "DELETED" }; }
       else if (path === "/api/matches") body = { ...blank, total: 1, matches: [{ ...match,
         can_attach_recording: !attached, can_delete_metadata: !attached,
         evidence_status: attached ? "ATTRIBUTION_PENDING" : "EVIDENCE_REQUIRED",
@@ -139,12 +144,13 @@ for (const reject of [false, true]) {
     await page.getByLabel("Recorded game build").fill("fixture");
     await page.getByLabel("Recording session ID").fill("session-1");
     await page.getByLabel("Recorded purpose").selectOption("ranked");
-    await page.getByLabel("Recording content").selectOption("synthetic");
+    await page.getByRole("region", { name: "Attach recording form" }).getByLabel("Recording content").selectOption("synthetic");
     await page.getByLabel("I checked both players", { exact: false }).check();
     await page.getByRole("button", { name: "Upload for attribution review" }).click();
     await expect(page.getByRole("region", { name: "Attach recording form" })).toBeVisible();
     expect(attached).toBe(false); // Browser enforces the separate processing-consent checkbox.
     await page.getByLabel("I consent to processing and storing this recording", { exact: false }).check();
+    await page.getByRole("region", { name: "Attach recording form" }).getByLabel("This is one continuous", { exact: false }).check();
     await page.locator(".recording-panel").screenshot({ path: `test-results/recording-form-${reject}.png` });
     await page.getByRole("button", { name: "Upload for attribution review" }).click();
     if (reject) {

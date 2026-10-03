@@ -25,7 +25,6 @@ from backend.core.evidence import as_opportunity
 from backend.core.jobs import cancel_run, enqueue_run
 from backend.core.loops import create_assignment, create_plan, evaluate_plan, record_practice
 from backend.core.match_ingestion import register_upload_source
-from backend.core.media_response import video_response
 from backend.core.models import (
     AnalysisRun,
     DefinitionVersion,
@@ -298,12 +297,15 @@ def asset_delete(request, asset_id):
 @handled
 def media(request, asset_id):
     asset = ReplayAsset.objects.get(pk=asset_id, owner=request.user, deleted_at__isnull=True)
-    if asset.storage_provider != "LOCAL":
-        return Response({"error": "Hosted playback awaits storage qualification"}, status=503)
-    path = private_path(asset.storage_key)
-    if not path.is_file():
-        return Response({"error": "Media is unavailable"}, status=404)
-    return video_response(path, request.headers.get("Range"))
+    from backend.core.cloud import CloudFailure
+    from backend.core.private_media import asset_response
+
+    try:
+        return asset_response(asset, request.headers.get("Range"))
+    except CloudFailure:
+        return Response(
+            {"error": "Private media storage is unavailable or awaits qualification"}, status=503
+        )
 
 
 class AssignmentInput(serializers.Serializer):

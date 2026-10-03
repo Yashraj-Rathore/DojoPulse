@@ -2,6 +2,7 @@
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.utils import timezone
 
 from analysis.annotations import validate_annotations
 from analysis.contracts import Eligibility, Opportunity, Outcome, digest
@@ -26,6 +27,7 @@ def as_opportunity(event):
         event.deleted_at or match.deleted_at or asset.deleted_at or match.asset_id != asset.pk
     )
     deleted = deleted or match.metadata_state == "REVIEW_REQUIRED"
+    deleted = deleted or bool(asset.retain_until and asset.retain_until <= timezone.now())
     return Opportunity(
         id=str(event.pk),
         played_key=f"{match.pk}:{event.played_key}",
@@ -84,6 +86,7 @@ def publish_annotations(operator, run_id, match_id, annotation):
         raise ValidationError("Resolve metadata correction before publishing gameplay evidence")
     if (
         run.asset.deleted_at
+        or (run.asset.retain_until and run.asset.retain_until <= timezone.now())
         or match.deleted_at
         or not locked_owner.is_active
         or run.status == "CANCELLED"

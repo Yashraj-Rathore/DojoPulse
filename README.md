@@ -92,6 +92,13 @@ the [incident runbook](docs/operations/security-runbook.md). Run
 budgets. Synthetic-only development can explicitly choose `PARSER_BACKEND=local` with
 DEBUG and LOCAL_OPERATOR_UPLOADS enabled; this is not hostile-media isolation.
 
+The UI uses resumable private uploads: pause and resume with the same file/details,
+including after refresh. Byte verification runs before analysis or recording attribution.
+`python manage.py process_uploads` performs verification/expired-upload cleanup without
+running the media parser; polling `process_runs` also sweeps uploads. Run it regularly
+and keep `purge_expired` scheduled. See [M06 storage](docs/architecture/evidence-storage.md)
+for quotas, cancellation, capability handling and hosted qualification gates.
+
 In a third terminal:
 
 ```powershell
@@ -334,6 +341,7 @@ access-controlled private root and reference them with pseudonyms and hashes.
 G1–G6 are NOT_RUN: human observability, deterministic detection, capture friction,
 practice measurement, natural frequency and comparable complete loops.
 [The pilot protocol](docs/pilot-protocol.md) specifies required data and stop decisions.
-Cloud storage/resumable upload adapters and Cloud Run deployment are intentionally not enabled.
+Resumable LOCAL upload/private playback engineering and controlled GCS adapters are implemented.
+Real GCS operation, external uploads and Cloud Run media deployment remain disabled.
 The local Docker parser isolation profile passed the separately recorded M15–M17
 qualification. Equivalent hosted isolation and external upload release remain gated.

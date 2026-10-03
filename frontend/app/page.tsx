@@ -7,6 +7,7 @@ import EvidenceBrowser from "./evidence-browser";
 import TrainingJourney from "./training-journey";
 import AccountAccess from "./account-access";
 import AccountControls from "./account-controls";
+import { useResumableUpload, UploadProgress } from "./resumable-upload";
 
 type Event = {id:string;mode:string;start_us:number;eligibility:string;outcome:string;source_asset_id:string};
 type Counts = {numerator:number;denominator:number;eligible_unknown:number;unknown_eligibility:number;coverage:number|null;rate:number|null;credible_interval?:number[]|null;excluded?:number;sessions?:number;eligibility_coverage?:number|null};
@@ -35,6 +36,7 @@ export default function Home(){
  const [sourceKind,setSourceKind]=useState("ranked");
  const [zone,setZone]=useState("UTC"),[reportEvent,setReportEvent]=useState(""),[matchEvidence,setMatchEvidence]=useState("");
  const [removingAsset,setRemovingAsset]=useState<string|null>(null);
+ const transfer=useResumableUpload(csrf);
  const request=useCallback(async(path:string,method="GET",body?:object|FormData)=>{
   const response=await fetch("/api/"+path,{method,credentials:"same-origin",headers:{"X-CSRFToken":csrf,...(body instanceof FormData?{}:{"Content-Type":"application/json"})},body:body?(body instanceof FormData?body:JSON.stringify(body)):undefined});
   const json=await response.json();
@@ -57,9 +59,8 @@ export default function Home(){
  function chooseFile(value:File|null){setFile(value);setValidPreview(false);setPreview(value?URL.createObjectURL(value):"");}
  async function upload(event:React.FormEvent<HTMLFormElement>){
   event.preventDefault();const form=new FormData(event.currentTarget);if(!file)return;
-  const metadata={game_build:form.get("build"),session_id:form.get("session"),played_at:new Date(String(form.get("played"))).toISOString(),source_kind:sourceKind,characters:["jin","jin"],overlays_verified:false,build_verified:false};
-  const body=new FormData();body.set("file",file);body.set("metadata",JSON.stringify(metadata));body.set("processing_consent","true");
-  await act(async()=>{await request("uploads","POST",body);chooseFile(null);});
+  const metadata={game_build:form.get("build"),session_id:form.get("session"),played_at:new Date(String(form.get("played"))).toISOString(),source_kind:sourceKind,characters:["jin","jin"],dataset_kind:form.get("dataset_kind")};
+  const completed=await transfer.start(file,metadata);if(completed){chooseFile(null);await refresh();}
  }
  const picked=selected;
  return <main>
@@ -78,16 +79,18 @@ export default function Home(){
     <TrainingJourney events={data.event_total??data.events.length} assignments={data.assignments.length} plans={data.plans} practice={data.practice.reduce((sum,p)=>sum+p.attempts,0)} evaluations={data.evaluations.length} zone={zone}/>
     <MatchHistory csrf={csrf} zone={zone} onEvidence={id=>{setMatchEvidence(id);document.getElementById("evidence")?.scrollIntoView();}}/>
     <section id="capture"><h2>01 / Capture one situation</h2><p>Jin defending against Jin’s u/f+4 is the provisional target. Move identity and the response still require expert verification.</p><ol><li>Record Steam PC, English UI, 1920 × 1080 at constant 60 fps.</li><li>Show HUD, both input histories, frame information and battle status. Capture one continuous match or practice block.</li><li>Keep the source uncut, with no pauses, rewinds or missing overlays. Export SDR H.264 MP4, up to 10 minutes / 512 MiB.</li></ol>
-     <form onSubmit={upload}><label htmlFor="capture-file">Capture file</label><input id="capture-file" type="file" accept="video/mp4" onChange={e=>chooseFile(e.target.files?.[0]??null)}/>
+     <form onSubmit={upload}><fieldset disabled={transfer.busy}><label htmlFor="capture-file">Capture file</label><input id="capture-file" type="file" accept="video/mp4" onChange={e=>chooseFile(e.target.files?.[0]??null)}/>
       {preview&&<video controls src={preview} onLoadedMetadata={e=>{const v=e.currentTarget;setValidPreview(v.videoWidth===1920&&v.videoHeight===1080&&v.duration>0&&v.duration<=600&&!!file&&file.size<=536870912);}}/>}
       {file&&<p className="muted">{validPreview?"Basic dimensions and duration accepted. The worker checks encoding and timing.":"Checking preview, or dimensions/duration exceed the capture profile."}</p>}
       <div className="rows"><div><label htmlFor="build">Exact game build</label><input id="build" name="build" placeholder="Read from the game" required/></div><div><label htmlFor="session">Play session ID</label><input id="session" name="session" placeholder="Your recording session" required/></div></div>
       <label htmlFor="played">Original play time (local)</label><input id="played" name="played" type="datetime-local" required/>
       <label htmlFor="mode">Recording purpose</label><select id="mode" value={sourceKind} onChange={e=>setSourceKind(e.target.value)}><option value="ranked">Ranked baseline / follow-up</option><option value="practice">Recorded practice</option></select>
+      <label htmlFor="capture-kind">Recording content</label><select id="capture-kind" name="dataset_kind" required><option value="">Confirm the content</option><option value="real">Real gameplay</option><option value="synthetic">Synthetic test recording</option></select>
+      <label><input type="checkbox" required/>This is one continuous, uncut capture without pauses or rewinds.</label>
       <label><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>I consent to processing this recording for this study. Model training is separate.</label>
-      <button disabled={busy||!localUploads||!validPreview||!consent}>Queue capture</button>
+      <button disabled={busy||!localUploads||!validPreview||!consent}>{["Upload paused","Upload interrupted"].includes(transfer.phase)?"Resume upload":"Queue capture"}</button>
       {!localUploads&&<p className="muted">Local operator uploads are disabled in this workspace.</p>}
-     </form>
+     </fieldset></form><UploadProgress upload={transfer}/>
     </section>
     <section><h2>Processing & review</h2><p className="muted">Analysis happens in a separate worker. Reviewed evidence appears only after an operator imports adjudicated labels.</p>
      {data.runs.length?data.runs.map(run=><div className="result" key={run.id}><span className="tag">{run.status.replaceAll("_"," ")}</span><p className="muted">Capture {run.asset_id.slice(0,8)}</p>{run.error_code&&<p>{run.error_code}</p>}{["QUEUED","PROCESSING"].includes(run.status)&&<button className="secondary" disabled={busy} onClick={()=>void act(async()=>{await request("runs/"+run.id,"DELETE");})}>Cancel analysis</button>}{removingAsset===run.asset_id?<div><p>Delete this recording and withdraw dependent evidence? Imported match metadata is retained.</p><button disabled={busy} onClick={()=>void act(async()=>{await request("assets/"+run.asset_id,"DELETE");setRemovingAsset(null);setSelected([]);})}>Confirm capture deletion</button><button className="secondary" onClick={()=>setRemovingAsset(null)}>Keep capture</button></div>:<button className="secondary" disabled={busy} onClick={()=>setRemovingAsset(run.asset_id)}>Delete capture</button>}</div>):<p className="empty">No captures yet. Upload a supported recording to begin.</p>}

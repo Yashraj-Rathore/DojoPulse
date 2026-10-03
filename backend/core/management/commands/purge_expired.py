@@ -16,6 +16,9 @@ class Command(BaseCommand):
         from backend.core.accounts import cleanup_account_mail
 
         cleanup_account_mail()
+        from backend.core.resumable import reconcile_uploads
+
+        reconcile_uploads()
         assets = ReplayAsset.objects.filter(
             Q(retain_until__lte=timezone.now()) | Q(deleted_at__isnull=False),
             purge_completed_at__isnull=True,
