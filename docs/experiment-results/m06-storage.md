@@ -34,7 +34,7 @@ Local checks:
   passed migration forward/reverse/forward, actual pg_dump/pg_restore, signed controls
   before reads, pending-upload erasure/checksum clearing and repeat replay. Source
   database was never restored or deleted; production RPO/RTO remains NOT_MEASURED.
-- Django system/schema checks, draft contract load, Ruff check/format (183 files),
+- Django system/schema checks, draft contract load, Ruff check/format (184 files),
   mypy (23 source files) and diff whitespace checks passed at the recorded checkpoint.
 - Both pinned Python locks: no known vulnerabilities. Production npm audit:
   zero vulnerabilities. Full dev npm audit separately has five high findings through
@@ -66,3 +66,26 @@ main was inspected at c5b553ad34f734b974d0a121caeb67b2f15696c1 and only main exi
 no remote rewrite or new Next config payload was found. Previous source-access review
 remains open. M06.08 satisfies the defined engineering scope; M06 release remains
 PARTIAL, with all real provider/scientific/hosting gates preserved.
+
+
+## Published implementation CI
+
+[Run 37135033487](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37135033487)
+completed SUCCESS at **2026-10-03 16:00:27 UTC**, first attempt, exact main head
+**0588ce4cb66a6a8dfff252a2115b684ff0e38afb**. All six jobs passed:
+Python/PostgreSQL, media sandbox, frontend, application containers, dependencies
+and deployment contracts. Logs and downloaded JUnit corroborate **340 Python tests
+in 66.36s**, seven skips separately exercised by **seven Docker isolation/max-profile
+tests in 142.07s**; **25 Chromium journeys in 28.2s**; three Terraform mocked tests;
+native PostgreSQL container-client migration/dump/restore/pending-upload erasure;
+production build/static/schema, both Python locks and production npm audits, and
+unprivileged API quarantine/standalone web startup. No retried or weakened gate.
+
+Final review added an owner-locked current-state/consent check after a slow upload
+status probe. Controlled cancellation during that probe cannot return the earlier
+session capability. **35 focused upload tests passed locally in 9.37s**, Ruff
+check/format and diff checks passed. This follow-up and qualification receipt are
+published on main with ordinary CI; final handoff requires the actual latest tip's
+six checks. The 340-test receipt above belongs to 0588ce4, not the follow-up.
+Actual hosted/scientific/privacy/provider gates and the development lint advisory
+remain open. No GCS session or external deployment was activated.

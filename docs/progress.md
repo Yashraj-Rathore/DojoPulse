@@ -912,3 +912,37 @@ Frontend final 25 Edge journeys/build/lint/types and native migration/recovery
 checks described above remain the final relevant UI/recovery checks. Both progress
 files and architecture now reflect completed local M06.08, retained M06 release
 gates and the development-only advisory. Normal main push/CI monitoring follows.
+
+
+## 2026-10-03 - M06 status-probe revocation follow-up
+
+Requirements: M06.02/.06/.08, M15.01/.06 and M19.02. During publication review,
+added an owner-locked state/consent recheck after the external progress probe.
+Cancellation during a slow GCS probe now returns the current cancelled state
+without its stale capability. Added a controlled probe/cancellation regression.
+Changed resumable service, upload tests and both progress files. Focused upload
+validation and publication will be recorded with the final receipt; no live
+GCS operation or gate change. The already published implementation is monitored
+separately; follow-up publication will receive normal exact-head CI.
+
+
+## 2026-10-03 - M06 main implementation publication and final revocation receipt
+
+Requirements: M06.02/.06/.08, M01.05/.06, M15.01/.04/.06 and M19.02.
+Published 0588ce4cb66a6a8dfff252a2115b684ff0e38afb directly to main without force.
+[CI 37135033487](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37135033487)
+passed all six jobs first attempt at 16:00:27 UTC: 340 PostgreSQL/Python tests
+(66.36s), seven Docker sandbox/max-profile tests (142.07s), 25 Chromium journeys
+(28.2s), three Terraform mocks, recovery including pending uploads, dependency/
+build/static/schema checks and unprivileged application startup. Downloaded Python/
+sandbox JUnit corroborates counts; no weakened or retried gate. Full dev lint-chain
+finding remains explicitly tracked separately from clean production audits.
+
+Final status-probe revocation fix described above passed **35 upload tests in 9.37s**,
+with Ruff/diff checks passing. Changed resumable service, regression tests, tracker,
+this log and M06 evidence. This combined privacy-fix/receipt uses normal CI and
+requires monitoring the actual latest main head before final handoff; prior 0588ce4
+success alone is insufficient. Only main remains. M06.08 is locally DONE, M06 release
+PARTIAL; actual GCS/CORS/IAM/late-erasure, media isolation, source-access review,
+permitted providers and real captures/studies remain gates. Next: qualify actual
+storage/hosting with approved inputs and acquire permitted reviewed real evidence.

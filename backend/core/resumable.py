@@ -220,10 +220,16 @@ def status(owner, session_id):
             )
         if not 0 <= received <= session.asset.bytes:
             raise ValidationError("Upload size differs from reservation")
-        UploadSession.objects.filter(pk=session.pk, state="UPLOADING").update(
-            received_bytes=received
-        )
-        session.received_bytes = received
+        with transaction.atomic():
+            lock_owner(owner.pk)
+            session = owned_session(owner, session_id)
+            if not owner_is_active(owner.pk):
+                raise ValidationError("Account is unavailable")
+            if session.state == "UPLOADING":
+                usable(session, owner)
+                session.received_bytes = received
+                session.save(update_fields=["received_bytes"])
+            # A slow upstream probe cannot return a capability from before revocation.
     run = (
         AnalysisRun.objects.filter(asset=session.asset, owner=owner).first()
         if session.state == "COMPLETE"

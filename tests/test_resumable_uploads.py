@@ -697,3 +697,19 @@ def test_crashed_verifier_exhausts_durable_attempt_budget(workspace):
     reconcile_uploads()
     assert UploadSession.objects.get(pk=session.pk).state == "CANCELLED"
     assert not AnalysisRun.objects.exists()
+
+
+def test_cancellation_during_status_probe_does_not_return_stale_capability(cloud):
+    from backend.core.resumable import status
+
+    owner, _, store = cloud
+    session = start(owner)
+
+    def revoked(session_url, size):
+        cancel(owner, session.pk)
+        return size
+
+    store.upload_status = revoked
+    result = status(owner, session.pk)
+    assert result["state"] == "CANCELLED" and result["upload_url"] is None
+    assert not AnalysisRun.objects.exists()
