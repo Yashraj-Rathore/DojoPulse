@@ -946,3 +946,21 @@ success alone is insufficient. Only main remains. M06.08 is locally DONE, M06 re
 PARTIAL; actual GCS/CORS/IAM/late-erasure, media isolation, source-access review,
 permitted providers and real captures/studies remain gates. Next: qualify actual
 storage/hosting with approved inputs and acquire permitted reviewed real evidence.
+
+
+## 2026-10-03 - Final M06 code verified on main
+
+Requirements: M01.05/.06, M06.08 and M19.02. Final privacy-fix code
+1d56929bdc7a5169048128c9e4c069c3220c350a passed all six
+[CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37135447719)
+first attempt at 16:07:03 UTC: 341 PostgreSQL/Python (66.30s), 25 Chromium
+(25.0s), seven Docker/max-profile (130.41s), three Terraform mock tests,
+recovery/pending-upload erasure, dependency/build/static/schema/startup gates.
+Exact check-runs API verifies six completed successes; GitHub still has only main.
+No retries or weakened gate. This receipt updates only PRODUCT_PROGRESS, this log
+and M06 qualification; no code changed after the qualified head. Publish ordinary
+CI and monitor the latest documentation tip before final handoff. M06 engineering
+scope is locally DONE; actual storage/capture/attribution/production release remains
+PARTIAL and independent scientific/provider/privacy/source-access gates stay open.
+Next implementation follows the tracker with permitted evidence and hosting inputs;
+keep development lint advisory remediation under reviewed dependency maintenance.
