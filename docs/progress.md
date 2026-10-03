@@ -1029,3 +1029,24 @@ also passes after lock changes. Earlier 30 Edge/build/TypeScript/lint/audits rem
 because frontend/dependencies were unchanged after that qualification. M07.07 is DONE in
 its defined local scope; real M07 and hosted review remain gated. Publication on main and
 actual latest-tip CI are the remaining delivery steps; no skip instruction is used.
+
+
+## 2026-10-03 - M07 publication verified on main
+
+Requirements: M01.05/.06, M07.07, M15.06 and M19.02. Published
+**dcda2bdb52fa34ca6ea9adc374bcb8ba79c44276** directly to main without force.
+All six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37141940752) passed first attempt at
+**17:53:53 UTC**: 371 PostgreSQL/Python (97.291s), 30 Chromium (34.2s), seven
+Docker/max-profile (140.787s), three Terraform mocks, native migration/dump/restore/
+repeat-control erasure, dependency/static/schema/build and unprivileged container startup.
+Downloaded Python/Docker JUnit confirms 378 tests/seven skipped in the main Python job
+and all seven separately executed Docker tests, zero failures/errors. GitHub API confirms
+attempt 1, exact main code SHA and only main; no retried or weakened gate.
+
+M07.07 is locally DONE; M07 real current-build/fact/expert/rights approval, hosted reviewer
+qualification and G1-G6 remain gated. No live provider/deployment was activated. This final
+receipt changes only PRODUCT_PROGRESS, docs/progress and M07 qualification. Publish it with
+ordinary CI and monitor its actual latest tip before handoff; earlier code success alone
+does not establish the documentation tip's green check. Next: permitted exact-build
+captures/experts and M08 dataset preparation; retain actual hosting/provider gates and
+reviewed dependency maintenance.

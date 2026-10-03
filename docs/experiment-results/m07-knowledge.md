@@ -59,3 +59,26 @@ checks pass; prior 30 Edge/build/TypeScript/lint and both-lock/production npm au
 current for unchanged frontend/dependencies. M07.07 local engineering acceptance is met;
 real/hosted release remains gated. Push and actual latest-tip CI are pending, including
 separate actual Docker isolation and application-container qualification.
+
+
+## Verified publication
+
+Commit **dcda2bdb52fa34ca6ea9adc374bcb8ba79c44276** was pushed directly to main.
+All six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37141940752)
+passed first attempt at **2026-10-03 17:53:53 UTC**. Artifact/log evidence:
+
+| Check | Actual result |
+|---|---|
+| PostgreSQL/Python | 371 passed, seven Docker tests skipped separately; 97.291s JUnit, zero failures/errors |
+| Docker isolation/max profile | All seven passed, no skips; 140.787s JUnit |
+| Frontend | 30 Chromium journeys passed, 34.2s; production build/lint/typecheck passed |
+| Deployment contracts | Three mocked Terraform tests passed; actual provisioning unapproved |
+| Native recovery | Fresh PostgreSQL migration forward/reverse/forward, dump/restore, repeat controls and source/grant/note/pending-upload erasure passed |
+| Dependencies | Both Python locks and production npm audits passed |
+| Application containers | Unprivileged API quarantine and standalone web startup passed |
+
+Downloaded JUnit under reports/m07-ci-37141940752 and CI logs substantiate counts;
+GitHub API confirms attempt 1 and the exact main head. Only main exists. No gates were
+weakened or rerun. Real game/hosting/provider/scientific approval remains absent.
+This final documentation receipt retains ordinary CI; monitor its actual latest main
+checks before handoff. No code changed after the qualified implementation.
