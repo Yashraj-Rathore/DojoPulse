@@ -237,6 +237,11 @@ def delete_account(owner, storage=None, *, password=None):
         Match.objects.filter(owner=owner).update(player_identity=None)
         PlayerGameIdentity.objects.filter(owner=owner).delete()
         Feedback.objects.filter(owner=owner).delete()
+        from backend.core.models import DrillAssignment, PracticeLog
+
+        PracticeLog.objects.filter(owner=owner).delete()
+        DrillAssignment.objects.filter(owner=owner).update(diagnosis={}, status="WITHDRAWN")
+
         NoticeReceipt.objects.filter(owner=owner).delete()
         UploadAdmission.objects.filter(owner=owner).delete()
         from backend.core.models import OperatorWork

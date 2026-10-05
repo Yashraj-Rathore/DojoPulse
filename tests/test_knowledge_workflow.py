@@ -772,3 +772,23 @@ def test_priority_assessment_requires_exact_independent_drill_release(env):
     assert not knowledge.effective(published, "synthetic", env.foreign.pk)
     knowledge.revoke(proposal, "ASSESSMENT_WITHDRAWN")
     assert not knowledge.effective(published, "synthetic", env.owner.pk)
+
+
+def test_m11_workflow_requires_new_version_and_both_independent_reviews(env):
+    from tests.test_practice_workflow import WORKFLOW
+
+    _, old = bundle(env)
+    payload = {**old.payload, "practice_workflow": WORKFLOW}
+    payload.pop("synthetic_only", None)
+    proposal = candidate(env, "drill", "test/drill/2", payload)
+    with pytest.raises(ValidationError):
+        knowledge.publish(env.owner, proposal.pk)
+    approve(env, proposal)
+    item = knowledge.publish(env.owner, proposal.pk)
+    assert item.payload["practice_workflow"] == WORKFLOW
+    old.refresh_from_db()
+    assert "practice_workflow" not in old.payload and item.content_hash != old.content_hash
+    bad = copy.deepcopy(payload)
+    bad["practice_workflow"]["progression"]["minimum_known"] = 1
+    with pytest.raises((ValidationError, ValueError)):
+        candidate(env, "drill", "test/drill/3", bad)

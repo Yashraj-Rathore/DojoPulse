@@ -147,7 +147,7 @@ def result_counts(matches):
     }
 
 
-def projection(owner, values):
+def projection(owner, values, *, include_membership=False):
     matches = filter_matches(
         Match.objects.filter(owner=owner, deleted_at=None, mode="ranked"), values
     )
@@ -274,6 +274,8 @@ def projection(owner, values):
             }
         )
         cards.append(card)
+        if include_membership:
+            card["membership"] = sorted((o.id, o.content_hash) for _, o in pairs)
     if len(cards) > MAX_GROUPS:
         raise ValidationError("Scope exceeds 100 measurement groups; choose a context/version")
     profiles = {

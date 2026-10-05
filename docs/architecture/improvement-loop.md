@@ -19,3 +19,9 @@ using played-at with known timezone/certainty, not upload time.
 
 Weakness ranking considers frequency, lost value, confidence and trainability. No normative
 label follows merely from a high P(action|situation). Native replay/training is the comparator.
+
+
+The [M11 practice workflow](practice-workflow.md) defines reviewed native instructions,
+version-pinned diagnosis assignments, complete current-source linking with recording-end
+chronology, separate self-reports and conservative progression. Frozen comparisons retain
+original memberships; unavailable linked practice cannot silently qualify a positive result.

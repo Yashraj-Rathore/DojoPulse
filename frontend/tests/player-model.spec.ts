@@ -65,7 +65,7 @@ test("reviewed research priority assigns through the existing training pipeline"
   await page.goto("/");
   const sent = page.waitForRequest(r => r.url().endsWith("/api/assignments") && r.method() === "POST");
   await page.getByRole("button", { name: "Assign Synthetic response drill" }).click();
-  expect((await sent).postDataJSON()).toEqual({ drill_key: "drill/1" });
+  expect((await sent).postDataJSON()).toEqual({ drill_key: "drill/1", request_id: expect.any(String), diagnosis: { card_id: card.id, evidence_hash: card.evidence_hash, policy_hash: card.policy_hash, filters: data.filters } });
   await expect(page.getByRole("heading", { name: "03 / Practice the same response" })).toBeVisible();
 });
 

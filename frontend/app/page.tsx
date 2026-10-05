@@ -1,10 +1,11 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import MatchHistory from "./match-history";
 import WorkspaceTools from "./workspace-tools";
 import EvidenceBrowser from "./evidence-browser";
 import PlayerModel from "./player-model";
+import PracticeGuide from "./practice-guide";
 import TrainingJourney from "./training-journey";
 import AccountAccess from "./account-access";
 import AccountControls from "./account-controls";
@@ -22,7 +23,7 @@ type Data = {
  assignments:{id:string;drill_id:string;status:string}[];
  plans:{id:string;assignment_id:string}[];
  evaluations:{id:string;revision:number;result:Result;invalidated_at:string|null}[];
- practice:{id:string;attempts:number;summary?:Counts}[];
+ practice:{id:string;attempts:number;available_attempts?:number;summary?:Counts}[];
 };
 const empty:Data={runs:[],events:[],drills:[],assignments:[],plans:[],evaluations:[],practice:[]};
 const percent=(n:number|null|undefined)=>n==null?"—":(n*100).toFixed(1)+"%";
@@ -37,6 +38,7 @@ export default function Home(){
  const [sourceKind,setSourceKind]=useState("ranked");
  const [zone,setZone]=useState("UTC"),[reportEvent,setReportEvent]=useState(""),[matchEvidence,setMatchEvidence]=useState("");
  const [removingAsset,setRemovingAsset]=useState<string|null>(null);
+ const linkRequests=useRef(new Map<string,string>());
  const transfer=useResumableUpload(csrf);
  const request=useCallback(async(path:string,method="GET",body?:object|FormData)=>{
   const response=await fetch("/api/"+path,{method,credentials:"same-origin",headers:{"X-CSRFToken":csrf,...(body instanceof FormData?{}:{"Content-Type":"application/json"})},body:body?(body instanceof FormData?body:JSON.stringify(body)):undefined});
@@ -77,7 +79,7 @@ export default function Home(){
    <div className="grid" id="workspace-content" tabIndex={-1}>
     <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
     <AccountControls csrf={csrf}/>
-    <TrainingJourney events={data.event_total??data.events.length} assignments={data.assignments.length} plans={data.plans} practice={data.practice.reduce((sum,p)=>sum+p.attempts,0)} evaluations={data.evaluations.length} zone={zone}/>
+    <TrainingJourney events={data.event_total??data.events.length} assignments={data.assignments.length} plans={data.plans} practice={data.practice.reduce((sum,p)=>sum+(p.available_attempts??p.attempts),0)} evaluations={data.evaluations.length} zone={zone}/>
     <MatchHistory csrf={csrf} zone={zone} onEvidence={id=>{setMatchEvidence(id);document.getElementById("evidence")?.scrollIntoView();}}/>
     <section id="capture"><h2>01 / Capture one situation</h2><p>Jin defending against Jin’s u/f+4 is the provisional target. Move identity and the response still require expert verification.</p><ol><li>Record Steam PC, English UI, 1920 × 1080 at constant 60 fps.</li><li>Show HUD, both input histories, frame information and battle status. Capture one continuous match or practice block.</li><li>Keep the source uncut, with no pauses, rewinds or missing overlays. Export SDR H.264 MP4, up to 10 minutes / 512 MiB.</li></ol>
      <form onSubmit={upload}><fieldset disabled={transfer.busy}><label htmlFor="capture-file">Capture file</label><input id="capture-file" type="file" accept="video/mp4" onChange={e=>chooseFile(e.target.files?.[0]??null)}/>
@@ -101,11 +103,12 @@ export default function Home(){
     <PlayerModel csrf={csrf} zone={zone} onEvidence={id=>{setMatchEvidence(id);document.getElementById("evidence")?.scrollIntoView();}} onAssigned={id=>{setAssignment(id);void refresh();document.getElementById("practice")?.scrollIntoView();}}/>
     <section id="practice"><h2>03 / Practice the same response</h2><p>Use the diagnosis above to review the supported situation. Frozen-plan baselines below are evidence snapshots; they do not independently establish a weakness.</p>
      {data.recommendations?.map(r=><div className="result" key={r.id}><h3>Your baseline: {r.state.replaceAll("_"," ").toLowerCase()}</h3><p>{r.state==="INVALIDATED"?"This diagnosis was withdrawn because supporting evidence changed or was deleted.":`${r.summary.numerator} successful responses / ${r.summary.denominator} known eligible outcomes. ${r.summary.eligible_unknown} unknown outcomes; ${r.summary.unknown_eligibility} unknown eligibility.`}</p><p className="muted">{r.situation}. Sparse or incompatible evidence cannot establish a reliable weakness.</p></div>)}
-     {data.drills.map(d=><div className="result" key={d.key}><span className="tag">{d.status}</span><h3>{d.payload.title||"Standing block-punish drill"}</h3><p className="muted">Jin vs Jin · standing · open space · 40 valid attempts. Randomize with a safe non-target alternative. Unobservable attempts remain unknown.</p><button disabled={busy||d.status!=="APPROVED"} onClick={()=>void act(async()=>{const a=await request("assignments","POST",{drill_key:d.key});setAssignment(a.id);})}>Assign reviewed drill</button></div>)}
+     {data.drills.map(d=><div className="result" key={d.key}><span className="tag">{d.status}</span><h3>{d.payload.title||"Standing block-punish drill"}</h3><p className="muted">Select an assignment to see its independently reviewed native setup and response. Legacy versions need a new reviewed workflow.</p><button disabled={busy||d.status!=="APPROVED"} onClick={()=>void act(async()=>{const a=await request("assignments","POST",{drill_key:d.key});setAssignment(a.id);})}>Assign reviewed drill</button></div>)}
      <label htmlFor="assignment">Drill assignment</label><select id="assignment" value={assignment} onChange={e=>setAssignment(e.target.value)}><option value="">Select an assignment</option>{data.assignments.map(a=><option key={a.id} value={a.id}>{a.drill_id} · {a.status}</option>)}</select>
-     <button disabled={busy||!assignment||!picked.length||!data.plans.some(p=>p.assignment_id===assignment)} onClick={()=>void act(async()=>{await request("assignments/"+assignment+"/practice","POST",{event_ids:picked});setSelected([]);})}>Link selected practice evidence</button>
+     {assignment&&<PracticeGuide key={assignment} assignment={assignment} csrf={csrf} zone={zone} revision={JSON.stringify([data.plans,data.practice,data.assignments])} onChanged={()=>void refresh().catch(e=>setError(e.message))}/>}
+     <button disabled={busy||!assignment||!picked.length||!data.plans.some(p=>p.assignment_id===assignment)} onClick={()=>void act(async()=>{const key=assignment+":"+[...picked].sort().join(",");if(!linkRequests.current.has(key))linkRequests.current.set(key,crypto.randomUUID());await request("assignments/"+assignment+"/practice","POST",{event_ids:picked,request_id:linkRequests.current.get(key)});setSelected([]);})}>Link selected practice evidence</button>
      {assignment&&!data.plans.some(p=>p.assignment_id===assignment)&&<p className="notice">Freeze a baseline plan for this assignment before linking practice. <a href="#compare">Set up your plan</a>.</p>}
-     <p className="muted">Reviewed practice attempts linked: {data.practice.reduce((sum,p)=>sum+p.attempts,0)}. Only verified compatible outcomes satisfy the practice requirement.</p>
+     <p className="muted">Reviewed practice attempts linked: {data.practice.reduce((sum,p)=>sum+(p.available_attempts??p.attempts),0)}. Only verified compatible outcomes satisfy the practice requirement.</p>
      {data.practice.map(p=>p.summary&&<p key={p.id} className="muted">Practice block {p.id.slice(0,8)}: {p.summary.numerator}/{p.summary.denominator} known successes · {percent(p.summary.coverage)} coverage · {p.summary.eligible_unknown} unknown outcomes. {p.summary.credible_interval?"Descriptive 95% interval: "+percent(p.summary.credible_interval[0])+" to "+percent(p.summary.credible_interval[1]):"Uncertainty unavailable until known outcomes exist."}</p>)}
     </section>
     <section id="compare"><h2>04 / Freeze & compare</h2><p className="muted">Freeze the baseline before practice. Later select the follow-up match evidence, then evaluate. At least 40 known opportunities across 5 sessions per period and 40 verified practice attempts are required.</p>

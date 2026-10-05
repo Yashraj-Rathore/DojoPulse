@@ -589,6 +589,26 @@ class DrillAssignment(Owned):
     recommendation = models.ForeignKey(Recommendation, on_delete=models.PROTECT, null=True)
     drill = models.ForeignKey(DefinitionVersion, on_delete=models.PROTECT)
     status = models.CharField(max_length=30, default="ASSIGNED")
+    request_id = models.UUIDField(null=True)
+    drill_hash = models.CharField(max_length=64, default="")
+    diagnosis = models.JSONField(default=dict)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "request_id"], name="unique_assignment_request"
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            old = type(self).objects.get(pk=self.pk)
+            if any(
+                getattr(old, field) != getattr(self, field)
+                for field in ("owner_id", "drill_id", "drill_hash", "diagnosis", "request_id")
+            ):
+                raise ValidationError("Assignment source and version pins are immutable")
+        return super().save(*args, **kwargs)
 
 
 class TrainingSession(Owned):
@@ -596,6 +616,62 @@ class TrainingSession(Owned):
     completed_at = models.DateTimeField(null=True)
     mode = models.CharField(max_length=40, default="recorded_in_game")
     setup = models.JSONField(default=dict)
+    request_id = models.UUIDField(null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="unique_practice_request")
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Recorded practice sessions and source pins are immutable")
+        return super().save(*args, **kwargs)
+
+
+class PracticeLog(Owned):
+    """Adherence self-report only; never a verified DrillAttempt or evaluation exposure."""
+
+    assignment = models.ForeignKey(DrillAssignment, on_delete=models.CASCADE)
+    request_id = models.UUIDField()
+    state = models.CharField(max_length=16)
+    started_at = models.DateTimeField(null=True)
+    ended_at = models.DateTimeField(null=True)
+    reported_attempts = models.PositiveIntegerField(null=True)
+    obstacle = models.CharField(max_length=24, default="NONE")
+    pins = models.JSONField(default=dict)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError(
+                "Practice self-reports are immutable; withdraw and create a new receipt"
+            )
+        kwargs["force_insert"] = True
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "request_id"], name="unique_practice_log_request"
+            ),
+            models.CheckConstraint(
+                condition=Q(state__in=["COMPLETED", "INTERRUPTED", "SKIPPED", "DELETED"]),
+                name="valid_practice_log_state",
+            ),
+            models.CheckConstraint(
+                condition=Q(state="DELETED")
+                | (
+                    Q(
+                        started_at__isnull=False,
+                        ended_at__isnull=False,
+                        reported_attempts__isnull=False,
+                    )
+                    & Q(ended_at__gte=F("started_at"))
+                    & Q(reported_attempts__lte=2000)
+                ),
+                name="practice_log_bounded_times",
+            ),
+        ]
 
 
 class DrillAttempt(models.Model):

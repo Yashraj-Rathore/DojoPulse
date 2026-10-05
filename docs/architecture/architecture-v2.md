@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.13.0. Decision date: 2026-10-05. Status: local engineering approved;
+Version: 2.14.0. Decision date: 2026-10-05. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -38,6 +38,11 @@ The [M07 knowledge contract](knowledge-governance.md) adds evidence-pinned indep
 review, new immutable releases, scoped revocable approval and explicit patch reanalysis.
 Events pin analysis knowledge; capture builds and frozen comparisons stay unchanged.
 Real game facts, expert approval and hosted reviewer access remain release gates.
+
+The [M11 practice contract](practice-workflow.md) adds independently reviewed native
+workflows, diagnosis-pinned assignment, separate adherence reports, complete current practice
+links and conservative evidence-based next action. Real reproducibility, G4 and utility
+remain open; no difficulty escalation, experiment rewrite or causal claim is inferred.
 
 ## Product and release boundary
 

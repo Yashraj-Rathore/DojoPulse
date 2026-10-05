@@ -67,3 +67,11 @@ digests, role consent, original-retention pins, prospective allocation, source
 hashes, append-only reviews and report revisions are separate from canonical
 GameplayEvents. Export/withdrawal/deletion and signed restore controls cover
 study evidence; see [pilot tools](pilot-tools.md).
+
+
+Migration 0019 pins DrillAssignment drill hash/optional diagnosis and owner/request UUID;
+TrainingSession gains retry identity and immutable source/workflow pins. PracticeLog is owned
+append-only self-reported adherence with bounded times/counts, categorical obstacles and
+version hashes. Reports never become DrillAttempts. Deletion tombstones prevent UUID retry
+resurrection; account deletion and every quarantined restore erase reports/diagnoses.
+See the [practice contract](practice-workflow.md); rollback refuses private M11 history.

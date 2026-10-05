@@ -78,7 +78,7 @@ FIELDS = {
             "setup",
             "native_practice",
         },
-        {"priority_assessment"},
+        {"priority_assessment", "practice_workflow"},
     ),
     "compatibility": (
         {"game_build", "from_knowledge", "to_knowledge", "disposition", "rationale"},
@@ -199,6 +199,10 @@ def validate_payload(kind, build, payload):
     ):
         raise ValidationError("Distinct reviewed move versions are required")
     if kind == "drill":
+        if "practice_workflow" in payload:
+            from analysis.practice import workflow
+
+            workflow(payload["practice_workflow"])
         if "priority_assessment" in payload:
             from analysis.player_model import priority_assessment
 

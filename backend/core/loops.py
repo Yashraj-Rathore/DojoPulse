@@ -70,7 +70,7 @@ def require_complete_captures(events):
 
 
 @transaction.atomic
-def create_assignment(owner, drill_key):
+def create_assignment(owner, drill_key, *, request_id=None, diagnosis=None):
     require_active(owner)
     drill = DefinitionVersion.objects.get(pk=drill_key, kind="drill")
     from backend.core.knowledge import require_definition
@@ -81,23 +81,72 @@ def create_assignment(owner, drill_key):
         owner.pk,
         kind="drill",
     )
-    return DrillAssignment.objects.create(owner=owner, drill=drill)
+    from backend.core.practice import assignment_diagnosis
+
+    input_hash = digest({"drill": drill_key, "diagnosis": diagnosis})
+    if request_id:
+        prior = DrillAssignment.objects.filter(owner=owner, request_id=request_id).first()
+        if prior:
+            if prior.diagnosis.get("input_hash") != input_hash or prior.status in {
+                "WITHDRAWN",
+                "CANCELLED",
+            }:
+                raise ValidationError("Assignment request belongs to different or withdrawn work")
+            prior._created = False
+            return prior
+    snapshot = assignment_diagnosis(owner, drill, diagnosis) if diagnosis is not None else {}
+    if request_id:
+        snapshot["input_hash"] = input_hash
+    item = DrillAssignment.objects.create(
+        owner=owner,
+        drill=drill,
+        drill_hash=drill.content_hash,
+        request_id=request_id,
+        diagnosis=snapshot,
+    )
+    item._created = True
+    return item
 
 
 @transaction.atomic
 def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start, followup_end):
     require_active(owner)
     assignment = DrillAssignment.objects.select_for_update().get(pk=assignment_id, owner=owner)
+    if assignment.status in {"WITHDRAWN", "CANCELLED"}:
+        raise ValidationError("Assignment is withdrawn or cancelled")
     events = owned_events(owner, baseline_ids)
     require_complete_captures(events)
     if not events:
         raise ValidationError("Baseline cannot be empty")
+    from backend.core.search import current_events
+
+    if set(
+        current_events(owner).filter(pk__in=[e.pk for e in events]).values_list("pk", flat=True)
+    ) != {e.pk for e in events}:
+        raise ValidationError("Baseline must use the current analysis publication")
     evidence = [as_opportunity(e) for e in events]
     if any(e.deleted or e.mode != "ranked" for e in evidence):
         raise ValidationError("Baseline must be undeleted real-match evidence")
     if any(not e.match.chronology_verified for e in events):
         raise ValidationError("Chronology requires review")
     first = evidence[0]
+    from backend.core.player_model import scope_of
+
+    if len({digest(scope_of(e)) for e in events}) != 1:
+        raise ValidationError("Baseline measurement hashes or platforms are mixed")
+    for field, value in (
+        ("metric_definition", first.metric),
+        ("knowledge_revision", first.knowledge_revision),
+    ):
+        if field in assignment.drill.payload and assignment.drill.payload[field] != value:
+            raise ValidationError("Drill does not match baseline measurement")
+    reviewed_workflow = assignment.drill.payload.get("practice_workflow")
+    if reviewed_workflow and reviewed_workflow["context"] != first.context:
+        raise ValidationError("Drill context does not match baseline")
+    if assignment.diagnosis.get("membership"):
+        pinned = dict(assignment.diagnosis["membership"])
+        if any(pinned.get(e.id) != e.content_hash for e in evidence):
+            raise ValidationError("Baseline must belong to the pinned assignment diagnosis")
     if (
         assignment.drill.payload.get("situation_definition") != first.situation
         or assignment.drill.payload.get("game_build") != first.game_build
@@ -171,9 +220,11 @@ def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start
 
 
 @transaction.atomic
-def record_practice(owner, assignment_id, event_ids):
+def record_practice(owner, assignment_id, event_ids, *, request_id=None):
     require_active(owner)
     assignment = DrillAssignment.objects.select_for_update().get(pk=assignment_id, owner=owner)
+    if assignment.status in {"WITHDRAWN", "CANCELLED"}:
+        raise ValidationError("Assignment is withdrawn or cancelled")
     from backend.core.knowledge import require_definition
 
     require_definition(
@@ -185,6 +236,22 @@ def record_practice(owner, assignment_id, event_ids):
     events = owned_events(owner, event_ids)
     if not events:
         raise ValidationError("No practice evidence")
+    from backend.core.practice import capture_end, validate_link
+
+    validate_link(owner, assignment, events)
+    if request_id:
+        prior = TrainingSession.objects.filter(owner=owner, request_id=request_id).first()
+        if prior:
+            if prior.assignment_id != assignment.pk or sorted(
+                prior.setup.get("event_ids", [])
+            ) != sorted(map(str, event_ids)):
+                raise ValidationError("Practice request belongs to different evidence")
+            prior._created = False
+            return prior
+    if DrillAttempt.objects.filter(session__assignment=assignment).count() + len(events) > 2000:
+        raise ValidationError(
+            "Practice exceeds 2000 linked trials; create a new reviewed assignment"
+        )
     situation = assignment.drill.payload["situation_definition"]
     if any(
         e.match.mode != "practice"
@@ -207,12 +274,18 @@ def record_practice(owner, assignment_id, event_ids):
     played_keys = [f"{e.match_id}:{e.played_key}" for e in events]
     if DrillAttempt.objects.filter(played_key__in=played_keys).exists():
         raise ValidationError("Reprocessed practice cannot count twice")
-    completed_at = max(e.match.played_at for e in events)
+    completed_at = max(capture_end(e) for e in events)
     session = TrainingSession.objects.create(
         owner=owner,
         assignment=assignment,
         completed_at=completed_at,
-        setup={"verification": "human-adjudication/1", "event_ids": [str(e.pk) for e in events]},
+        request_id=request_id,
+        setup={
+            "verification": "human-adjudication/1",
+            "event_ids": sorted(str(e.pk) for e in events),
+            "drill_hash": assignment.drill.content_hash,
+            "workflow_hash": digest(assignment.drill.payload.get("practice_workflow")),
+        },
     )
     for i, event in enumerate(events):
         DrillAttempt.objects.create(
@@ -220,6 +293,7 @@ def record_practice(owner, assignment_id, event_ids):
         )
     assignment.status = "PRACTICED"
     assignment.save(update_fields=["status"])
+    session._created = True
     return session
 
 
@@ -263,41 +337,30 @@ def evaluate_plan(owner, plan_id, followup_ids):
             )
     if any(not e.match.chronology_verified for e in baseline + followup):
         raise ValidationError("Chronology requires review")
-    sessions = TrainingSession.objects.filter(
-        assignment=plan.assignment, owner=owner, completed_at__isnull=False
-    )
-    from analysis.contracts import aware_time
+    from backend.core.player_model import scope_of
+    from backend.core.practice import current_practice
 
-    sessions = sessions.filter(
-        completed_at__gte=aware_time(spec.baseline_end),
-        completed_at__lte=aware_time(spec.followup_start),
+    practice, unavailable = current_practice(
+        owner, plan.assignment, plan=plan, spec=spec, scope=scope_of(baseline[0])
     )
-    attempts = DrillAttempt.objects.filter(
-        session__in=sessions,
-        source_event__deleted_at__isnull=True,
-        source_event__match__deleted_at__isnull=True,
-        source_event__match__asset__deleted_at__isnull=True,
-        source_event__match__asset__isnull=False,
-        source_event__eligibility="ELIGIBLE",
-        source_event__outcome__in=["SUCCESS", "FAILURE"],
-        source_event__verified=True,
-        source_event__match__played_at__gte=aware_time(spec.baseline_end),
-        source_event__match__played_at__lte=aware_time(spec.followup_start),
-    ).exclude(source_event__match__metadata_state="REVIEW_REQUIRED")
-    if spec.dataset_kind == "real":
-        attempts = attempts.filter(source_event__match__played_at__gte=plan.created_at)
-    completed = sessions.order_by("-completed_at").first()
+    observations = [as_opportunity(e) for e in practice]
+    from backend.core.practice import capture_end
+
+    completed_at = max((capture_end(e) for e in practice), default=None)
     result = evaluate(
         spec,
         [as_opportunity(e) for e in baseline],
         [as_opportunity(e) for e in followup],
-        verified_practice=attempts.count(),
-        practice_completed_at=completed.completed_at.isoformat() if completed else None,
+        verified_practice=0
+        if unavailable
+        else sum(
+            o.eligibility == "ELIGIBLE" and o.outcome in {"SUCCESS", "FAILURE"}
+            for o in observations
+        ),
+        practice_completed_at=completed_at.isoformat() if completed_at else None,
     )
-    result["practice_membership"] = sorted(
-        (str(a.source_event_id), as_opportunity(a.source_event).content_hash)
-        for a in attempts.select_related("source_event__match__asset")
-    )
+    result["practice_membership"] = sorted((o.id, o.content_hash) for o in observations)
+    result["unavailable_practice_trials"] = unavailable
     previous = plan.evaluations.order_by("-revision").first()
     if previous and digest(previous.result) == digest(result) and not previous.invalidated_at:
         return previous

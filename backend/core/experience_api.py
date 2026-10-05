@@ -276,6 +276,8 @@ def notices(request):
 def export_account(request):
     active_owner(request.user)
     user = request.user
+    # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
+    # raw provider payloads or reviewer/opponent identities enter this export.
     from backend.core.models import (
         AccountEmail,
         AttemptMetric,
@@ -291,13 +293,26 @@ def export_account(request):
         PilotEnrollment,
         PilotReview,
         PilotSession,
+        PracticeLog,
         RunBudget,
         UploadSession,
     )
 
-    # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
-    # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "practice_reports": (
+            PracticeLog.objects.filter(owner=user).exclude(state="DELETED"),
+            [
+                "id",
+                "assignment_id",
+                "state",
+                "started_at",
+                "ended_at",
+                "reported_attempts",
+                "obstacle",
+                "pins",
+                "created_at",
+            ],
+        ),
         "dataset_collections": (
             DatasetCollection.objects.filter(owner=user),
             [
@@ -474,7 +489,10 @@ def export_account(request):
                 "verified",
             ],
         ),
-        "assignments": (DrillAssignment.objects.filter(owner=user), ["id", "drill_id", "status"]),
+        "assignments": (
+            DrillAssignment.objects.filter(owner=user),
+            ["id", "drill_id", "status", "drill_hash", "diagnosis"],
+        ),
         "practice": (
             TrainingSession.objects.filter(owner=user),
             ["id", "assignment_id", "completed_at", "mode"],

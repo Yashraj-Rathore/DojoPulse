@@ -87,6 +87,12 @@ dataset = DatasetCollection.objects.create(owner=manager, title='Synthetic erasu
 DatasetStudy.objects.create(dataset=dataset, study=study)
 DatasetSnapshot.objects.create(dataset=dataset, sequence=1, request_id=uuid.uuid4(), data={'private': 'must-erase'})
 DatasetPartition.objects.create(dataset=dataset, kind='PLAYER', token='a'*64, binding='', split='held-out')
+from backend.core.models import DrillAssignment, PracticeLog
+practice_drill = DefinitionVersion.objects.create(key='recovery/drill/1', kind='drill', status='APPROVED', payload={'synthetic_only': True})
+assignment = DrillAssignment.objects.create(owner=manager, drill=practice_drill, drill_hash=practice_drill.content_hash, diagnosis={'private': 'must-erase'})
+PracticeLog.objects.create(owner=manager, assignment=assignment, request_id=uuid.uuid4(), state='COMPLETED',
+    started_at=timezone.now(), ended_at=timezone.now(), reported_attempts=40, pins={'private': 'must-erase'})
+
 """
 
 DELETE = """
@@ -139,6 +145,10 @@ assert not DatasetCollection.objects.filter(deleted_at=None).exists()
 assert not DatasetSnapshot.objects.filter(invalidated_at=None).exists()
 assert not DatasetSnapshot.objects.exclude(data={}).exists()
 assert not DatasetPartition.objects.exists()
+from backend.core.models import PracticeLog, DrillAssignment
+assert not PracticeLog.objects.exists()
+assert not DrillAssignment.objects.exclude(diagnosis={}, status='CANCELLED').exists()
+
 # Its immutable historical definition is retained; the restored grant is permanently revoked.
 for asset in ReplayAsset.objects.all():
     assert not private_path(asset.storage_key).exists()

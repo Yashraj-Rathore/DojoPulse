@@ -108,8 +108,37 @@ def session(request):
 
 
 @api_view(["GET"])
+@handled
+@transaction.atomic
 def overview(request):
     user = request.user
+    lock_owner(user.pk)
+    from backend.core.practice import current_practice
+    from backend.core.security import capacity_lock
+
+    capacity_lock()
+    practice_data, by_assignment = [], {}
+    for session in TrainingSession.objects.filter(owner=user).select_related("assignment")[:50]:
+        if session.assignment_id not in by_assignment:
+            try:
+                rows, _ = current_practice(user, session.assignment)
+                by_assignment[session.assignment_id] = {e.pk: e for e in rows}
+            except (EvaluationPlan.DoesNotExist, ValidationError, ValueError):
+                by_assignment[session.assignment_id] = {}
+        linked = list(session.attempts.values_list("source_event_id", flat=True))
+        current = by_assignment[session.assignment_id]
+        observations = [as_opportunity(current[key]) for key in linked if key in current]
+        practice_data.append(
+            {
+                "id": session.pk,
+                "assignment_id": session.assignment_id,
+                "attempts": len(linked),
+                "available_attempts": len(observations),
+                "unavailable_attempts": len(linked) - len(observations),
+                "summary": summarize(observations),
+                "completed_at": session.completed_at,
+            }
+        )
     from backend.core.knowledge import visible_drills
 
     events = (
@@ -167,21 +196,7 @@ def overview(request):
                 .order_by("-created_at")
                 .values("id", "plan_id", "revision", "result", "invalidated_at")[:50]
             ),
-            "practice": [
-                {
-                    "id": s.pk,
-                    "assignment_id": s.assignment_id,
-                    "attempts": s.attempts.count(),
-                    "summary": summarize(
-                        [
-                            as_opportunity(a.source_event)
-                            for a in s.attempts.select_related("source_event__match__asset")
-                        ]
-                    ),
-                    "completed_at": s.completed_at,
-                }
-                for s in TrainingSession.objects.filter(owner=user)[:50]
-            ],
+            "practice": practice_data,
         }
     )
 
@@ -309,6 +324,13 @@ def media(request, asset_id):
 
 class AssignmentInput(serializers.Serializer):
     drill_key = serializers.CharField(max_length=160)
+    request_id = serializers.UUIDField(required=False)
+    diagnosis = serializers.JSONField(required=False)
+
+    def validate(self, values):
+        if "diagnosis" in values and "request_id" not in values:
+            raise serializers.ValidationError("Evidence-backed assignments need a request ID")
+        return values
 
 
 class PlanInput(serializers.Serializer):
@@ -323,6 +345,7 @@ class PlanInput(serializers.Serializer):
 
 class MembershipInput(serializers.Serializer):
     event_ids = serializers.ListField(child=serializers.UUIDField(), max_length=2000)
+    request_id = serializers.UUIDField(required=False)
 
 
 @api_view(["POST"])
@@ -330,8 +353,8 @@ class MembershipInput(serializers.Serializer):
 def assignments(request):
     data = AssignmentInput(data=request.data)
     data.is_valid(raise_exception=True)
-    item = create_assignment(request.user, data.validated_data["drill_key"])
-    return Response({"id": item.pk, "status": item.status}, status=201)
+    item = create_assignment(request.user, **data.validated_data)
+    return Response({"id": item.pk, "status": item.status}, status=201 if item._created else 200)
 
 
 @api_view(["POST"])
@@ -351,8 +374,10 @@ def plans(request):
 def practice(request, assignment_id):
     data = MembershipInput(data=request.data)
     data.is_valid(raise_exception=True)
-    item = record_practice(request.user, assignment_id, data.validated_data["event_ids"])
-    return Response({"id": item.pk, "attempts": item.attempts.count()}, status=201)
+    item = record_practice(request.user, assignment_id, **data.validated_data)
+    return Response(
+        {"id": item.pk, "attempts": item.attempts.count()}, status=201 if item._created else 200
+    )
 
 
 @api_view(["POST"])

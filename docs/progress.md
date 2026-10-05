@@ -1215,3 +1215,48 @@ log and M10 qualification with actual source-code checks; keep ordinary CI and
 monitor the actual latest main tip before handoff. Next: acquire permitted
 M07/M08 exact-build evidence and real expert/player diagnosis qualification before
 real M09/M10 release; provider/hosted/source-access/dependency gates remain separate.
+
+
+### 2026-10-05 - M11 local practice implementation (qualification in progress)
+
+M11.01-M11.07: added a new immutable reviewed workflow contract, diagnosis-pinned assignments,
+owned self-report lifecycle, complete/current exact-scope practice linking, source-end chronology,
+conservative progression and guided UI. M11.05 reopened after identifying partial/stale selection
+and chronology gaps; no real drill, G4, expert or player effectiveness result is implied.
+Changed analysis/practice.py, backend/core practice/API/models/loops/knowledge/privacy/restore,
+migration 0019 and frontend practice guide/assignment integration. Validation is in progress;
+initial focused PostgreSQL run started. Publication remains pending. Next: qualify lifecycle,
+concurrency, migration/restore, UI and full regression before publishing directly on main.
+
+
+### 2026-10-05 - M11 local module qualification completed; publication pending
+
+M11.01-M11.07 plus M07.05, M10.02, M12.01-M12.03, M13.04/.06/.07,
+M14.04/.05, M15.01/.06, M16.05, M01.05/.06 and M19.02: coherent local practice
+module is implemented. M11.05 was explicitly reopened and fixed for complete/current
+scope, source-end chronology and current exposure; local qualification restores DONE.
+M11.07 remains PARTIAL until the exact published main commit passes CI.
+
+Changes: analysis/practice.py; backend/core practice, practice_api, models, migration 0019,
+loops, knowledge, player_model, api, export/storage/recovery/native rehearsal; backend/config
+routes; frontend practice guide, home/diagnosis assignment integration and browser fixtures;
+meaningful practice/governance/browser tests; architecture 2.14.0, practice contract,
+ADR-022, D034, data-model/improvement-loop docs and M11 qualification evidence.
+
+Actual validation: full PostgreSQL 446 passed/seven separately exercised Docker skips in
+287.24s, before final overview/immutable-pin refinements and the added positive-reevaluation
+case. Final 114 affected PostgreSQL tests passed in 86.70s, including concurrency, owner/CSRF,
+consent, complete/current/cross-scope/window checks, unknowns/real gate, stale/expired exposure,
+JSON-stable original memberships, governed new-version review, retries/export/account erasure.
+An earlier focused run had 113 passes and a tuple-versus-JSON-array test expectation failure;
+canonical digest comparison corrected it. Final 43 Edge journeys passed in 54.2s; mobile
+390px guide inspected without overflow. Production Next build, ESLint/TypeScript, Ruff/format
+(211 files), mypy (26 modules), Django/schema and local migration 0019 pass. Native PostgreSQL
+fresh forward/reverse/forward, actual dump/restore, repeat replay, controls-before-reads and
+pending-upload/report/diagnosis erasure pass; production RPO/RTO remains unmeasured.
+
+Assumptions/gates: reviewed thresholds are research proposals; no game facts, expert
+credentials, source/provider permissions, real participants, G4/utility or hosted approval
+invented. Reports remain adherence only and add zero comparison exposure. No endpoint,
+dependency or provider activation. Next: push directly to main with normal CI and monitor
+all six jobs, then publish/update the checked progress receipt and monitor the final tip.
