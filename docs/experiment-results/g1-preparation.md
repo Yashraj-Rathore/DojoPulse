@@ -35,8 +35,23 @@ recognition activation or canonical events. Existing immutable snapshot QA is un
 
 Local npm validation initially stalled under restricted execution. The permission-enabled
 frontend checks completed; the stale wrapper was terminated. No code/dependency workaround
-or test guard was introduced. Remote full-suite/sandbox/Terraform/container/audit CI and actual
-latest-tip publication must still be monitored before verified delivery.
+or test guard was introduced.
+
+## Actual source CI qualification
+
+Published source **e6743424fabc82a867e84dfc473d9399a3b95ccc** passed all six jobs in
+[run 37380495040](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37380495040),
+first attempt, completed 2026-10-05 22:19:16 UTC. Watcher exited 0; exact SHA and all six
+completed/success states verified. Downloaded backend artifact: 526 cases, **519 passes**,
+seven separately gated Docker skips, zero errors/failures, 550.267s. Downloaded sandbox
+artifact: **seven actual Docker/max-profile passes**, zero skips/errors/failures, 142.471s.
+Completed job logs: **52 Chromium passes** (47.8s), **three Terraform mocks**. Audits/static/
+format/types/build/application-container/unprivileged-startup checks and native PostgreSQL
+guarded migration/dump/restore/erasure rehearsal passed. No retry or test guard change needed.
+
+The final tracking receipt retains ordinary CI; its actual latest main SHA must be monitored
+before verified delivery. Source software qualification does not establish real gameplay,
+external source permissions, exact game build, expertise or hosted readiness.
 
 ## Acquisition result and remaining work
 

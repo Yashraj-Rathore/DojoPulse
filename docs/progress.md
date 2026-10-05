@@ -1605,3 +1605,32 @@ No footage/reviewer approval claimed. Qualifying capture count remains zero; gam
 unavailable here, even though installation was found. Next: publish main with enabled CI and
 monitor exact tip; obtain permitted originals and independent exact-build facts/labels before
 real recognition. Both progress files and D037/current architecture reflect this boundary.
+
+### 2026-10-05 - G1 preparation source published; exact CI pending
+
+M08.08, M01.05/.06 and M19.02: committed/pushed e6743424fabc82a867e84dfc473d9399a3b95ccc
+directly to main with ordinary CI (17 files, including both progress files). Remote branch
+inventory before publication contains only main; local tree was clean after commit. Actual
+source run 37380495040 is in progress; no source-wide remote success claimed yet. Earlier
+local checks retain the exact scoped results above. Real footage/expertise and G1/G2 still
+missing. Monitor all six source jobs, then publish a normal-CI qualification receipt and
+verify the actual final tip. No feature branch or paid/cloud/provider activation.
+
+### 2026-10-05 - G1 preparation source fully qualified; final receipt keeps CI enabled
+
+M08.08, M08.02-M08.05, M07.02, M09.02-M09.04, M01.02/.05/.06 and M19.02:
+source e6743424fabc82a867e84dfc473d9399a3b95ccc passed all six jobs in run 37380495040,
+first attempt, completed 22:19:16 UTC. Exact SHA/all six success states and watcher exit 0
+verified. Downloaded backend XML: 526 cases, 519 passes/seven separately gated Docker skips,
+zero errors/failures, 550.267s. Downloaded sandbox XML: seven actual Docker/max-profile
+passes, zero skips/errors/failures, 142.471s. Completed logs: 52 Chromium passes (47.8s)
+and three Terraform mocks; audits/static/format/types/build/container/unprivileged startup
+and guarded native PostgreSQL migration/dump/restore/erasure passed. Remote main still exactly
+e674342 before preparing this receipt. No CI retry or source/test guard change required.
+
+Updated PRODUCT_PROGRESS.md current checks/publication/M08.08/M19.02/next position, this log,
+G1 software qualification and D037. Local M08.08 DONE does not complete actual M07/M08/M09:
+zero qualifying real captures, no verified in-game build/overlays/experts/independent labels;
+G1/G2 remain NOT_RUN. Publish this ordinary-CI tracking receipt, monitor its actual latest main
+SHA, then confirm local/remote/head/branch consistency and clean tree. No skip instructions,
+feature branches, game control, external collection, private transport or hosted release.
