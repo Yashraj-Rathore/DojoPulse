@@ -13,6 +13,7 @@ from backend.core.match_api import private
 from backend.core.match_ingestion import active_owner
 from backend.core.models import (
     AnalysisRun,
+    ComparisonSession,
     DrillAssignment,
     EvaluationPlan,
     Feedback,
@@ -299,6 +300,20 @@ def export_account(request):
     )
 
     tables = {
+        "comparison_sessions": (
+            ComparisonSession.objects.filter(owner=user).exclude(state="DELETED"),
+            [
+                "id",
+                "plan_id",
+                "phase",
+                "revision",
+                "code",
+                "state",
+                "played_at",
+                "match_ids",
+                "content_hash",
+            ],
+        ),
         "practice_reports": (
             PracticeLog.objects.filter(owner=user).exclude(state="DELETED"),
             [
@@ -499,11 +514,11 @@ def export_account(request):
         ),
         "plans": (
             EvaluationPlan.objects.filter(owner=user),
-            ["id", "assignment_id", "specification", "content_hash"],
+            ["id", "assignment_id", "specification", "protocol", "content_hash"],
         ),
         "evaluations": (
             ImprovementEvaluation.objects.filter(owner=user),
-            ["id", "plan_id", "revision", "result", "invalidated_at"],
+            ["id", "plan_id", "phase", "revision", "result", "invalidated_at"],
         ),
         "feedback": (
             Feedback.objects.filter(owner=user),

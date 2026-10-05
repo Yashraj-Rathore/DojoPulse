@@ -75,3 +75,10 @@ append-only self-reported adherence with bounded times/counts, categorical obsta
 version hashes. Reports never become DrillAttempts. Deletion tombstones prevent UUID retry
 resurrection; account deletion and every quarantined restore erase reports/diagnoses.
 See the [practice contract](practice-workflow.md); rollback refuses private M11 history.
+
+
+The [M12 longitudinal contract](longitudinal-evaluation.md) extends frozen EvaluationPlan
+with optional protocol/request pins, ImprovementEvaluation with immutable phase revisions,
+and owned append-only ComparisonSession receipts. All recorded current target events,
+source/decoder manifests, missing collection and original practice dates qualify results;
+retention cannot rewrite a baseline or authorize real effectiveness/power claims.

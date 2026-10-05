@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.14.0. Decision date: 2026-10-05. Status: local engineering approved;
+Version: 2.15.0. Decision date: 2026-10-05. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -159,3 +159,9 @@ The [M10 player model](player-model.md) projects version-specific reviewed diagn
 explicit independently reviewed research priorities, timestamp cards and separate recorded
 result/gameplay histories. Proposed policy thresholds and relative assessments still require
 real expert/player qualification; no real diagnosis release is implied by local tests.
+
+
+M12 now follows [the longitudinal evaluation contract](longitudinal-evaluation.md):
+predeclared follow-up/retention, complete current collections and owned gap receipts,
+exact decoder/source pins, append-only private reproducible reports and baseline-only
+planning. ADR-023 preserves legacy hashes; real G5/G6, actual power and bias remain gated.

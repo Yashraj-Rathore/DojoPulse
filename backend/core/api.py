@@ -139,6 +139,7 @@ def overview(request):
                 "completed_at": session.completed_at,
             }
         )
+    from backend.core.comparison_api import result_view as comparison_result
     from backend.core.knowledge import visible_drills
 
     events = (
@@ -191,11 +192,12 @@ def overview(request):
                 .order_by("-created_at")
                 .values("id", "situation", "state", "summary")[:50]
             ),
-            "evaluations": list(
-                ImprovementEvaluation.objects.filter(owner=user)
-                .order_by("-created_at")
-                .values("id", "plan_id", "revision", "result", "invalidated_at")[:50]
-            ),
+            "evaluations": [
+                {"plan_id": row.plan_id, **comparison_result(user, row)}
+                for row in ImprovementEvaluation.objects.filter(owner=user)
+                .select_related("plan__assignment")
+                .order_by("-created_at")[:50]
+            ],
             "practice": practice_data,
         }
     )
@@ -334,6 +336,8 @@ class AssignmentInput(serializers.Serializer):
 
 
 class PlanInput(serializers.Serializer):
+    request_id = serializers.UUIDField(required=False)
+    schedule = serializers.JSONField(required=False)
     assignment_id = serializers.UUIDField()
     baseline_ids = serializers.ListField(
         child=serializers.UUIDField(), min_length=1, max_length=2000
@@ -366,7 +370,10 @@ def plans(request):
     for key in ("baseline_end", "followup_start", "followup_end"):
         values[key] = values[key].isoformat()
     plan = create_plan(request.user, **values)
-    return Response({"id": plan.pk, "specification": plan.specification}, status=201)
+    return Response(
+        {"id": plan.pk, "specification": plan.specification, "protocol": plan.protocol},
+        status=201 if plan._created else 200,
+    )
 
 
 @api_view(["POST"])
@@ -380,12 +387,29 @@ def practice(request, assignment_id):
     )
 
 
+class EvaluationInput(serializers.Serializer):
+    event_ids = serializers.ListField(
+        child=serializers.UUIDField(), max_length=2000, required=False
+    )
+    phase = serializers.ChoiceField(choices=["FOLLOWUP", "RETENTION"], default="FOLLOWUP")
+
+    def validate(self, values):
+        if set(self.initial_data) - set(self.fields):
+            raise serializers.ValidationError("Unsupported comparison input")
+        return values
+
+
 @api_view(["POST"])
 @handled
 def evaluations(request, plan_id):
-    data = MembershipInput(data=request.data)
+    data = EvaluationInput(data=request.data)
     data.is_valid(raise_exception=True)
-    item = evaluate_plan(request.user, plan_id, data.validated_data["event_ids"])
+    item = evaluate_plan(
+        request.user,
+        plan_id,
+        data.validated_data.get("event_ids"),
+        phase=data.validated_data["phase"],
+    )
     return Response(
         {
             "id": item.pk,

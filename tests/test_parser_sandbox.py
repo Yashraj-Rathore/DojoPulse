@@ -88,6 +88,7 @@ def test_malformed_media_abstains_without_host_artifacts(inputs, tmp_path):
     source, metadata = inputs
     result = analyze_isolated(source, tmp_path / "report.json", metadata)
     assert result["status"] == "FAILED" and result["opportunities"] == []
+    assert result["decoder_identity"] == {"contract": "isolated-media/1", "image_sha256": IMAGE}
     assert not (tmp_path / "report.json").exists()
 
 

@@ -74,10 +74,17 @@ def apply_restore_controls():
         from backend.core.datasets import restore_revoke as revoke_datasets
 
         revoke_datasets()
-        from backend.core.models import DrillAssignment, PracticeLog
+        from backend.core.models import (
+            ComparisonSession,
+            DrillAssignment,
+            ImprovementEvaluation,
+            PracticeLog,
+        )
 
         # Restore cannot resurrect a removed report or trust an old diagnosis authorization.
         PracticeLog.objects.all().delete()
+        ComparisonSession.objects.all().delete()
+        ImprovementEvaluation.objects.filter(invalidated_at=None).update(invalidated_at=now)
         DrillAssignment.objects.all().update(diagnosis={}, status="CANCELLED")
 
     token = replaying.set(True)

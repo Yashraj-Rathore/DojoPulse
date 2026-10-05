@@ -1283,3 +1283,96 @@ remain NOT_RUN. No production/provider/recognizer activation. This receipt is pu
 ordinary CI and the actual latest main tip is monitored before handoff. Next: acquire
 permitted exact-build M07/M08 evidence and qualified experts for real M09/M10/M11/G1/G4;
 provider/hosting/security/dependency gates remain separate.
+
+
+### 2026-10-05 - M12 local longitudinal module implementation started
+
+M12.01-M12.08: extending frozen plans with optional predeclared follow-up/retention
+schedules, exact measurement/source/decoder pins, baseline-only planning diagnostics,
+append-only owned session reports and phased result revisions. Legacy plan hashes stay
+stable. Changed analysis/comparison.py, core models/comparisons/loops/API and guarded
+migration 0020. Validation: initial mypy passed; full runtime/privacy/UI qualification
+not yet run. No real cohort, effect, power, provider usage or hosted approval invented.
+Next: complete private comparison reports, consent/erasure lifecycle and guided UI,
+then PostgreSQL/browser/native regression, direct-main publication and latest-tip CI.
+
+
+### 2026-10-05 - M12 report, privacy and comparison UI implemented
+
+M12.01-M12.08, M13.04/.06/.07, M14.04/.05, M15.01/.06, M16.05,
+M01.05/.06 and M19.02: completed comparison detail/download and collection report APIs,
+current availability projections, trusted coordinator decoder pins, account export/erasure
+and restore controls plus native rehearsal fixtures. Added retention planning, owned gap
+reporting/retries, source views and inactive result handling to the player UI. Architecture
+2.15.0, ADR-023 and D035 record boundaries. Existing 26 loop/practice PostgreSQL tests pass
+in 42.87s; Ruff/mypy27 and UI lint/typecheck pass. New meaningful comparison/privacy/
+concurrency and four browser cases added; focused/full/native/build validation in progress.
+Real G5/G6/bias/power/utility remain NOT_RUN. Next: resolve regression findings, qualify
+full module and publish/monitor direct main with ordinary CI.
+
+
+### 2026-10-05 - M12 qualification findings and source expiration refinement
+
+M12.02/.03/.06/.08, M13.04/.06/.07 and M16.05: local source availability,
+retention expiry and attribution now explicitly gate comparison currentness; per-match/run
+provenance avoids conflating shared runs and avoids duplicate availability reads within a
+collection. All 47 Edge journeys passed in 45.9s; 390px provenance/hash view inspected with
+no overflow. Native migration/dump/restore/repeat erasure passed after correcting the new
+synthetic fixture to include baseline membership. First new focused run: 45 passed/two
+fixture failures (nonexistent platform field and duplicate played keys); next run 20
+passed/one stale test-fixture platform mutation; corrected to actual asset metadata. These
+are recorded failures, not approvals. Final full PostgreSQL, affected regression and final
+build/browser refinement checks are running; publication pending. Real gates unchanged.
+
+
+### 2026-10-05 - M12 final provenance and display review
+
+M12.03/.06/.08 and M13.04/.07: reuse per-match/run frozen measurement manifests
+when checking exact source compatibility (including practice) and label retention in
+the main result view. This keeps complete provenance while reducing duplicate source
+queries. Four final M12 browser cases passed in 8.6s; final production build passed;
+full Python run continues and final affected regression will cover this refinement.
+No real/provider/hosted gates changed.
+
+
+### 2026-10-05 - M12 full regression completed; concurrency hook updated
+
+M12.03/.08 and M15.01: full PostgreSQL run recorded 468 passes, seven separately
+exercised Docker skips and one failure in 477.65s. The existing deletion-versus-evaluation
+race test patched the old loops.evaluate import after the engine moved to comparisons;
+updated the hook to pause the actual engine so the same ownership/deletion assertion
+remains exercised. Final affected PostgreSQL/concurrency regression now runs against the
+finished provenance refinements. All initial validation failures remain recorded; publication
+pending. Static218/mypy27 and final production build/lint/typecheck pass.
+
+
+### 2026-10-05 - M12 coherent local qualification completed; publication pending
+
+M12.01-M12.08 plus M13.04/.06/.07, M14.04/.05, M15.01/.06, M16.05,
+M01.05/.06 and M19.02: completed scheduled follow-up/retention, exact source/decoder/
+measurement pins, complete current collections and missing-session accounting, immutable
+phased reports/reproducible export, planning diagnostics and integrated comparison UI.
+M12.08 remains PARTIAL until the exact source publication passes CI; real M12.05-M12.07
+remain blocked/unvalidated, and G5/G6 remain NOT_RUN.
+
+Changed analysis/comparison.py; core comparison/API/models/loops/parser, experience export,
+storage/recovery/native rehearsal and migration 0020; routes; frontend guide/home/styles/
+fixtures/four browser cases; comparison and PostgreSQL-race/sandbox provenance tests;
+architecture 2.15.0, ADR-023/D035, comparison contract/domain/loop docs and qualification.
+
+Actual validation: final 50 affected PostgreSQL tests passed in 177.71s, no skips/failures/
+errors; 47 Edge journeys in 45.9s and final four M12 cases in 8.6s. Final production build,
+lint/TypeScript, Ruff/format218/mypy27, Django/schema/0020/loader/docs checks pass. Native
+fresh forward/reverse/forward, actual dump/restore and repeated controls/receipt erasure/
+result invalidation pass. Initial full run recorded 468 passes/one outdated race patch-hook
+failure/seven separately qualified Docker skips in 477.65s; fixed hook and actual deletion
+race passed in final affected run. Initial new fixture failures and native seed correction
+are retained above. No local actual Docker/hosted/scientific result is claimed.
+
+Assumptions: unknown old/synthetic decoder provenance stays unknown; real plans need a
+prospective schedule/known source/coordinator decoder pin, actual approvals and fixed-window
+completion. Upstream expiration does not erase an authorized stored copy; local source
+expiration/attribution/withdrawal prevents use. Reports add zero gameplay exposure; planning
+is baseline-only, actual power false, release false. Source/provider/hosting gates unchanged.
+Next: push ordinary commit directly to main, monitor all six jobs, then publish the progress
+receipt and monitor the actual final tip.

@@ -92,6 +92,14 @@ practice_drill = DefinitionVersion.objects.create(key='recovery/drill/1', kind='
 assignment = DrillAssignment.objects.create(owner=manager, drill=practice_drill, drill_hash=practice_drill.content_hash, diagnosis={'private': 'must-erase'})
 PracticeLog.objects.create(owner=manager, assignment=assignment, request_id=uuid.uuid4(), state='COMPLETED',
     started_at=timezone.now(), ended_at=timezone.now(), reported_attempts=40, pins={'private': 'must-erase'})
+from backend.core.models import EvaluationPlan, ComparisonSession, ImprovementEvaluation
+comparison = EvaluationPlan.objects.create(owner=manager, assignment=assignment,
+    specification={'dataset_kind': 'synthetic', 'baseline_membership': [], 'restore_fixture': True}, protocol={'restore_fixture': True})
+ComparisonSession.objects.create(owner=manager, plan=comparison, phase='FOLLOWUP', session_key='b'*64,
+    code='private-session', revision=1, request_id=uuid.uuid4(), state='MISSING', played_at=timezone.now(),
+    match_ids=[], content_hash='c'*64, input_hash='d'*64)
+ImprovementEvaluation.objects.create(owner=manager, plan=comparison, revision=1,
+    result={'restore_fixture': True})
 
 """
 
@@ -147,6 +155,9 @@ assert not DatasetSnapshot.objects.exclude(data={}).exists()
 assert not DatasetPartition.objects.exists()
 from backend.core.models import PracticeLog, DrillAssignment
 assert not PracticeLog.objects.exists()
+from backend.core.models import ComparisonSession, ImprovementEvaluation
+assert not ComparisonSession.objects.exists()
+assert not ImprovementEvaluation.objects.filter(invalidated_at=None).exists()
 assert not DrillAssignment.objects.exclude(diagnosis={}, status='CANCELLED').exists()
 
 # Its immutable historical definition is retained; the restored grant is permanently revoked.

@@ -690,11 +690,23 @@ class EvaluationPlan(Owned):
     assignment = models.OneToOneField(DrillAssignment, on_delete=models.PROTECT)
     specification = models.JSONField()
     content_hash = models.CharField(max_length=64, editable=False)
+    protocol = models.JSONField(default=dict)
+    request_id = models.UUIDField(null=True)
+    input_hash = models.CharField(max_length=64, default="")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="unique_plan_request")
+        ]
 
     def save(self, *args, **kwargs):
         if not self._state.adding:
             raise ValidationError("EvaluationPlan is frozen")
-        self.content_hash = digest(self.specification)
+        self.content_hash = (
+            digest({"specification": self.specification, "protocol": self.protocol})
+            if self.protocol
+            else digest(self.specification)
+        )
         kwargs["force_insert"] = True
         super().save(*args, **kwargs)
 
@@ -704,6 +716,7 @@ class ImprovementEvaluation(Owned):
     revision = models.PositiveIntegerField()
     result = models.JSONField()
     invalidated_at = models.DateTimeField(null=True)
+    phase = models.CharField(max_length=16, default="FOLLOWUP")
 
     class Meta:
         constraints = [
@@ -715,6 +728,46 @@ class ImprovementEvaluation(Owned):
             raise ValidationError("Evaluation results are append-only")
         kwargs["force_insert"] = True
         super().save(*args, **kwargs)
+
+
+class ComparisonSession(Owned):
+    """Append-only owned play ledger; reported gaps never become gameplay observations."""
+
+    plan = models.ForeignKey(EvaluationPlan, on_delete=models.CASCADE)
+    phase = models.CharField(max_length=16)
+    session_key = models.CharField(max_length=64)
+    code = models.CharField(max_length=100, default="")
+    revision = models.PositiveIntegerField()
+    request_id = models.UUIDField()
+    state = models.CharField(max_length=16)
+    played_at = models.DateTimeField(null=True)
+    match_ids = models.JSONField(default=list)
+    content_hash = models.CharField(max_length=64)
+    input_hash = models.CharField(max_length=64)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Comparison session receipts are append-only")
+        kwargs["force_insert"] = True
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "request_id"], name="unique_comparison_session_request"
+            ),
+            models.UniqueConstraint(
+                fields=["plan", "phase", "session_key", "revision"],
+                name="unique_comparison_session_revision",
+            ),
+            models.CheckConstraint(
+                condition=Q(phase__in=["FOLLOWUP", "RETENTION"]), name="valid_comparison_phase"
+            ),
+            models.CheckConstraint(
+                condition=Q(state__in=["RECORDED", "MISSING", "SKIPPED", "DELETED"]),
+                name="valid_comparison_session_state",
+            ),
+        ]
 
 
 class SecurityMutex(models.Model):

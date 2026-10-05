@@ -140,7 +140,13 @@ def analyze_isolated(source, output, metadata):
     try:
         result = run_bounded(command, timeout=330, max_output=1_048_576)
         try:
-            return validate_report(json.loads(result.stdout))
+            report = validate_report(json.loads(result.stdout))
+            # The credentialed coordinator pins its actual image; untrusted output cannot.
+            report["decoder_identity"] = {
+                "contract": "isolated-media/1",
+                "image_sha256": settings.PARSER_IMAGE,
+            }
+            return report
         except RecursionError as error:
             raise ValueError("INVALID_PARSER_REPORT") from error
     finally:

@@ -7,7 +7,6 @@ from django.db import transaction
 from django.utils import timezone
 
 from analysis.contracts import EvaluationSpec, digest
-from analysis.evaluation import evaluate
 from backend.core.evidence import as_opportunity
 from backend.core.models import (
     DefinitionVersion,
@@ -109,11 +108,38 @@ def create_assignment(owner, drill_key, *, request_id=None, diagnosis=None):
 
 
 @transaction.atomic
-def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start, followup_end):
+def create_plan(
+    owner,
+    assignment_id,
+    baseline_ids,
+    baseline_end,
+    followup_start,
+    followup_end,
+    *,
+    schedule=None,
+    request_id=None,
+):
     require_active(owner)
     assignment = DrillAssignment.objects.select_for_update().get(pk=assignment_id, owner=owner)
     if assignment.status in {"WITHDRAWN", "CANCELLED"}:
         raise ValidationError("Assignment is withdrawn or cancelled")
+    input_hash = digest(
+        {
+            "assignment": str(assignment_id),
+            "baseline": sorted(map(str, baseline_ids)),
+            "baseline_end": baseline_end,
+            "followup_start": followup_start,
+            "followup_end": followup_end,
+            "schedule": schedule,
+        }
+    )
+    if request_id:
+        prior = EvaluationPlan.objects.filter(owner=owner, request_id=request_id).first()
+        if prior:
+            if prior.input_hash != input_hash:
+                raise ValidationError("Plan request belongs to different frozen work")
+            prior._created = False
+            return prior
     events = owned_events(owner, baseline_ids)
     require_complete_captures(events)
     if not events:
@@ -199,6 +225,11 @@ def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start
 
     if any(aware_time(e.played_at) > aware_time(baseline_end) for e in evidence):
         raise ValidationError("Baseline extends beyond cutoff")
+    from backend.core.comparisons import make_protocol
+
+    if specification.dataset_kind == "real" and schedule is None:
+        raise ValidationError("Real comparison requires a prospective collection schedule")
+    protocol = make_protocol(schedule, specification, events) if schedule is not None else {}
     from analysis.statistics import summarize
 
     summary = summarize(evidence)
@@ -214,9 +245,16 @@ def create_plan(owner, assignment_id, baseline_ids, baseline_end, followup_start
     )
     assignment.recommendation = recommendation
     assignment.save(update_fields=["recommendation"])
-    return EvaluationPlan.objects.create(
-        owner=owner, assignment=assignment, specification=asdict(specification)
+    item = EvaluationPlan.objects.create(
+        owner=owner,
+        assignment=assignment,
+        specification=asdict(specification),
+        protocol=protocol,
+        request_id=request_id,
+        input_hash=input_hash,
     )
+    item._created = True
+    return item
 
 
 @transaction.atomic
@@ -298,75 +336,12 @@ def record_practice(owner, assignment_id, event_ids, *, request_id=None):
 
 
 @transaction.atomic
-def evaluate_plan(owner, plan_id, followup_ids):
+def evaluate_plan(owner, plan_id, followup_ids=None, *, phase="FOLLOWUP"):
     require_active(owner)
     plan = EvaluationPlan.objects.select_for_update().get(pk=plan_id, owner=owner)
-    spec = EvaluationSpec.from_dict(plan.specification)
-    from backend.core.knowledge import require_definition
+    from backend.core.comparisons import evaluate_comparison
 
-    require_definition(
-        plan.assignment.drill_id, spec.dataset_kind, owner.pk, kind="drill", historical=True
-    )
-    from analysis.contracts import aware_time
-
-    if spec.dataset_kind == "real" and timezone.now() < aware_time(spec.followup_end):
-        raise ValidationError("Fixed follow-up window has not ended; no repeated peeking")
-    baseline_ids = [key for key, _ in spec.baseline_membership]
-    baseline = owned_events(owner, baseline_ids)
-    followup = owned_events(owner, followup_ids)
-    require_complete_captures(followup)
-    if spec.dataset_kind == "real":
-        from django.db.models import F
-
-        expected = set(
-            GameplayEvent.objects.filter(
-                owner=owner,
-                situation=spec.situation,
-                metric=spec.metric,
-                match__context=spec.context,
-                match__mode="ranked",
-                match__dataset_kind="real",
-                match__played_at__gte=aware_time(spec.followup_start),
-                match__played_at__lte=aware_time(spec.followup_end),
-                run_id=F("match__analysispublication__run_id"),
-            ).values_list("pk", flat=True)
-        )
-        if expected != {e.pk for e in followup}:
-            raise ValidationError(
-                "Follow-up must include every recorded target opportunity in the frozen window"
-            )
-    if any(not e.match.chronology_verified for e in baseline + followup):
-        raise ValidationError("Chronology requires review")
-    from backend.core.player_model import scope_of
-    from backend.core.practice import current_practice
-
-    practice, unavailable = current_practice(
-        owner, plan.assignment, plan=plan, spec=spec, scope=scope_of(baseline[0])
-    )
-    observations = [as_opportunity(e) for e in practice]
-    from backend.core.practice import capture_end
-
-    completed_at = max((capture_end(e) for e in practice), default=None)
-    result = evaluate(
-        spec,
-        [as_opportunity(e) for e in baseline],
-        [as_opportunity(e) for e in followup],
-        verified_practice=0
-        if unavailable
-        else sum(
-            o.eligibility == "ELIGIBLE" and o.outcome in {"SUCCESS", "FAILURE"}
-            for o in observations
-        ),
-        practice_completed_at=completed_at.isoformat() if completed_at else None,
-    )
-    result["practice_membership"] = sorted((o.id, o.content_hash) for o in observations)
-    result["unavailable_practice_trials"] = unavailable
-    previous = plan.evaluations.order_by("-revision").first()
-    if previous and digest(previous.result) == digest(result) and not previous.invalidated_at:
-        return previous
-    return ImprovementEvaluation.objects.create(
-        owner=owner, plan=plan, revision=previous.revision + 1 if previous else 1, result=result
-    )
+    return evaluate_comparison(owner, plan, followup_ids, phase)
 
 
 def invalidate_for_events(event_ids):
@@ -381,6 +356,8 @@ def invalidate_for_events(event_ids):
         selected = result.plan.specification["baseline_membership"] + result.result.get(
             "followup_membership", []
         )
-        selected += result.result.get("practice_membership", [])
+        selected += result.result.get("practice_membership", []) + result.result.get(
+            "reference_membership", []
+        )
         if ids.intersection(str(x[0]) for x in selected):
             ImprovementEvaluation.objects.filter(pk=result.pk).update(invalidated_at=timezone.now())

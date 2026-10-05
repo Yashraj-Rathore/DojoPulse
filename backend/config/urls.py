@@ -4,6 +4,7 @@ from django.urls import path
 from backend.core import (
     account_api,
     api,
+    comparison_api,
     dataset_api,
     experience_api,
     knowledge_api,
@@ -88,4 +89,7 @@ urlpatterns = [
     path("api/plans", api.plans),
     path("api/assignments/<uuid:assignment_id>/practice", api.practice),
     path("api/plans/<uuid:plan_id>/evaluate", api.evaluations),
+    path("api/plans/<uuid:plan_id>/comparison", comparison_api.detail),
+    path("api/plans/<uuid:plan_id>/sessions", comparison_api.sessions),
+    path("api/comparison-sessions/<uuid:session_id>", comparison_api.remove_session),
 ]

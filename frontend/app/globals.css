@@ -21,3 +21,6 @@ html{scroll-padding-top:20px}button,input,select,summary,a,textarea{touch-action
 .knowledge-workspace select { max-width: 100%; }
 .knowledge-workspace select[multiple] { min-height: 6rem; }
 .player-model article, .player-model dd, .player-model li { overflow-wrap: anywhere; }
+
+[aria-label="Longitudinal comparison guide"] { overflow-wrap: anywhere; }
+[aria-label="Longitudinal comparison guide"] pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 28rem; overflow: auto; font-size: .85rem; }

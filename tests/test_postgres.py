@@ -75,7 +75,7 @@ def test_deletion_cannot_race_past_evaluation_publication(django_user_model):
             close_old_connections()
 
     with (
-        patch("backend.core.loops.evaluate", paused),
+        patch("backend.core.comparisons.evaluate", paused),
         ThreadPoolExecutor(max_workers=2) as executor,
     ):
         first = executor.submit(compare)

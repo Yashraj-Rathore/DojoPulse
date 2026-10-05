@@ -25,3 +25,10 @@ The [M11 practice workflow](practice-workflow.md) defines reviewed native instru
 version-pinned diagnosis assignments, complete current-source linking with recording-end
 chronology, separate self-reports and conservative progression. Frozen comparisons retain
 original memberships; unavailable linked practice cannot silently qualify a positive result.
+
+
+The [M12 longitudinal contract](longitudinal-evaluation.md) extends frozen EvaluationPlan
+with optional protocol/request pins, ImprovementEvaluation with immutable phase revisions,
+and owned append-only ComparisonSession receipts. All recorded current target events,
+source/decoder manifests, missing collection and original practice dates qualify results;
+retention cannot rewrite a baseline or authorize real effectiveness/power claims.
