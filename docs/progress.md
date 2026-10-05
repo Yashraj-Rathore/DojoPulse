@@ -1558,3 +1558,50 @@ capacity and hosted release remain required. Updated this log, PRODUCT_PROGRESS.
 and D036 qualification status. Publish this final receipt on main with CI enabled and monitor
 the actual final tip, with a clean local/remote/head/branch check. Scientific/provider/hosting
 activation and repository access-review/development-advisory work remain open.
+
+### 2026-10-05 - Real capture discovery and G1 assessment implementation, validation in progress
+
+M07.02-M07.05, M08.02-M08.05/M08.08, M09.02-M09.04 and M01.02: user authorized the
+first real recognition loop, then confirmed no capture paths/reviewers and requested YouTube
+or direct-game discovery. Public primary documentation and bounded local Steam/process/video
+inventory were reviewed. Tekken 8 is installed; no qualifying captures or exact in-game build
+were verified. Wavu documents metadata; a local recorder project uses in-client replay playback.
+The discovered Commons 2022 trailer is edited, outside the profile and has an unreviewed external
+licence claim. No video downloaded, game launched, contact sent or private endpoint called.
+
+Added analysis/observability.py, tools/assess_observability.py, owned live-checked snapshot API
+route and dataset UI/download. Report preserves all unresolved ranked TARGET windows, separates
+TRIAL/practice and target-absent controls, validates session/task membership, shows category/QC/
+timing/session gaps and source concentration, and compares exact proposed threshold boundaries.
+Reports contain aggregate counts/pins without source/reviewer identities or labels; G1 remains
+NOT_RUN and release approval false even for perfect/real-labelled receipts. Immutable dataset
+QA, M09 policies and canonical pipeline unchanged; no new database table/migration.
+
+Added tests/test_observability.py and browser coverage; capture/runbook, research, ADR-025,
+architecture 2.17.0, README, dataset contract, D037 and tracker synchronized. Actual checks so
+far: 19 new PostgreSQL/offline/API/privacy/threshold tests passed in 123.18s; Ruff passes and
+mypy checks 31 sources. Existing dataset/recognition compatibility, final frontend/static/build/
+browser/schema checks and publication remain pending. Actual footage, rights/protocol approval,
+exact-build expert facts, qualified independent labels, G1/G2 and real observation calibration
+remain blocked. Next: finish local checks, then acquire original permitted in-client recordings
+with verified overlays and independently review before developing/releasing real recognition.
+
+### 2026-10-05 - M08.08 local tooling qualified; real acquisition remains incomplete
+
+M08.02-M08.05/M08.08, M07.02 and M09.02-M09.04: 19 initial new tests passed (123.18s)
+plus one final private annotation-error case (13.38s); 53 existing dataset/recognition tests
+passed (291.77s). First full Edge suite had 51 passes and one new-test synchronization timeout:
+expiry was toggled before the prior refresh finished, correctly removing the report/button.
+Fixed the test sequence; six dataset Edge cases passed (9.9s). All application changes remain
+covered by passing scoped checks; full remote CI pending. Inspected mobile screenshot and
+overflow/keyboard checks pass. ESLint/typecheck/Next production build, Ruff/format/mypy 31,
+Django/migration consistency, 170 local links and diff checks pass. Optional DRF OpenAPI
+generation unavailable due to missing inflection; not recorded as successful, no dependency
+added. Restricted npm wrapper stalled; permission-enabled checks passed and stale wrapper stopped.
+
+Added docs/experiment-results/g1-preparation.md; tracker M08.08 DONE is local tooling only.
+M07/M08 actual evidence, M09 real observation implementation and G1/G2 remain incomplete.
+No footage/reviewer approval claimed. Qualifying capture count remains zero; game UI control is
+unavailable here, even though installation was found. Next: publish main with enabled CI and
+monitor exact tip; obtain permitted originals and independent exact-build facts/labels before
+real recognition. Both progress files and D037/current architecture reflect this boundary.

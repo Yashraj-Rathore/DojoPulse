@@ -361,3 +361,11 @@ The [dataset workspace](docs/architecture/dataset-operations.md) at `/datasets` 
 M07 releases to new consented pilot studies, collection-wide splits, frozen reviewed
 source manifests and timing/coverage QA. Private snapshots are revocable, with explicit
 owned-source canonical import; real footage, expert qualification and G1-G6 remain gates.
+
+Use **Assess observability** on a current `/datasets` snapshot, or run
+`.venv/Scripts/python.exe -m tools.assess_observability private_data/snapshot.json --output reports/g1-observability.json`,
+to inspect the proposed 20-capture G1 evidence. The
+[capture procedure and report contract](docs/architecture/observability-assessment.md) preserve
+unresolved windows, separate practice and disclose missing timing/coverage/expert checks.
+Reports do not approve real recognition; [source research](docs/research/capture-acquisition-2026-10-05.md)
+found no qualifying public capture set.

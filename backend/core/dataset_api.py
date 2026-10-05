@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from analysis.observability import assess
 from backend.core import datasets, knowledge
 from backend.core.api import handled
 from backend.core.match_api import private
@@ -150,7 +151,7 @@ def command(request, dataset_id, operation):
 @private
 @handled
 @transaction.atomic
-def download(request, dataset_id, snapshot_id):
+def download(request, dataset_id, snapshot_id, observability=False):
     owner, dataset = datasets.collection_for(request.user, dataset_id, require_live=False)
     if not datasets.live_measurement(dataset, historical=dataset.state == "FROZEN"):
         datasets.invalidate(dataset.pk, "MEASUREMENT_UNAVAILABLE")
@@ -159,7 +160,8 @@ def download(request, dataset_id, snapshot_id):
     try:
         with transaction.atomic():
             bundle = datasets.current_snapshot(owner, dataset, row)
+            result = assess(bundle) if observability else bundle
     except (ValidationError, ValueError) as error:
         datasets.invalidate(dataset.pk, "STALE_PERMISSION_OR_INPUT")
         return Response({"error": str(error)}, status=410)
-    return Response(bundle)
+    return Response(result)

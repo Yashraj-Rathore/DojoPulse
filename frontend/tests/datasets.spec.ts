@@ -6,6 +6,7 @@ const dataset = { id, title: "Reviewed fixture data", state: "COLLECTING", datas
 const slice = { sources: 1, players: 1, sessions: 1, tasks: 1, categories: { SUCCESS: 1, FAILURE: 0, NEAR_MISS: 0, UNCERTAIN: 0, TARGET_ABSENT: 0 }, missing_categories: ["FAILURE", "NEAR_MISS", "UNCERTAIN", "TARGET_ABSENT"], adjudicated: 0, structured_agreement_rate: 1, review_seconds: 120, timing: { independently_audited: 1, unaudited: 0, uncertainty_max_us: 100, reviewer_start_gap_max_us: 100 }, detector_versions: [], recognition: null };
 const qa = { splits: { "held-out": slice }, representative_coverage: false, scientific_gate: "NOT_RUN", release_approval: false, timing_interpretation: "Reviewer agreement does not establish real frame accuracy." };
 const snapshot = { id: "snapshot-1", sequence: 1, content_hash: "a".repeat(64), valid: true, reason: "", qa };
+const observability = { content_hash: "b".repeat(64), data: { snapshot_hash: snapshot.content_hash, dataset_kind: "synthetic", scientific_gate: "NOT_RUN", proposed_threshold_result: "INSUFFICIENT_EVIDENCE", blockers: ["SYNTHETIC_DATA", "INSUFFICIENT_CAPTURES", "EXPERT_QUALIFICATION_NOT_VERIFIED"], totals: { captures: 1, excluded_non_ranked_captures: 0, players: 1, sessions: 1, critical_windows: 1, resolvable_windows: 0, unresolved_windows: 1, resolvable_rate: 0, timing_unaudited_windows: 1, review_seconds: 120, unresolved_reasons: { UNKNOWN_OUTCOME: 1 } }, interpretation: "Timing completeness and reviewer agreement do not prove frame accuracy or automatic recognition." } };
 
 test("collection pins reviewed knowledge, retries sealing and exports a current snapshot", async ({ page }) => {
   let created = false; let frozen = false; let sealed = false; let linked = false;
@@ -76,13 +77,39 @@ test("mobile snapshot remains readable and explains missing adverse evidence", a
   await page.route("**/api/session", r => r.fulfill({ json: { authenticated: true, operator: true, csrf: "test" } }));
   await page.route("**/api/datasets", r => r.fulfill({ json: { datasets: [dataset], releases: [] } }));
   await page.route(`**/api/datasets/${id}`, r => r.fulfill({ json: { ...dataset, state: "FROZEN", source_count: 1, studies: [], snapshots: [snapshot] } }));
+  await page.route(`**/api/datasets/${id}/snapshots/${snapshot.id}/observability`, r => r.fulfill({ json: observability }));
   await page.goto("/datasets"); await page.getByLabel("Selected dataset").selectOption(id);
   await expect(page.getByText("Missing categories: failure, near miss, uncertain, target absent.")).toBeVisible();
   await expect(page.getByText(qa.timing_interpretation)).toBeVisible();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Assess observability 1" }).click();
+  expect((await download).suggestedFilename()).toBe("dojopulse-observability-1.json");
+  await expect(page.getByRole("region", { name: "Observability for snapshot 1" })).toContainText("1 ranked captures of 20 required");
+  await expect(page.getByText("G1 NOT_RUN. insufficient evidence.")).toBeVisible();
+  await expect(page.getByText("Remaining checks: synthetic data; insufficient captures; expert qualification not verified.")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole("button", { name: "Download snapshot 1" }).focus();
   await expect(page.getByRole("button", { name: "Download snapshot 1" })).toBeFocused();
   await page.screenshot({ path: "test-results/m08-datasets-mobile.png", fullPage: true });
+});
+
+test("zero-window report preserves unknown rate and expired evidence removes the assessment", async ({ page }) => {
+  let revoked = false;
+  await page.route("**/api/session", r => r.fulfill({ json: { authenticated: true, operator: true, csrf: "test" } }));
+  await page.route("**/api/datasets", r => r.fulfill({ json: { datasets: [dataset], releases: [] } }));
+  await page.route(`**/api/datasets/${id}`, r => r.fulfill({ json: { ...dataset, state: "FROZEN", source_count: 1, studies: [], snapshots: [revoked ? { ...snapshot, valid: false, reason: "SOURCE_EXPIRED", qa: null } : snapshot] } }));
+  await page.route(`**/api/datasets/${id}/snapshots/${snapshot.id}/observability`, r => r.fulfill(revoked ? { status: 410, json: { error: "Source evidence expired. Report withheld." } } : { json: { ...observability, data: { ...observability.data, totals: { ...observability.data.totals, critical_windows: 0, unresolved_windows: 0, resolvable_rate: null } } } }));
+  await page.goto("/datasets"); await page.getByLabel("Selected dataset").selectOption(id);
+  await page.getByRole("button", { name: "Assess observability 1" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("region", { name: "Observability for snapshot 1" })).toContainText("Resolvable rate: unknown.");
+  await expect(page.getByRole("button", { name: "Assess observability 1" })).toBeEnabled();
+  revoked = true;
+  await page.getByRole("button", { name: "Assess observability 1" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Report withheld");
+  await expect(page.getByRole("region", { name: "Observability for snapshot 1" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Refresh datasets" }).click();
+  await expect(page.getByRole("button", { name: "Assess observability 1" })).toHaveCount(0);
 });
 
 test("nonoperators cannot open dataset management", async ({ page }) => {

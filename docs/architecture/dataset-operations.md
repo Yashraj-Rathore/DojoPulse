@@ -92,3 +92,8 @@ cross-account aliases, previously seen footage or outside-the-app reviewer conta
 Real sampling/rights/consent, expert qualification, timestamp audits, deletion audits,
 actual storage/hosting and scientific G1/G2 remain gated. There is no training job,
 live replay fetch, automatic detection release or real participant activation here.
+
+The [G1 observability assessment](observability-assessment.md) derives an aggregate, hashed
+proposal report from a current owned snapshot through the existing revocation checks, or
+reproduces it offline. It preserves the immutable dataset-snapshot/1 QA contract and adds no
+persistent label store or scientific approval. See ADR-025 for acquisition boundaries.

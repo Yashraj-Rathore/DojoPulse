@@ -58,6 +58,11 @@ urlpatterns = [
     path("api/recognition/<uuid:detector_id>/<str:operation>", recognition_api.command),
     path("api/datasets/<uuid:dataset_id>", dataset_api.detail),
     path("api/datasets/<uuid:dataset_id>/snapshots/<uuid:snapshot_id>", dataset_api.download),
+    path(
+        "api/datasets/<uuid:dataset_id>/snapshots/<uuid:snapshot_id>/observability",
+        dataset_api.download,
+        {"observability": True},
+    ),
     path("api/datasets/<uuid:dataset_id>/<str:operation>", dataset_api.command),
     path("api/pilot-invitation", pilot_api.inspect_invitation),
     path("api/pilot-join", pilot_api.join),
