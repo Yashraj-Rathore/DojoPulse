@@ -1667,3 +1667,35 @@ real-device/participant usefulness, real captures/G1-G6 and hosted/provider appr
 open. Remote/local main still 20f74cc and only main exists. Next: publish ordinary main
 commit, monitor exact source including container assets, then normal final receipt/latest-tip
 checks. Return to permitted exact-build capture/reviewer work after this UI delivery.
+
+### 2026-10-05 - UI source published with enabled CI
+
+M13.09, M16.02, M19.02 and M01.05/.06: source ec5e10217918b1bb3245bdd65dc5d99f08201ace
+committed/pushed directly to main after fresh remote-head verification. Exactly 20 intended
+files changed; local tree clean after commit. Only main exists locally/remotely. Additional
+133 local Markdown links, parsed workflow/six-job and public packaging assertions pass.
+Python PyYAML was unavailable; the already installed js-yaml validated the workflow instead;
+no dependency installed. Exact-source CI pending, no source-wide remote success claimed.
+Next: monitor all six jobs including real standalone asset HTTP comparisons, record scoped
+qualification and publish an ordinary final progress receipt with actual latest-tip checks.
+
+### 2026-10-05 - UI source fully qualified; final receipt keeps CI enabled
+
+M13.01/.04/.07/.09, M16.02, M19.02 and M01.05/.06: source ec5e10217918b1bb3245bdd65dc5d99f08201ace
+passed all six jobs in run 37385253136 first attempt, completed 23:04:25 UTC. Exact SHA/all
+six success states and watcher exit 0 verified. Backend artifact: 526 cases, 519 passes/seven
+separately gated Docker skips, zero errors/failures, 550.314s. Actual sandbox artifact: seven
+Docker/max-profile passes, zero skips/errors/failures, 90.925s. Completed logs verify 54
+Chromium passes (39.4s), three Terraform, actual unprivileged standalone hero/icon HTTP byte
+comparisons, production build, audits/static and guarded native migration/dump/restore/erasure.
+An initial local CI-log extraction hit Windows CP1252 output encoding; UTF-8 retry succeeded;
+no source/job/test rerun or guard change was needed. Fresh remote source head equals local
+source and only main exists.
+
+Updated PRODUCT_PROGRESS.md, this log, UI receipt and D038. M13.09 DONE means local visual
+engineering; overall M13/real usability/accessibility/devices and G1-G6 remain incomplete.
+Publish this ordinary final tracking receipt, monitor its actual latest main SHA and confirm
+clean local/remote/head/branch state. Original art/fonts and prompts are in the design notes;
+no copied reference assets, private endpoint, cloud provisioning, gameplay/data activation
+or real-player claim. After UI delivery, resume permitted exact-build footage and independent
+review using the existing preparation tools.

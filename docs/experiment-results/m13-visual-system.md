@@ -1,7 +1,8 @@
 # M13.09 original visual system — software qualification
 
 2026-10-05; Architecture 2.17.0. Local UI engineering, not gameplay, participant,
-accessibility or hosted-release acceptance. Publication and exact-source CI pending.
+accessibility or hosted-release acceptance. Source ec5e102 published and all six CI jobs passed;
+final ordinary-CI tracking receipt still requires actual latest-tip verification.
 
 ## Implemented
 
@@ -34,7 +35,7 @@ both mandatory progress files. [Design and exact generation prompt](../design/vi
 | Responsive and keyboard checks | Visitor 1440/768/390/320px widths and player 390px have no horizontal overflow; decorative art loads; sign-in/training/matches/capture links and skip-to-workspace focus work; disabled account/capture gates remain |
 | Visual review | Inspected desktop/mobile visitor, desktop/mobile training-path and mobile dataset screenshots; corrected missing sentence spacing in narrow training overview |
 | Static color contrast | Body 17.02:1, muted on panel 8.50:1, primary button 8.96:1, field border 3.11:1, focus on panel 11.57:1. These selected pairs are not a full page or accessibility audit |
-| Backend/Docker/Terraform locally | Not rerun for this UI change; latest prior backend qualification is dated in the G1 receipt. Full remote CI and new container asset checks pending |
+| Backend/Docker/Terraform locally | Not rerun for this UI change; latest prior backend qualification is dated in the G1 receipt. Full remote CI and actual container asset checks passed on source ec5e102; detailed source results below |
 
 Generated original artwork inspected before format-only WebP compression: 1536 x 1024,
 169,594 bytes; no reference artwork copied. Fonts and licences are committed; no external
@@ -49,3 +50,23 @@ participant usability, actual hosted delivery and G1–G6 remain unqualified.
 
 Work stays on main; normal CI must verify the exact published source and any final receipt.
 No feature branches, skip instructions, deployment, paid provisioning or data/provider activation.
+
+## Published source qualification
+
+Source ec5e10217918b1bb3245bdd65dc5d99f08201ace passed all six jobs in
+[run 37385253136](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37385253136),
+first attempt, completed 2026-10-05 23:04:25 UTC. Watcher matched exact SHA/all six success
+states and exited 0. Downloaded PostgreSQL XML: 526 cases, 519 passes, seven separately gated
+Docker skips, zero failures/errors, 550.314s. Downloaded sandbox XML: seven actual Docker/
+max-profile passes, zero skips/failures/errors, 90.925s. Completed job logs confirm 54 Chromium
+passes (39.4s), three Terraform mocks, production build and actual hero/icon HTTP byte comparisons
+inside the unprivileged standalone container. Static/type/format/audits and guarded native
+PostgreSQL migration/dump/restore/erasure checks pass. Local documentation checks: 133 links,
+workflow YAML/six-job and public packaging assertions passed; installed js-yaml was used
+because Python PyYAML was unavailable. No new dependency was needed.
+
+Fresh remote main equals the source and branch inventory contains only main. No CI rerun,
+source/test-guard change or feature branch required. Publish this final qualification receipt
+with normal CI, then monitor the actual final main SHA and verify clean local/remote/branch
+consistency. An earlier successful source does not establish the receipt's check mark.
+Real gameplay, participant usability, screen-reader/device and hosted/provider gates remain open.
