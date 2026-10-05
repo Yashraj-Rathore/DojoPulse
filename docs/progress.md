@@ -1406,3 +1406,113 @@ actual private API database reads. No safety assertion or product gate was weake
 Changed comparison guard/test, contract, PRODUCT_PROGRESS.md, this log and M12 evidence.
 M12.08 remains PARTIAL pending exact final guard publication CI. Real M12/G5/G6 unchanged.
 Next: push guard on main, monitor all six, then publish qualified receipt with normal CI.
+
+
+### 2026-10-05 - M12 historical-real guard pushed on main; exact CI running
+
+M12.03/.06/.08 and M01.05/.06: published 8f2f57b8e31991165fe9f701450a5e8a27e609ff
+(`fix: require prospective protocols for historical real comparisons`) directly on main.
+[Run 37355869813](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37355869813)
+uses ordinary CI; two jobs have passed at this update and remaining jobs are running.
+Earlier six-job success belongs to 65bbc2d, not this new tip. M12.08 remains PARTIAL until
+this exact source revision completes qualification. Progress receipt will retain CI and
+actual latest-tip monitoring. No new provider/hosting/scientific approval.
+
+
+### 2026-10-05 - M12 final code six-job qualification verified; receipt publication pending
+
+M12.03/.06/.08, M01.05/.06 and M19.02: published final code
+8f2f57b8e31991165fe9f701450a5e8a27e609ff passed all six jobs first attempt in
+[run 37355869813](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37355869813).
+All six completed/success states were observed; gh run watch --exit-status returned 0.
+Python job completed its full suite, native 0020 recovery rehearsal and artifact upload
+at 18:34:53 UTC. This timestamp is the observed job completion, not an invented run
+updatedAt. Other five jobs completed successfully; real local M12.08 acceptance is DONE.
+M12 overall remains PARTIAL; actual cohort, source bias, retention/power and G5/G6 are unrun.
+
+Automatic approval review rejected the final guard CI log/artifact download and run-metadata
+requests because its usage limit was reached. The rejection explicitly says review could
+not be completed and is not a finding that the actions are unsafe. No approval bypass was
+attempted. Final guard artifact counts/timings have not been inspected or claimed; the earlier
+65bbc2d downloaded artifacts retain their own dated 469 PostgreSQL/47 Chromium/seven Docker/
+three Terraform scope. The five targeted guard tests remain local evidence (19.43s).
+
+Changed PRODUCT_PROGRESS.md, this log and M12 evidence for the final receipt, locally only.
+Receipt commit/push and a fresh remote-head/branch recheck remain pending review availability;
+there is no claim of a published receipt or its CI. Resume with ordinary main-only commit,
+push and monitor the actual latest tip. Next recommended engineering module: M09 detector/
+artifact governance, explicit unknown/confidence handling, reproducible benchmark reporting
+and reviewed fallback; release recognition only with permitted representative real labels.
+No actual provider, production, powered study or recognition activation.
+
+### 2026-10-05 - M12 final artifact receipt recovered during authorized M09 implementation
+
+M12.03/.06/.08, M01.05/.06 and M19.02: automatic review is available again. Read-only final
+8f2f57b run 37355869813 artifacts were downloaded: 477 cases, **470 PostgreSQL passes and seven
+separate Docker skips**, zero failures/errors, 429.660s; separate Docker job seven actual passes,
+141.479s. Earlier unavailable-download statements retain their historical scope. Final M12
+receipt will be included in the authorized M09 publication, with CI on the exact new tip.
+
+### 2026-10-05 - M09 coherent local recognition engineering implemented, qualification running
+
+M09.01-M09.08, M08.05/.06, M14.04/.05, M15.01/.06, M16.05, M18.07, M01.02/.05/.06 and M19.02:
+fixed engine and immutable measurement/code/template/config manifests, bounded nullable/ordinal
+observations/evidence spans, explicit UNKNOWN/unverified candidates, all-held-out-source benchmark
+receipts, independent exact-report approvals, latest passing activation, one active version,
+replacement/rollback/stop/drift controls, staff UI/API and portable owner reproduction. Existing
+M08/M18 blinded review remains canonical fallback; no candidate event publication. Privacy/export,
+withdrawal/expiry/reviewer revocation and restore erasure include new guarded migration 0021.
+Architecture 2.16.0, ADR-024 and D036 record the boundary.
+
+Changed analysis/recognition.py, tools/analyze_capture.py and tools/recognize_observations.py;
+backend/core models, recognition service/API, dataset invalidation, recovery/native rehearsal,
+private export and URLs; frontend recognition route/navigation/styles/browser tests; recognition
+contracts/ADR/qualification and both mandatory progress files. Local corrected initial PostgreSQL
+suite: 26 passes in 130.78s after 11 ordering failures/15 passes (112.32s). Initial frontend lint
+caught the installed React effect rule; callback pattern fixed. Ruff/format226/mypy29 pass;
+Django/schema checks passed before the last small changes. Full PostgreSQL, final UI/browser,
+native PostgreSQL 0021 recovery and source/latest-tip CI remain in progress.
+
+Assumptions: synthetic observations are fixture claims; no real probability calibration or
+independent expert approval exists. All software benchmarks are retrospective; repeated hold-out
+inspection cannot qualify G2. Real registration/activation, provider access and hosting remain
+closed; no training rights are implied. Next: complete local qualification, commit/push main with
+ordinary CI, monitor actual final-tip checks, then acquire permitted real data and expert labels.
+
+### 2026-10-05 - M09 UI, static and native recovery qualification
+
+M09.05-.08, M14.04/.05, M15.01/.06 and M16.05: 51 Edge browser tests passed (54.3s), including
+four M09 flows. Inspected 390px mobile screenshot; layout, focus, separate metrics, stop and
+manual fallback readable. Production Next 16.3.6 build/lint/types, Ruff/format226/mypy29,
+Django/schema-drift and affected documentation links passed. Native PostgreSQL 0021 guarded
+empty-schema forward/reverse/forward and seeded dump/restore erased private detector manifests,
+observation inputs, reports and approval rows before quarantined reads; repeated controls and
+pending-upload erasure passed. Real G1/G2, calibration and hosted isolation remain unrun.
+Full PostgreSQL regression suite still running; exact publication/latest-tip CI remain pending.
+
+### 2026-10-05 - M09 local development schema applied
+
+M09.05/.08, M01.05/.06: applied additive core.0021_recognition_lifecycle successfully to the
+loopback local development PostgreSQL database; Django system check passed. Native disposable
+schema/recovery qualification above remains a separate check. No live cloud/provider/real
+recognition activation. Final PostgreSQL regression and exact-tip publication CI remain pending.
+
+### 2026-10-05 - M09 full local PostgreSQL regression passed
+
+M09.01-M09.08 and affected privacy/recovery requirements: 498 PostgreSQL/Python tests passed,
+seven separate Docker skips, 648.03s, 505 JUnit cases with zero errors/failures. Includes 28
+M09 cases, owner-only exact-report CLI reproduction and actual cross-account locking regression.
+Final added OpenCV template bridge is checked separately because it was added after collection;
+its result is not included in the 498 count. Earlier 51 Edge/static/build/schema/docs/native
+0021 migration/recovery checks passed. Source/main publication and actual latest-tip CI pending.
+
+### 2026-10-05 - M09 final template bridge qualified, source ready for main
+
+M09.01-.08, M15.01 and M01.05/.06: separately collected final PostgreSQL/OpenCV test passed
+in 9.54s. Actual synthetic template matching emitted pinned LOW-support UNKNOWN candidates;
+credentialed report sanitizer discarded candidates and kept automatic opportunities empty.
+Final Ruff/format226/mypy29 recheck passed. Combined local evidence is 498 full-suite passes
+plus this one separate case, 51 Edge browser passes, build/lint/types/schema/docs and native
+0021 migration/dump/restore/erasure. Seven real Docker tests require the dedicated CI job.
+No dependency/provider/real-recognition/hosting activation. M09.08 remains PARTIAL pending
+exact-source remote qualification; commit/push main and monitor actual final tip next.

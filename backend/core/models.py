@@ -1150,3 +1150,86 @@ class DatasetSnapshot(models.Model):
                 fields=["dataset", "request_id"], name="dataset_snapshot_request"
             ),
         ]
+
+
+class DetectorVersion(Owned):
+    dataset = models.ForeignKey(DatasetCollection, on_delete=models.PROTECT)
+    version = models.CharField(max_length=160)
+    manifest = models.JSONField()
+    content_hash = models.CharField(max_length=64)
+    state = models.CharField(max_length=16, default="REGISTERED")
+    request_id = models.UUIDField()
+    reviewer_one = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="detector_review_one"
+    )
+    reviewer_two = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="detector_review_two"
+    )
+    activated_at = models.DateTimeField(null=True)
+    disabled_reason = models.CharField(max_length=40, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Detector configuration is immutable; register a new version")
+        self.content_hash = digest(self.manifest)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "version"], name="detector_owner_version"),
+            models.UniqueConstraint(fields=["owner", "request_id"], name="detector_request"),
+            models.UniqueConstraint(
+                fields=["dataset"], condition=Q(state="ACTIVE"), name="detector_active_dataset"
+            ),
+            models.CheckConstraint(
+                condition=Q(state__in=["REGISTERED", "ACTIVE", "DISABLED", "INVALIDATED"]),
+                name="detector_state_valid",
+            ),
+        ]
+
+
+class RecognitionRun(Owned):
+    detector = models.ForeignKey(DetectorVersion, on_delete=models.CASCADE, related_name="runs")
+    snapshot = models.ForeignKey(DatasetSnapshot, on_delete=models.PROTECT)
+    request_id = models.UUIDField()
+    inputs = models.JSONField()
+    report = models.JSONField()
+    input_hash = models.CharField(max_length=64)
+    content_hash = models.CharField(max_length=64)
+    invalidated_at = models.DateTimeField(null=True)
+    reason = models.CharField(max_length=40, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError(
+                "Recognition receipts are immutable; invalidation erases private inputs"
+            )
+        self.input_hash = digest(self.inputs)
+        self.content_hash = digest(self.report)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="recognition_run_request")
+        ]
+
+
+class DetectorReview(Owned):
+    run = models.ForeignKey(RecognitionRun, on_delete=models.CASCADE, related_name="reviews")
+    decision = models.CharField(max_length=10)
+    report_hash = models.CharField(max_length=64)
+    request_id = models.UUIDField()
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Detector reviews are immutable")
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["run", "owner"], name="detector_independent_review"),
+            models.UniqueConstraint(fields=["owner", "request_id"], name="detector_review_request"),
+            models.CheckConstraint(
+                condition=Q(decision__in=["APPROVE", "REJECT"]), name="detector_review_valid"
+            ),
+        ]

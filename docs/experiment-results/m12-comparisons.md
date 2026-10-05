@@ -55,3 +55,30 @@ Real prospective cohort, source/decoder bias, session independence, effect/reten
 powered broader study, expert/player usability and G5/G6 remain NOT_RUN. Local fallback
 cannot supply trusted decoder identity; actual isolated decoding pins it. No endpoint,
 dependency, provider, recognizer or hosted release activation.
+
+
+## Final code qualification
+
+Final code **8f2f57b8e31991165fe9f701450a5e8a27e609ff** passed all six jobs first attempt
+in [run 37355869813](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37355869813).
+All job states were completed/success and the watcher returned 0. Full PostgreSQL suite and
+native recovery finished successfully; observed Python job completion 18:34:53 UTC.
+Final-run artifact counts/timings were not downloaded: automatic approval review failed
+because its usage limit was reached. Earlier 65bbc2d counts above retain that source scope.
+No newer counts are inferred. M12.08 DONE qualifies local engineering only.
+
+The final progress receipt is saved locally and remains uncommitted/unpublished pending
+approval-review availability. Resume receipt publication on main with CI enabled and
+monitor its exact tip. A fresh remote-head/branch recheck is also pending. Real M12/G5/G6,
+source bias, retention/power, participant utility and hosted readiness remain unvalidated.
+
+
+## Recovered final artifact receipt (2026-10-05)
+
+During the explicitly authorized M09 implementation turn, automatic review became available
+again. Downloaded final **8f2f57b** artifacts confirm **470 PostgreSQL passes / seven separate
+Docker skips**, 477 cases, zero errors/failures, 429.660s. The separate Docker job confirms
+**seven actual sandbox/max-profile passes**, 141.479s. The earlier download limitation above
+is historical, not a continuing block. This receipt is included with the next authorized
+M09 main publication; its exact latest-tip checks must still be monitored. No additional
+real, provider, hosting, effectiveness or scientific approval is supplied.

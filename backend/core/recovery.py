@@ -74,6 +74,9 @@ def apply_restore_controls():
         from backend.core.datasets import restore_revoke as revoke_datasets
 
         revoke_datasets()
+        from backend.core.recognition import restore_revoke as revoke_recognition
+
+        revoke_recognition()
         from backend.core.models import (
             ComparisonSession,
             DrillAssignment,

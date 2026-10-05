@@ -1,6 +1,7 @@
 """Local extraction: python -m tools.analyze_capture capture.mp4 --output report.json."""
 
 import argparse
+import hashlib
 import json
 import time
 import uuid
@@ -10,7 +11,9 @@ from typing import Any
 from jsonschema import ValidationError
 
 from analysis.annotations import review_metrics, validate_annotations
+from analysis.contracts import digest
 from analysis.media import extract_samples, probe, profile
+from analysis.recognition import CONDITIONS, candidates, manifest
 from analysis.vision import reconcile, template_candidates
 
 
@@ -20,6 +23,7 @@ def analyze(
     metadata_path: Path | None = None,
     annotations_path: Path | None = None,
     templates_path: Path | None = None,
+    detector_manifest_path: Path | None = None,
 ) -> dict[str, Any]:
     started = time.monotonic()
     report: dict[str, Any] = {
@@ -44,11 +48,20 @@ def analyze(
         report["artifacts"] = {"directory": directory.name, **samples}
         if templates_path:
             config = json.loads(templates_path.read_text(encoding="utf-8"))
+            if (
+                not isinstance(config.get("templates"), list)
+                or not 1 <= len(config["templates"]) <= 20
+            ):
+                raise ValueError("BOUNDED_TEMPLATE_CONFIGURATION_REQUIRED")
+            artifact_pins = {"template-config": digest(config)}
             raw: list[dict[str, Any]] = []
             for entry in config["templates"]:
                 template = (templates_path.parent / entry["file"]).resolve()
                 if not template.is_relative_to(templates_path.parent.resolve()):
                     raise ValueError("TEMPLATE_PATH_ESCAPE")
+                if entry["label"] in artifact_pins or template.stat().st_size > 1_048_576:
+                    raise ValueError("INVALID_TEMPLATE_ARTIFACT")
+                artifact_pins[entry["label"]] = hashlib.sha256(template.read_bytes()).hexdigest()
                 for sample in samples["samples"]:
                     candidate = template_candidates(
                         directory / sample["file"],
@@ -66,6 +79,52 @@ def analyze(
                             }
                         )
             report["observations"] = reconcile(raw, config.get("max_gap_us", 100000))
+            report["observation_artifacts"] = artifact_pins
+        if detector_manifest_path:
+            detector = manifest(json.loads(detector_manifest_path.read_text(encoding="utf-8")))
+            duration = round(info["duration_seconds"] * 1_000_000)
+            windows = []
+            for index, observation in enumerate(report["observations"]):
+                if observation["label"] not in CONDITIONS:
+                    continue
+                start, end = observation["start_us"], observation["end_us"]
+                windows.append(
+                    {
+                        "id": f"template-window-{index}",
+                        "start_us": start,
+                        "end_us": end,
+                        "observations": [
+                            {
+                                "condition": observation["label"],
+                                "value": True,
+                                "support": "LOW",
+                                "start_us": start,
+                                "end_us": end,
+                                "uncertainty_us": 16667,
+                                "evidence": f"template/{observation['label']}",
+                            }
+                        ],
+                    }
+                )
+            observation_batch = {
+                "schema_version": "observation-batch/1",
+                "manifest_hash": digest(detector),
+                "observation_artifacts": report.get("observation_artifacts", {}),
+                "sources": [
+                    {
+                        "source_id": metadata.get("source_id", info["source_sha256"]),
+                        "source_sha256": info["source_sha256"],
+                        "duration_us": duration,
+                        "game_build": metadata.get("game_build", "unknown"),
+                        "platform": metadata.get("platform", "unknown"),
+                        "capture_profile": report["capture_profile"],
+                        "provenance": "UNCALIBRATED_TEMPLATE",
+                        "windows": windows,
+                    }
+                ],
+            }
+            report["recognition_candidates"] = candidates(detector, observation_batch)
+            report["observation_batch"] = observation_batch
         report["status"] = "REVIEW_REQUIRED"
         report["issues"] = ["GAMEPLAY_PROFILE_UNVALIDATED", "MOVE_KNOWLEDGE_UNVERIFIED"]
         if not metadata.get("build_confirmed"):
@@ -114,8 +173,20 @@ def main() -> None:
         "--annotations", type=Path, help="Operator-reviewed sidecar; never client truth"
     )
     parser.add_argument("--templates", type=Path, help="Optional uncalibrated candidate templates")
+    parser.add_argument(
+        "--detector-manifest",
+        type=Path,
+        help="Pinned offline template-to-UNKNOWN candidate receipt",
+    )
     args = parser.parse_args()
-    report = analyze(args.capture, args.output, args.metadata, args.annotations, args.templates)
+    report = analyze(
+        args.capture,
+        args.output,
+        args.metadata,
+        args.annotations,
+        args.templates,
+        args.detector_manifest,
+    )
     print(
         json.dumps(
             {"status": report["status"], "issues": report["issues"], "report": str(args.output)}

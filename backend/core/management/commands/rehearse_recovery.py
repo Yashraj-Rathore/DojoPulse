@@ -85,8 +85,16 @@ dataset = DatasetCollection.objects.create(owner=manager, title='Synthetic erasu
     knowledge=DefinitionVersion.objects.get(pk='recovery/build/1'), measurement={'restore-fixture': True},
     sampling={'private': 'must-erase'}, request_id=uuid.uuid4())
 DatasetStudy.objects.create(dataset=dataset, study=study)
-DatasetSnapshot.objects.create(dataset=dataset, sequence=1, request_id=uuid.uuid4(), data={'private': 'must-erase'})
+dataset_snapshot = DatasetSnapshot.objects.create(dataset=dataset, sequence=1, request_id=uuid.uuid4(), data={'private': 'must-erase'})
 DatasetPartition.objects.create(dataset=dataset, kind='PLAYER', token='a'*64, binding='', split='held-out')
+from backend.core.models import DetectorVersion, RecognitionRun, DetectorReview
+# Private storage/erasure fixture only, not an approved manifest or benchmark.
+detector = DetectorVersion.objects.create(owner=manager, dataset=dataset, version='recovery/detector/1',
+    manifest={'private': 'must-erase'}, reviewer_one=operators[0], reviewer_two=operators[1], request_id=uuid.uuid4())
+recognition_run = RecognitionRun.objects.create(owner=manager, detector=detector, snapshot=dataset_snapshot,
+    inputs={'private': 'must-erase'}, report={'private': 'must-erase'}, request_id=uuid.uuid4())
+DetectorReview.objects.create(owner=operators[0], run=recognition_run, decision='APPROVE',
+    report_hash=recognition_run.content_hash, request_id=uuid.uuid4())
 from backend.core.models import DrillAssignment, PracticeLog
 practice_drill = DefinitionVersion.objects.create(key='recovery/drill/1', kind='drill', status='APPROVED', payload={'synthetic_only': True})
 assignment = DrillAssignment.objects.create(owner=manager, drill=practice_drill, drill_hash=practice_drill.content_hash, diagnosis={'private': 'must-erase'})
@@ -153,6 +161,12 @@ assert not DatasetCollection.objects.filter(deleted_at=None).exists()
 assert not DatasetSnapshot.objects.filter(invalidated_at=None).exists()
 assert not DatasetSnapshot.objects.exclude(data={}).exists()
 assert not DatasetPartition.objects.exists()
+from backend.core.models import DetectorVersion, RecognitionRun, DetectorReview
+assert DetectorVersion.objects.count() == 1 and RecognitionRun.objects.count() == 1
+assert not DetectorVersion.objects.exclude(manifest={}, state='INVALIDATED').exists()
+assert not RecognitionRun.objects.exclude(inputs={}, report={}).exists()
+assert not RecognitionRun.objects.filter(invalidated_at=None).exists()
+assert not DetectorReview.objects.exists()
 from backend.core.models import PracticeLog, DrillAssignment
 assert not PracticeLog.objects.exists()
 from backend.core.models import ComparisonSession, ImprovementEvaluation

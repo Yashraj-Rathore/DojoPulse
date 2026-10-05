@@ -285,6 +285,8 @@ def export_account(request):
         ConsentReceipt,
         DatasetCollection,
         DatasetSnapshot,
+        DetectorReview,
+        DetectorVersion,
         KnowledgeProposal,
         KnowledgeReanalysis,
         KnowledgeReview,
@@ -295,11 +297,43 @@ def export_account(request):
         PilotReview,
         PilotSession,
         PracticeLog,
+        RecognitionRun,
         RunBudget,
         UploadSession,
     )
 
     tables = {
+        "detector_versions": (
+            DetectorVersion.objects.filter(owner=user),
+            [
+                "id",
+                "dataset_id",
+                "version",
+                "manifest",
+                "content_hash",
+                "state",
+                "created_at",
+                "activated_at",
+                "disabled_reason",
+            ],
+        ),
+        "recognition_receipts": (
+            RecognitionRun.objects.filter(owner=user),
+            [
+                "id",
+                "detector_id",
+                "snapshot_id",
+                "input_hash",
+                "content_hash",
+                "created_at",
+                "invalidated_at",
+                "reason",
+            ],
+        ),
+        "detector_reviews": (
+            DetectorReview.objects.filter(owner=user),
+            ["id", "run_id", "decision", "report_hash", "created_at"],
+        ),
         "comparison_sessions": (
             ComparisonSession.objects.filter(owner=user).exclude(state="DELETED"),
             [

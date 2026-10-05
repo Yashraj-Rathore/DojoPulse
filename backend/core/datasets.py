@@ -264,6 +264,9 @@ def live_pin(capture):
 
 
 def invalidate(dataset_id, reason):
+    from backend.core.recognition import invalidate_dataset
+
+    invalidate_dataset(dataset_id, reason)
     from backend.core.loops import invalidate_for_events
     from backend.core.models import GameplayEvent, MatchContribution
 
@@ -301,6 +304,9 @@ def invalidate_definitions(keys):
 
 
 def erase_account(owner_id):
+    from backend.core.recognition import erase_account as erase_recognition
+
+    erase_recognition(owner_id)
     for dataset in DatasetCollection.objects.filter(owner_id=owner_id, deleted_at=None):
         invalidate(dataset.pk, "ACCOUNT_WITHDRAWN")
         DatasetPartition.objects.filter(dataset=dataset).delete()

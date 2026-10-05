@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.15.0. Decision date: 2026-10-05. Status: local engineering approved;
+Version: 2.16.0. Decision date: 2026-10-05. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -64,6 +64,11 @@ Python; Django/DRF modular monolith; PostgreSQL; private media; independently ex
 batch processing; stable participants; revisioned analysis; immutable game knowledge;
 observation/event/conclusion separation; deterministic rules with unknown states;
 counts and statistical uncertainty; internal drill schema with optional adapters.
+The [M09 recognition contract](recognition-validation.md) adds immutable detector manifests,
+bounded timestamped candidate observations, all-source retrospective benchmarks, independent
+synthetic activation, version rollback/drift stop and revocable private reproduction receipts.
+Real recognition/calibration/G1/G2 remain gated; candidates never publish canonical events.
+
 No LLM, neural player embedding, broker, vector store, warehouse, or native game integration.
 
 ## Implementation boundary

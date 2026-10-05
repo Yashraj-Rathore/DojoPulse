@@ -13,6 +13,7 @@ from backend.core import (
     pilot_api,
     player_model_api,
     practice_api,
+    recognition_api,
     recording_api,
     upload_api,
 )
@@ -51,6 +52,10 @@ urlpatterns = [
     path("api/usage", operations_api.usage),
     path("api/pilots", pilot_api.studies),
     path("api/datasets", dataset_api.collections),
+    path("api/recognition", recognition_api.versions),
+    path("api/recognition/<uuid:detector_id>", recognition_api.detail),
+    path("api/recognition/<uuid:detector_id>/runs/<uuid:run_id>", recognition_api.download),
+    path("api/recognition/<uuid:detector_id>/<str:operation>", recognition_api.command),
     path("api/datasets/<uuid:dataset_id>", dataset_api.detail),
     path("api/datasets/<uuid:dataset_id>/snapshots/<uuid:snapshot_id>", dataset_api.download),
     path("api/datasets/<uuid:dataset_id>/<str:operation>", dataset_api.command),
