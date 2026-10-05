@@ -15,7 +15,9 @@ optional retention start/end/count. Retention starts strictly after follow-up en
 collection ends within 366 days of baseline cutoff. Real plans require the schedule,
 prospective follow-up, known source representation and a coordinator-pinned isolated
 decoder image. Existing gameplay/knowledge/consent approvals still apply; this contract
-grants none. Real evaluation waits until its fixed window ends; synthetic fixtures can
+grants none. Historical real plans without this protocol cannot qualify or display
+current evidence; a new reviewed prospective plan is required. Synthetic legacy hashes
+and workflows remain supported. Real evaluation waits until its fixed window ends; synthetic fixtures can
 exercise historical windows. This is not an efficacy stop-rule override.
 
 The baseline manifest pins canonical opportunity hashes, independent review hashes,

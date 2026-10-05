@@ -209,6 +209,8 @@ def availability(owner, item):
     """Check present authorization/publication without changing the historical result JSON."""
     if item.invalidated_at:
         return False, ["EVIDENCE_WITHDRAWN"]
+    if item.plan.specification["dataset_kind"] == "real" and not item.plan.protocol:
+        return False, ["PROSPECTIVE_SOURCE_PROTOCOL_REQUIRED"]
     from backend.core.knowledge import require_definition
 
     try:
@@ -274,6 +276,8 @@ def evaluate_comparison(owner, plan, followup_ids, phase):
     from backend.core.loops import owned_events, require_complete_captures
 
     spec = phase_spec(plan, phase)
+    if spec.dataset_kind == "real" and not plan.protocol:
+        raise ValidationError("Legacy real plans need a new reviewed prospective source protocol")
     require_definition(
         plan.assignment.drill_id, spec.dataset_kind, owner.pk, kind="drill", historical=True
     )

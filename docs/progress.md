@@ -1376,3 +1376,33 @@ expiration/attribution/withdrawal prevents use. Reports add zero gameplay exposu
 is baseline-only, actual power false, release false. Source/provider/hosting gates unchanged.
 Next: push ordinary commit directly to main, monitor all six jobs, then publish the progress
 receipt and monitor the actual final tip.
+
+
+### 2026-10-05 - M12 source CI green; historical-real protocol guard added
+
+M12.03/.06/.08 and M01.05/.06: source 65bbc2d7809db1b47c8906b729883cc42f17bf5f
+passed all six jobs in [run 37354566008](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37354566008).
+Final review found that pre-protocol real plans must also be explicitly prevented from
+qualifying/displaying current evidence. Added guard in comparisons.py and a historical-row
+regression fixture without inventing real measurement approval. Synthetic legacy workflows
+stay supported. Targeted validation in progress; initial new test recorded four passes/one
+missing model import failure in 19.33s, now corrected. Publication/latest-tip qualification
+remains pending; real G5/G6 unchanged. Next: finish targeted checks and publish/monitor.
+
+
+### 2026-10-05 - M12 downloaded source evidence and guard qualification
+
+M12.03/.06/.08, M01.05/.06 and M19.02: source run 37354566008, updated
+18:20:57 UTC, first attempt all six completed/success. Downloaded JUnit/logs verify
+469 PostgreSQL passes/seven separate Docker skips (476 cases, zero errors/failures,
+245.350s), 47 Chromium in 45.2s, seven actual Docker/max-profile in 142.794s,
+three Terraform mocks, native guarded 0020 forward/reverse/forward/dump/restore/erasure,
+clean lock/production audits, static/build/schema/loader and unprivileged startup.
+
+The final historical-real guard passed five targeted PostgreSQL/legacy workflow cases in
+19.43s; Ruff/format218/mypy27 pass. Its second initial fixture run recorded four passes/
+one cached-related-row assertion in 21.27s; refreshing the simulated historical row matches
+actual private API database reads. No safety assertion or product gate was weakened.
+Changed comparison guard/test, contract, PRODUCT_PROGRESS.md, this log and M12 evidence.
+M12.08 remains PARTIAL pending exact final guard publication CI. Real M12/G5/G6 unchanged.
+Next: push guard on main, monitor all six, then publish qualified receipt with normal CI.

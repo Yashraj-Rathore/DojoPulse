@@ -34,8 +34,22 @@ fixture mutation. Corrected to actual asset metadata. Initial native seed lacked
 result's required baseline membership; corrected fixture and final rehearsal passed.
 No product gate or assertion was removed to make those checks pass.
 
-Main publication and actual Linux/full-suite, Chromium, Docker/max-profile, Terraform,
-audit and application-container CI are pending. No Docker execution is claimed locally.
+Source **65bbc2d7809db1b47c8906b729883cc42f17bf5f** passed all six jobs first attempt
+in [run 37354566008](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37354566008),
+updated 2026-10-05 18:20:57 UTC. Downloaded artifacts/logs record 469 PostgreSQL passes/
+seven separate Docker skips (476 JUnit cases, zero errors/failures, 245.350s); 47 Chromium
+journeys in 45.2s; seven actual Docker/max-profile cases in 142.794s; three Terraform mocks;
+native guarded migration/restore/erasure; static/schema/build/loader and unprivileged
+container startup. Both Python lock audits and production npm audit are clean. Existing
+development lint advisory and hosted/source-access review remain separately tracked.
+
+Final guard review explicitly prevents historical real plans without a prospective source
+protocol from being evaluated or displayed as current. Five targeted PostgreSQL/legacy
+workflow cases passed in 19.43s; Ruff/format218/mypy27 pass. Initial targeted fixtures
+recorded four passes/one missing import failure (19.33s) then four passes/one cached-row
+fixture assertion (21.27s). Corrected import and refreshed historical row to simulate actual
+API reads; no guard was weakened. Guard publication/latest-tip CI remain pending.
+No Docker execution is claimed locally.
 
 Real prospective cohort, source/decoder bias, session independence, effect/retention,
 powered broader study, expert/player usability and G5/G6 remain NOT_RUN. Local fallback

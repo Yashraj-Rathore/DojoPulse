@@ -19,7 +19,7 @@ from analysis.contracts import EvaluationSpec, digest
 from backend.core.comparisons import availability, delete_session, record_session
 from backend.core.evidence import as_opportunity
 from backend.core.loops import create_assignment, create_plan, evaluate_plan, record_practice
-from backend.core.models import AnalysisRun, ComparisonSession, Match, ReplaySource
+from backend.core.models import AnalysisRun, ComparisonSession, EvaluationPlan, Match, ReplaySource
 from backend.core.storage import delete_account
 from tests.test_backend import FakeStorage
 from tests.test_complete_loop import approved_drill, make_capture
@@ -114,6 +114,20 @@ def test_plan_request_retry_keeps_recommendation_and_hash(env):
     )
     with pytest.raises(ValidationError, match="different"):
         create_plan(owner, **{**values, "schedule": {**SCHEDULE, "expected_followup_sessions": 6}})
+
+
+def test_legacy_real_plan_cannot_bypass_prospective_source_protocol(env):
+    owner, plan, _, _, _, _ = env
+    historical = evaluate_plan(owner, plan.pk)
+    # Simulate a pre-0020 historical row, not approved real measurement or intake.
+    EvaluationPlan.objects.filter(pk=plan.pk).update(
+        protocol={}, specification={**plan.specification, "dataset_kind": "real"}
+    )
+    plan.refresh_from_db()
+    historical.refresh_from_db()
+    assert availability(owner, historical) == (False, ["PROSPECTIVE_SOURCE_PROTOCOL_REQUIRED"])
+    with pytest.raises(ValidationError, match="prospective source protocol"):
+        evaluate_plan(owner, plan.pk)
 
 
 def test_missing_session_blocks_positive_then_resolves_by_original_code(env):
