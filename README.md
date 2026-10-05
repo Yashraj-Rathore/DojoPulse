@@ -350,3 +350,8 @@ The local operator [knowledge workspace](docs/architecture/knowledge-governance.
 `/knowledge` supports build registration, independent review, immutable synthetic releases
 and reviewed patch reanalysis. Record explicit platform with source evidence. Real knowledge
 publication remains disabled; synthetic approval does not establish Tekken facts or expertise.
+
+The [dataset workspace](docs/architecture/dataset-operations.md) at `/datasets` binds
+M07 releases to new consented pilot studies, collection-wide splits, frozen reviewed
+source manifests and timing/coverage QA. Private snapshots are revocable, with explicit
+owned-source canonical import; real footage, expert qualification and G1-G6 remain gates.

@@ -114,3 +114,8 @@ authorization is not a hosted-throughput claim. Hosted scheduling/playback,
 revocation, retained-copy erasure and 10,000-task performance remain unqualified.
 Honest logs, representative captures, expertise, blindness outside the app and
 complete real-world play remain protocol/real-study duties.
+
+[M08 collections](dataset-operations.md) create new studies with pinned governed target/
+measurement and explicit dataset consent. Their keyed split/source guards span studies
+and snapshots, and labels include observed-or-null independent timing audits. Legacy
+standalone studies retain their draft target and original consent/schema behavior.

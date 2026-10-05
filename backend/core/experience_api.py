@@ -280,6 +280,8 @@ def export_account(request):
         AccountEmail,
         AttemptMetric,
         ConsentReceipt,
+        DatasetCollection,
+        DatasetSnapshot,
         KnowledgeProposal,
         KnowledgeReanalysis,
         KnowledgeReview,
@@ -296,6 +298,32 @@ def export_account(request):
     # Explicit field allowlists: no password hashes, upload-session tokens, storage paths,
     # raw provider payloads or reviewer/opponent identities enter this export.
     tables = {
+        "dataset_collections": (
+            DatasetCollection.objects.filter(owner=user),
+            [
+                "id",
+                "title",
+                "dataset_kind",
+                "knowledge_id",
+                "measurement",
+                "sampling",
+                "state",
+                "created_at",
+                "deleted_at",
+            ],
+        ),
+        "dataset_snapshot_receipts": (
+            DatasetSnapshot.objects.filter(dataset__owner=user),
+            [
+                "id",
+                "dataset_id",
+                "sequence",
+                "content_hash",
+                "created_at",
+                "invalidated_at",
+                "reason",
+            ],
+        ),
         "knowledge_proposals": (
             KnowledgeProposal.objects.filter(owner=user),
             [

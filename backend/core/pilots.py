@@ -52,7 +52,7 @@ def actor(user):
     return current
 
 
-def study_for(user, study_id, *, manager=False):
+def study_for(user, study_id, *, manager=False, privacy=False):
     current = actor(user)
     require_processing(current)
     study = (
@@ -68,6 +68,15 @@ def study_for(user, study_id, *, manager=False):
         )
     if study.dataset_kind == "synthetic" and not settings.DEBUG:
         raise PermissionDenied("Synthetic pilot tools are local development only")
+    from backend.core.datasets import live_measurement, study_dataset
+
+    dataset = study_dataset(study)
+    if (
+        not privacy
+        and dataset
+        and not live_measurement(dataset, historical=dataset.state == "FROZEN")
+    ):
+        raise PermissionDenied("This dataset's reviewed measurement is unavailable")
     member = PilotEnrollment.objects.filter(
         study=study, owner=current, state="ACTIVE", expires_at__gt=timezone.now()
     ).first()
@@ -87,6 +96,9 @@ def collecting(study):
 
 
 def bump(study):
+    from backend.core.datasets import invalidate_study
+
+    invalidate_study(study.pk)
     PilotStudy.objects.filter(pk=study.pk).update(revision=F("revision") + 1)
     PilotGateReport.objects.filter(study=study, invalidated_at=None).update(
         invalidated_at=timezone.now(), data={}
@@ -94,7 +106,7 @@ def bump(study):
 
 
 @transaction.atomic
-def create_study(user, title, dataset_kind, request_id):
+def create_study(user, title, dataset_kind, request_id, *, dataset=None):
     current = actor(user)
     require_processing(current)
     if not current.is_staff:
@@ -107,7 +119,11 @@ def create_study(user, title, dataset_kind, request_id):
         raise PermissionDenied("Synthetic studies require local development")
     prior = PilotStudy.objects.filter(owner=current, request_id=request_id).first()
     if prior:
-        if (prior.title, prior.dataset_kind) != (title, dataset_kind):
+        from backend.core.datasets import study_dataset
+
+        if (prior.title, prior.dataset_kind) != (title, dataset_kind) or study_dataset(
+            prior
+        ) != dataset:
             raise ValidationError("Study request ID already used")
         return prior
     if PilotStudy.objects.filter(owner=current, deleted_at=None).count() >= 20:
@@ -132,13 +148,27 @@ def create_study(user, title, dataset_kind, request_id):
             "G6": ">=60% comparable plus native/usual comparison; <30% or no added utility revises scope",
         },
     }
-    return PilotStudy.objects.create(
+    if dataset:
+        from backend.core.datasets import CONSENT as DATASET_CONSENT
+        from backend.core.models import DatasetStudy
+
+        protocol.update(
+            target=dataset.measurement["situation"],
+            measurement=dataset.measurement,
+            dataset_id=str(dataset.pk),
+            sampling=dataset.sampling,
+        )
+        protocol["consent"] += DATASET_CONSENT
+    row = PilotStudy.objects.create(
         owner=current,
         title=title,
         dataset_kind=dataset_kind,
         protocol=protocol,
         request_id=request_id,
     )
+    if dataset:
+        DatasetStudy.objects.create(dataset=dataset, study=row)
+    return row
 
 
 @transaction.atomic
@@ -221,6 +251,9 @@ def assign_split(user, study_id, enrollment_id, split, comparison_order="UNASSIG
         raise ValidationError("Assign a player-disjoint split before their first session")
     if comparison_order not in {"UNASSIGNED", "STRUCTURED_FIRST", "NATIVE_FIRST", "USUAL_FIRST"}:
         raise ValidationError("Invalid prospective comparison allocation")
+    from backend.core.datasets import check_split
+
+    check_split(study, row, split)
     PilotEnrollment.objects.filter(pk=row.pk).update(split=split, comparison_order=comparison_order)
     bump(study)
 
@@ -262,6 +295,9 @@ def add_session(user, study_id, **data):
         return prior
     if PilotSession.objects.filter(enrollment__study=study).count() >= settings.PILOT_MAX_SESSIONS:
         raise ValidationError("Local session capacity reached")
+    from backend.core.datasets import session_guard
+
+    session_guard(study, member, data["code"], data["played_at"])
     row = PilotSession.objects.create(enrollment=member, **data)
     bump(study)
     return row
@@ -312,12 +348,16 @@ def add_capture(user, study_id, session_id, asset_id):
         raise ValidationError(
             "Session code and play time must equal the source's original chronology"
         )
+    from backend.core.datasets import capture_pin
+
+    provenance = capture_pin(study, member, session, asset, match, duration)
     row = PilotCapture.objects.create(
         session=session,
         asset=asset,
         source_sha256=asset.source_sha256,
         game_build=match.game_build,
         duration_seconds=duration,
+        provenance=provenance,
         original_retain_until=(
             PilotCapture.objects.filter(asset=asset, withdrawn_at=None)
             .order_by("session__played_at")
@@ -335,6 +375,8 @@ def add_capture(user, study_id, session_id, asset_id):
 
 
 def live_capture(capture):
+    from backend.core.datasets import live_pin
+
     member = capture.session.enrollment
     asset = capture.asset
     return bool(
@@ -342,6 +384,7 @@ def live_capture(capture):
         and asset
         and not asset.deleted_at
         and asset.source_sha256 == capture.source_sha256
+        and live_pin(capture)
         and (not asset.retain_until or asset.retain_until > timezone.now())
         and member.state == "ACTIVE"
         and member.expires_at > timezone.now()
@@ -520,6 +563,35 @@ def review_task(user, study_id, task_id, label, seconds, request_id):
     if member.role != ("ADJUDICATOR" if member.pk == task.adjudicator_id else "REVIEWER"):
         raise PermissionDenied("Current assigned role required")
     checked = label_for(task.kind, label)
+    from backend.core.datasets import study_dataset
+
+    if study_dataset(study) and task.kind != "QC":
+        timing = label.get("timing")
+        if not isinstance(timing, dict) or set(timing) != {
+            "start_us",
+            "end_us",
+            "frame_duration_us",
+        }:
+            raise ValidationError(
+                "Dataset labels require an explicit timing audit, including unknowns"
+            )
+        start, end, frame = (timing[k] for k in ("start_us", "end_us", "frame_duration_us"))
+        if (start is None) != (end is None) or (
+            start is not None
+            and (
+                type(start) is not int
+                or type(end) is not int
+                or not task.start_us <= start <= end <= task.end_us
+            )
+        ):
+            raise ValidationError(
+                "Reviewed timing must be inside the assigned window or both unknown"
+            )
+        if frame is not None and (type(frame) is not int or not 1 <= frame <= 1000000):
+            raise ValidationError("Frame duration is a bounded measured integer or unknown")
+        if frame is not None and start is None:
+            raise ValidationError("Frame audit requires observed timestamps")
+        checked["timing"] = timing
     prior = PilotReview.objects.filter(task=task, reviewer=member).first()
     if prior:
         if prior.label != checked or prior.seconds != seconds or prior.request_id != request_id:
@@ -569,7 +641,9 @@ def invalidate_captures(query):
             ReplayAsset.objects.filter(pk=capture.asset_id).update(retain_until=restored)
     PilotReview.objects.filter(task__capture_id__in=ids).delete()
     PilotTask.objects.filter(capture_id__in=ids).update(prediction=None)
-    query.update(asset=None, source_sha256="", game_build="", withdrawn_at=timezone.now())
+    query.update(
+        asset=None, source_sha256="", game_build="", provenance={}, withdrawn_at=timezone.now()
+    )
     for study_id in studies:
         bump(PilotStudy.objects.get(pk=study_id))
 
@@ -627,11 +701,14 @@ def erase_account(owner_id):
             protocol={},
             protocol_digest="",
         )
+    from backend.core.datasets import erase_account as erase_datasets
+
+    erase_datasets(owner_id)
 
 
 @transaction.atomic
 def close_study(user, study_id):
-    current, study, _ = study_for(user, study_id, manager=True)
+    current, study, _ = study_for(user, study_id, manager=True, privacy=True)
     from backend.core.control_journal import record_intent
 
     record_intent(current.pk, "PILOT_CLOSE", study=str(study.pk))

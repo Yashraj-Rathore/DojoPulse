@@ -779,6 +779,7 @@ class PilotCapture(models.Model):
     game_build = models.CharField(max_length=80, blank=True)
     duration_seconds = models.FloatField()
     original_retain_until = models.DateTimeField(null=True)
+    provenance = models.JSONField(default=dict)
     withdrawn_at = models.DateTimeField(null=True)
 
     class Meta:
@@ -938,4 +939,85 @@ class KnowledgeReanalysis(Owned):
             models.UniqueConstraint(
                 fields=["owner", "request_id"], name="knowledge_reanalysis_request"
             )
+        ]
+
+
+class DatasetCollection(Owned):
+    title = models.CharField(max_length=80)
+    dataset_kind = models.CharField(max_length=12)
+    knowledge = models.ForeignKey(DefinitionVersion, on_delete=models.PROTECT)
+    measurement = models.JSONField()
+    sampling = models.JSONField()
+    state = models.CharField(max_length=12, default="COLLECTING")
+    request_id = models.UUIDField()
+    deleted_at = models.DateTimeField(null=True)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Dataset specification is immutable; create a new collection")
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "request_id"], name="dataset_request"),
+            models.CheckConstraint(
+                condition=Q(dataset_kind__in=["synthetic", "real"])
+                & Q(state__in=["COLLECTING", "FROZEN", "CLOSED"]),
+                name="dataset_collection_valid",
+            ),
+        ]
+
+
+class DatasetStudy(models.Model):
+    dataset = models.ForeignKey(DatasetCollection, on_delete=models.CASCADE, related_name="studies")
+    study = models.OneToOneField(PilotStudy, on_delete=models.PROTECT)
+
+
+class DatasetPartition(models.Model):
+    """Keyed leakage guards; no raw identity, source hash or session code."""
+
+    dataset = models.ForeignKey(DatasetCollection, on_delete=models.CASCADE)
+    kind = models.CharField(max_length=12)
+    token = models.CharField(max_length=64)
+    binding = models.CharField(max_length=64, blank=True)
+    split = models.CharField(max_length=16)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["dataset", "kind", "token"], name="dataset_partition"),
+            models.CheckConstraint(
+                condition=Q(kind__in=["PLAYER", "SESSION", "SOURCE"])
+                & Q(split__in=["development", "validation", "held-out"]),
+                name="dataset_partition_valid",
+            ),
+        ]
+
+
+class DatasetSnapshot(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    dataset = models.ForeignKey(
+        DatasetCollection, on_delete=models.CASCADE, related_name="snapshots"
+    )
+    sequence = models.PositiveIntegerField()
+    request_id = models.UUIDField()
+    data = models.JSONField()
+    content_hash = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    invalidated_at = models.DateTimeField(null=True)
+    reason = models.CharField(max_length=30, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError(
+                "Dataset snapshots are immutable; invalidation may erase private data"
+            )
+        self.content_hash = digest(self.data)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["dataset", "sequence"], name="dataset_sequence"),
+            models.UniqueConstraint(
+                fields=["dataset", "request_id"], name="dataset_snapshot_request"
+            ),
         ]

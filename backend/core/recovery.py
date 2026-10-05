@@ -71,6 +71,9 @@ def apply_restore_controls():
         from backend.core.knowledge import restore_revoke
 
         restore_revoke()
+        from backend.core.datasets import restore_revoke as revoke_datasets
+
+        revoke_datasets()
     token = replaying.set(True)
     try:
         for record in records:

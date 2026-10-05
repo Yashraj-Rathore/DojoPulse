@@ -9,6 +9,7 @@ from typing import Any
 from jsonschema import Draft202012Validator, FormatChecker
 
 from analysis.annotations import validate_annotations
+from analysis.datasets import validate_snapshot
 from analysis.media import file_hash
 
 
@@ -80,8 +81,11 @@ def main() -> None:
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--metadata-only", action="store_true")
     args = parser.parse_args()
-    result = validate_manifest(
-        json.loads(args.manifest.read_text(encoding="utf-8")), args.root, args.metadata_only
+    value = json.loads(args.manifest.read_text(encoding="utf-8"))
+    result = (
+        validate_snapshot(value)
+        if "data" in value
+        else validate_manifest(value, args.root, args.metadata_only)
     )
     print(json.dumps(result))
 

@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.11.0. Decision date: 2026-10-03. Status: local engineering approved;
+Version: 2.12.0. Decision date: 2026-10-05. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -144,3 +144,8 @@ recognition on evidence. Keep the useful deployment foundation; do not deploy it
 
 See [data](data-model.md), [events](event-model.md), [pipeline](video-pipeline.md),
 [evaluation](evaluation-model.md), [security](security-privacy.md), and [deployment](deployment.md).
+
+The [M08 dataset module](dataset-operations.md) reuses consented pilot review with
+exact M07 measurement pins, collection-wide split/source guards, immutable revocable
+snapshots, timing/coverage QA and explicit owned-source canonical import. Real golden
+data, independent frame/held-out accuracy and actual provider/hosting remain unqualified.

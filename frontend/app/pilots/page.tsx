@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { workspaceRequest } from "../workspace-api";
 
-type Study = { id: string; title: string; dataset_kind: string; state: string; role: string; revision: number; protocol_digest: string; protocol: { consent: string; target: string; baseline_end: string; followup_start: string; ends_at: string; audit_ends_at: string } };
+type Study = { id: string; title: string; dataset_kind: string; state: string; role: string; revision: number; protocol_digest: string; protocol: { dataset_id?: string; consent: string; target: string; baseline_end: string; followup_start: string; ends_at: string; audit_ends_at: string } };
 type Member = { id: string; pseudonym: string; role: string; split: string };
 type Session = { id: string; code: string; phase: string; state: string; played_at: string };
 type Capture = { id: string; session_id: string; game_build: string; duration_seconds: number; source_sha256: string };
@@ -36,6 +36,7 @@ export default function Pilots() {
   const [withdraw, setWithdraw] = useState(false);
   const ids = useRef<Record<string, string>>({});
   const invitationFragment = useRef<string | null>(null);
+  const studyFragment = useRef<string | null>(null);
   const refresh = useCallback(async () => {
     const response = await workspaceRequest<{ studies: Study[] }>(csrf, "pilots");
     setStudies(response.studies);
@@ -46,11 +47,15 @@ export default function Pilots() {
     let cancelled = false;
     // Invitation secrets never enter query parameters, analytics or request URLs.
     const fragment = new URLSearchParams(window.location.hash.slice(1));
+    const studyId = fragment.get("study") || studyFragment.current;
+    studyFragment.current = studyId;
+    if (studyId) window.history.replaceState(null, "", window.location.pathname);
     const invite = fragment.get("invite") || invitationFragment.current;
     invitationFragment.current = invite;
     if (invite) window.history.replaceState(null, "", window.location.pathname);
     fetch("/api/session", { cache: "no-store" }).then(r => r.json()).then(s => {
       if (cancelled) return;
+      if (studyId) setSelected(studyId);
       if (invite) setToken(invite);
       setCsrf(s.csrf || ""); setAuthenticated(!!s.authenticated); setOperator(!!s.operator);
       if (!s.authenticated) setError("Sign in through the player workspace to access a study.");
@@ -127,8 +132,8 @@ export default function Pilots() {
           <details><summary>Optional frozen detector prediction</summary><Field name="detector_version" title="Detector version" required={false} /><Field name="prediction_start_us" title="Predicted start, microseconds" type="number" min={0} max={600000000} required={false} /><Choice name="prediction_eligibility" title="Predicted eligibility" options={["UNKNOWN", "ELIGIBLE", "INELIGIBLE"]} /><Choice name="prediction_outcome" title="Predicted outcome" options={["UNKNOWN", "SUCCESS", "FAILURE"]} /></details><button disabled={busy || !data.captures.length}>Assign review task</button>
         </form></section>}
         <section><h2>{data.role === "MANAGER" ? "Review progress" : "Assigned review queue"}</h2><p>Other labels appear only after both independent reviewers submit. Disagreements require the assigned third reviewer.</p>{!data.tasks.length && <p>No assigned tasks.</p>}{data.tasks.map(task => <article className="result" key={task.id}><h3>{task.kind} / {task.id.slice(0, 8)}</h3><p>{task.start_us}–{task.end_us} microseconds / {label(task.state)}</p>
-          {task.can_review && <><video controls preload="none" src={task.media_url} aria-label={`Review recording ${task.id.slice(0, 8)}`} /><form onSubmit={e => void submit(e, "review", f => ({ task_id: task.id, seconds: Number(f.seconds), label: task.kind === "QC" ? { visibility: f.visibility, profile_valid: f.profile_valid === "true", target_absent: f.target_absent === "true" } : { visibility: f.visibility, conditions: { ...Object.fromEntries(conditions.map(c => [c, bool(f[c])])), uncertainty_us: Number(f.uncertainty_us) } } }), true)}>
-            <input type="hidden" name="task_id" value={task.id} /><Choice name="visibility" title="Evidence visibility" options={["UNOBSERVABLE", "UNCERTAIN", "RESOLVABLE"]} />{task.kind === "QC" ? <><Choice name="profile_valid" title="Capture profile valid" options={["false", "true"]} /><Choice name="target_absent" title="Target absent in source" options={["false", "true"]} /></> : <><div className="pilot-conditions">{conditions.map(c => <Choice key={c} name={c} title={label(c)} options={["unknown", "true", "false"]} />)}</div><Field name="uncertainty_us" title="Timestamp uncertainty, microseconds" type="number" min={0} max={1000000} /></>}<Field name="seconds" title="Measured review seconds" type="number" min={1} max={28800} /><p>Submitted reviews are immutable. Unknown evidence must remain unknown.</p><button disabled={busy}>Submit independent review</button>
+          {task.can_review && <><video controls preload="none" src={task.media_url} aria-label={`Review recording ${task.id.slice(0, 8)}`} /><form onSubmit={e => void submit(e, "review", f => ({ task_id: task.id, seconds: Number(f.seconds), label: task.kind === "QC" ? { visibility: f.visibility, profile_valid: f.profile_valid === "true", target_absent: f.target_absent === "true" } : { visibility: f.visibility, conditions: { ...Object.fromEntries(conditions.map(c => [c, bool(f[c])])), uncertainty_us: Number(f.uncertainty_us) }, ...(data.protocol.dataset_id ? { timing: { start_us: nullableNumber(f.audit_start_us), end_us: nullableNumber(f.audit_end_us), frame_duration_us: nullableNumber(f.frame_duration_us) } } : {}) } }), true)}>
+            <input type="hidden" name="task_id" value={task.id} /><Choice name="visibility" title="Evidence visibility" options={["UNOBSERVABLE", "UNCERTAIN", "RESOLVABLE"]} />{task.kind === "QC" ? <><Choice name="profile_valid" title="Capture profile valid" options={["false", "true"]} /><Choice name="target_absent" title="Target absent in source" options={["false", "true"]} /></> : <><div className="pilot-conditions">{conditions.map(c => <Choice key={c} name={c} title={label(c)} options={["unknown", "true", "false"]} />)}</div><Field name="uncertainty_us" title="Timestamp uncertainty, microseconds" type="number" min={0} max={1000000} />{data.protocol.dataset_id && <><p>Audit observed timestamps inside this window. Leave both timestamps and frame duration blank when unobservable; never estimate missing evidence.</p><Field name="audit_start_us" title="Audited start, microseconds" type="number" min={task.start_us} max={task.end_us} required={false} /><Field name="audit_end_us" title="Audited end, microseconds" type="number" min={task.start_us} max={task.end_us} required={false} /><Field name="frame_duration_us" title="Measured frame duration, microseconds" type="number" min={1} max={1000000} required={false} /></>}</>}<Field name="seconds" title="Measured review seconds" type="number" min={1} max={28800} /><p>Submitted reviews are immutable. Unknown evidence must remain unknown.</p><button disabled={busy}>Submit independent review</button>
           </form></>}{task.submitted && <p>Your review is submitted.</p>}{task.reviews.length > 0 && <details><summary>Completed independent labels</summary><pre>{JSON.stringify(task.reviews, null, 2)}</pre></details>}{task.final_label && <details><summary>Resolved label</summary><pre>{JSON.stringify(task.final_label, null, 2)}</pre></details>}
         </article>)}</section>
         {data.role === "MANAGER" && <section><h2>Freeze and assess the dataset</h2><p>Freezing prevents new members, sessions, captures, tasks and predictions. Assigned reviews may finish; each new review invalidates older reports. Withdrawal always remains available.</p><button disabled={busy || data.state !== "COLLECTING"} onClick={() => void act(async () => { await workspaceRequest(csrf, `pilots/${selected}/freeze`, "POST", {}); setStatus("Source inputs frozen. Independent reviews can still finish."); })}>Freeze source inputs</button><button disabled={busy || data.state !== "FROZEN"} onClick={() => void act(async () => { await workspaceRequest(csrf, `pilots/${selected}/reports`, "POST", {}); setStatus("Six evidence reports generated. Scientific gates remain NOT_RUN."); })}>Generate G1–G6 reports</button><button className="secondary" disabled={busy || !data.reports.length} onClick={() => void download("reports")}>Download current reports</button><button className="secondary" disabled={busy || data.state !== "FROZEN"} onClick={() => void download("annotations")}>Export reviewed annotations</button></section>}

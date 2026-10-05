@@ -75,3 +75,9 @@ rights, frame/reach/timing evidence and a documented release decision. Hosting n
 qualified private reviewer authorization, storage, isolation and recovery. No provider,
 undocumented endpoint, detector, real study, expert approval or deployment is enabled.
 M07.02/.03/.05 release gates remain open.
+
+M08 adds an [explicit source-specific dataset measurement grant](dataset-operations.md).
+An owned retained source may import only its exact independently reviewed current
+snapshot batch through the canonical operator publisher, with snapshot/definition hash
+pins. This does not make another workspace's synthetic definitions or drills generally
+available; dataset withdrawal invalidates derived active events and evaluations.

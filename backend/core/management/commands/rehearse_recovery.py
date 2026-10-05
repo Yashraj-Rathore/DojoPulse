@@ -79,6 +79,14 @@ for operator in operators:
     knowledge.review(operator, proposal.pk, proposal_hash=proposal.content_hash, decision='APPROVE',
         note='Synthetic restore proof', confirm_reviewed=True, request_id=uuid.uuid4())
 knowledge.publish(owner, proposal.pk)
+# Minimal private-storage fixture, not a qualified dataset or measurement release.
+from backend.core.models import DatasetCollection, DatasetStudy, DatasetSnapshot, DatasetPartition, DefinitionVersion
+dataset = DatasetCollection.objects.create(owner=manager, title='Synthetic erasure fixture', dataset_kind='synthetic',
+    knowledge=DefinitionVersion.objects.get(pk='recovery/build/1'), measurement={'restore-fixture': True},
+    sampling={'private': 'must-erase'}, request_id=uuid.uuid4())
+DatasetStudy.objects.create(dataset=dataset, study=study)
+DatasetSnapshot.objects.create(dataset=dataset, sequence=1, request_id=uuid.uuid4(), data={'private': 'must-erase'})
+DatasetPartition.objects.create(dataset=dataset, kind='PLAYER', token='a'*64, binding='', split='held-out')
 """
 
 DELETE = """
@@ -124,6 +132,13 @@ assert not KnowledgeProposal.objects.exclude(state='WITHDRAWN', payload={}, prov
 assert not KnowledgeEvidence.objects.exists()
 assert not KnowledgeReview.objects.exclude(note='').exists()
 assert DefinitionVersion.objects.get(pk='recovery/build/1').status == 'APPROVED'
+from backend.core.models import DatasetCollection, DatasetSnapshot, DatasetPartition
+assert DatasetCollection.objects.count() == 1
+assert not DatasetCollection.objects.exclude(state='CLOSED', measurement={}, sampling={}).exists()
+assert not DatasetCollection.objects.filter(deleted_at=None).exists()
+assert not DatasetSnapshot.objects.filter(invalidated_at=None).exists()
+assert not DatasetSnapshot.objects.exclude(data={}).exists()
+assert not DatasetPartition.objects.exists()
 # Its immutable historical definition is retained; the restored grant is permanently revoked.
 for asset in ReplayAsset.objects.all():
     assert not private_path(asset.storage_key).exists()

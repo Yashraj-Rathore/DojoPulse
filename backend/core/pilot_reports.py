@@ -515,6 +515,11 @@ def decide(user, study_id, report_id, action, reason, reference):
 @transaction.atomic
 def annotations(user, study_id):
     _, study, _ = study_for(user, study_id, manager=True)
+    return annotation_batches(study)
+
+
+def annotation_batches(study):
+    """Internal builder. Callers hold capacity lock and independently check access."""
     if study.state != "FROZEN":
         raise ValidationError("Freeze the study before exporting labels")
     from analysis.annotations import validate_annotations
@@ -584,7 +589,11 @@ def annotations(user, study_id):
             "played_at": match.played_at.isoformat(),
             "examples": examples,
         }
-        validate_annotations(batch, capture.source_sha256)
+        validate_annotations(
+            batch,
+            capture.source_sha256,
+            situation=study.protocol["target"] if study.protocol.get("dataset_id") else None,
+        )
         batches.append(batch)
     return {
         "scope": "SOFTWARE_REHEARSAL" if study.dataset_kind == "synthetic" else "REVIEW_REQUIRED",

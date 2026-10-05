@@ -606,6 +606,10 @@ def event_knowledge(event):
 
 
 def event_available(event):
+    if event.measurement.get("dataset_snapshot"):
+        from backend.core.datasets import event_available as dataset_event_available
+
+        return dataset_event_available(event)
     if not event.measurement and event.match.dataset_kind == "synthetic":
         return True
     for key in (event_knowledge(event), event.situation, event.metric):
@@ -646,6 +650,9 @@ def revoke(proposal, reason, *, erase=False, retire=False):
             dependent.save(update_fields=["state", "reason"])
             keys.add(dependent.published_id)
     if keys:
+        from backend.core.datasets import invalidate_definitions
+
+        invalidate_definitions(keys)
         assignments = DrillAssignment.objects.filter(drill_id__in=keys)
         ImprovementEvaluation.objects.filter(
             plan__assignment__in=assignments, invalidated_at=None

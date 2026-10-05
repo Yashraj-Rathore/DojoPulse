@@ -1050,3 +1050,60 @@ ordinary CI and monitor its actual latest tip before handoff; earlier code succe
 does not establish the documentation tip's green check. Next: permitted exact-build
 captures/experts and M08 dataset preparation; retain actual hosting/provider gates and
 reviewed dependency maintenance.
+
+
+## 2026-10-05 - M08 local dataset operations implemented
+
+Requirements: M08.01-M08.07, M07.05, M09.04, M12.02, M14.04/.05,
+M15.01/.06, M16.05, M18.07, M01.05/.06 and M19.02. User authorized the
+complete available M08 module, direct push to main and monitoring. Architecture
+2.12.0, ADR-020/D032; stable M08.07 distinguishes local engineering from real data.
+
+Changed core models/migration 0018, dataset services/API/routes, pilot protocol/source/
+review/export hooks, canonical publisher and source-scoped measurement grants,
+knowledge/privacy/recovery/account export, portable dataset validator, native recovery
+seed/assertions, frontend dataset workspace/linked review timing/navigation and focused
+regression/browser tests. Updated both trackers, architecture, ADR, README and contract.
+
+Collections pin M07 definition/build/platform/dependency hashes and sampling before
+new linked self-consented studies. Existing consent cannot be attached retroactively.
+Keyed player/session/source partitions preserve original splits/source assignment after
+withdrawal until closure. Freeze inputs/predictions before held-out manager label access;
+structured/timestamp differences require independent adjudication. Receipts include full
+QC, negative/uncertain categories, missing-session inventory, timing/review coverage and
+reference-relative predictions, never scientific or training approval. Explicit owned
+source import uses the existing canonical publisher; original capture facts stay intact.
+
+Withdrawal/retention/source/knowledge/account/restore invalidate and erase private
+snapshots and dependent current event contributions/evaluations. Restored collections
+are closed before reads. Unavailable knowledge still permits privacy closure. Local
+protocol guard retention is explicit; real key rotation/alias blindness/retained-copy
+and hosted operations remain unqualified.
+
+Validation so far: 41 focused PostgreSQL dataset/pilot passes in 91.75s before the
+last added binding/retirement/migration/race cases; production build, TypeScript/ESLint,
+Ruff/mypy/Django/schema and native fresh migration round trips/pg_dump/restore/repeated
+controls/private dataset erasure passed. Browser qualification exposed Strict Mode
+losing the linked study fragment; fixed with a persistent ref. Corrected browser and
+final full backend checks are pending. Minimal recovery seed tests private-data erasure,
+not approved dataset validity. No test gate or release flag was weakened.
+
+Remote verified sole main unchanged at 7b1fd81. Publication/latest-tip CI pending;
+M08.07 is PARTIAL until final qualification. Real M08 still needs permitted exact-build
+representative footage, qualified reviewers/adjudicator, external held-out/timing and
+erasure audits. G1-G6 remain NOT_RUN; no provider/cloud/training activation. Next:
+qualify and publish, then acquire approved real evidence before M09 detector release.
+
+
+M08 final local qualification (same implementation): **394 passed, seven separate
+Docker skips** in 274.99s; JUnit reports/m08-python-final.xml, zero failures/errors.
+Includes all 23 dataset cases and the actual PostgreSQL import/foreign-reviewer
+withdrawal race. All 35 Edge journeys passed in 34.8s; inspected 390px screenshot,
+production build/TypeScript/ESLint, Ruff/format/mypy/Django/schema/links and both
+Python-lock/production npm audits pass. Final native PostgreSQL fresh migration
+forward/reverse/forward through 0018 plus real dump/restore/repeated controls asserts
+private snapshot JSON erased, collections closed, keyed partitions removed, and
+pending-upload/knowledge erasure. Verified-empty local M08 tables were safely
+round-tripped to match the final additive schema without removing dataset history.
+M08.07 DONE for local engineering; real M08 and G1-G6 remain gated. Publication
+and exact latest-main CI are pending; no skips/reduced gates in published commits.

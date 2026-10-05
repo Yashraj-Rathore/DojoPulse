@@ -54,7 +54,7 @@ def as_opportunity(event):
 
 
 @transaction.atomic
-def publish_annotations(operator, run_id, match_id, annotation):
+def publish_annotations(operator, run_id, match_id, annotation, *, dataset_snapshot_id=None):
     if not operator.is_staff or not operator.is_active:
         raise PermissionDenied("Independent review import requires an operator")
     owner_id = AnalysisRun.objects.values_list("owner_id", flat=True).get(pk=run_id)
@@ -100,7 +100,12 @@ def publish_annotations(operator, run_id, match_id, annotation):
         raise ValidationError("Deleted/cancelled evidence cannot publish")
     from backend.core.knowledge import publication_measurement
 
-    measurement = publication_measurement(run, match)
+    if dataset_snapshot_id:
+        from backend.core.datasets import canonical_measurement
+
+        measurement = canonical_measurement(run, match, dataset_snapshot_id, annotation)
+    else:
+        measurement = publication_measurement(run, match)
     validate_annotations(annotation, run.asset.source_sha256, situation=measurement["situation"])
     if (
         annotation["game_build"] != match.game_build
@@ -125,7 +130,10 @@ def publish_annotations(operator, run_id, match_id, annotation):
     ):
         raise ValidationError("Exact duplicate capture already contributes to this owner")
     if publication and publication.run_id == run.pk:
-        if run.result.get("annotation_hash") != digest(annotation):
+        if run.result.get("annotation_hash") != digest(annotation) or (
+            run.result.get("measurement_hash")
+            and run.result["measurement_hash"] != digest(measurement)
+        ):
             raise ValidationError("Published run differs; create a new analysis revision")
         return publication
     if GameplayEvent.objects.filter(run=run, match=match).exists():
@@ -174,5 +182,6 @@ def publish_annotations(operator, run_id, match_id, annotation):
         publication = AnalysisPublication.objects.create(match=match, run=run)
     run.status = "PARTIAL"  # reviewed target only, never claim complete video understanding
     run.result["annotation_hash"] = digest(annotation)
+    run.result["measurement_hash"] = digest(measurement)
     run.save(update_fields=["status", "result"])
     return publication

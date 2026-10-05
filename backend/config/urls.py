@@ -4,6 +4,7 @@ from django.urls import path
 from backend.core import (
     account_api,
     api,
+    dataset_api,
     experience_api,
     knowledge_api,
     match_api,
@@ -41,6 +42,10 @@ urlpatterns = [
     path("api/operations/cost", operations_api.cost),
     path("api/usage", operations_api.usage),
     path("api/pilots", pilot_api.studies),
+    path("api/datasets", dataset_api.collections),
+    path("api/datasets/<uuid:dataset_id>", dataset_api.detail),
+    path("api/datasets/<uuid:dataset_id>/snapshots/<uuid:snapshot_id>", dataset_api.download),
+    path("api/datasets/<uuid:dataset_id>/<str:operation>", dataset_api.command),
     path("api/pilot-invitation", pilot_api.inspect_invitation),
     path("api/pilot-join", pilot_api.join),
     path("api/pilots/<uuid:study_id>", pilot_api.study_detail),
