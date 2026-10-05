@@ -1107,3 +1107,26 @@ pending-upload/knowledge erasure. Verified-empty local M08 tables were safely
 round-tripped to match the final additive schema without removing dataset history.
 M08.07 DONE for local engineering; real M08 and G1-G6 remain gated. Publication
 and exact latest-main CI are pending; no skips/reduced gates in published commits.
+
+
+## 2026-10-05 - M08 publication verified on main
+
+Requirements: M01.05/.06, M08.07, M15.06 and M19.02. Published
+**d83f3422990d40199a1ef3a3ad0b13eec45091a8** directly to main without force.
+All six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37329783254) passed first attempt at **15:10:08 UTC**:
+394 PostgreSQL/Python (230.107s JUnit; seven separately gated Docker skips),
+35 Chromium (35.5s), seven Docker/max-profile (138.628s), three Terraform mocks,
+native guarded migration/dump/restore/repeated-control/dataset erasure, both Python
+lock and production npm audits, static/schema/build and unprivileged startup.
+Downloaded JUnit records 401 Python cases, seven skips and zero failures/errors;
+all seven Docker cases separately pass with zero skips/failures/errors. Exact
+check-runs API confirms six completed successes and GitHub retains only main.
+
+M08.07 is locally DONE; real M08 remains PARTIAL/BLOCKED by permitted representative
+footage, qualified independent reviewers/adjudicator, timing/held-out and deletion
+audits. G1-G6 remain NOT_RUN; no live provider, hosting or training activated.
+This receipt changes only PRODUCT_PROGRESS, this log and M08 qualification. Publish
+with ordinary CI and monitor its actual latest main tip; source-code success does
+not establish the documentation tip's check mark. Next: approved real evidence
+through M07/M08 before M09 recognition release; retain separate hosted/provider
+and source-access/dependency maintenance gates.

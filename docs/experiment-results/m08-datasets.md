@@ -44,3 +44,16 @@ success/failure/negative/uncertain labels, qualified reviewers/adjudicator, inde
 held-out and frame accuracy evidence, external retained-copy erasure, hosted scale and
 G1-G6 remain unrun. Known dev lint advisory and source-access review remain tracked;
 no dependency/provider/release flag was changed.
+
+
+Publication qualification: **d83f3422990d40199a1ef3a3ad0b13eec45091a8** is
+published directly on main. All six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37329783254) pass first attempt at
+15:10:08 UTC, 2026-10-05. Remote JUnit: 394 Python pass/seven separate Docker skips
+(230.107s), seven Docker/max-profile pass (138.628s), zero failures/errors. Logs:
+35 Chromium (35.5s), three Terraform mocks, actual recovery/erasure and unchanged
+static/schema/build/audit/startup gates pass. Downloaded evidence is local under
+reports/m08-ci and reports/m08-ci.log. Only main remains; no retry or weakened gate.
+
+The final progress receipt is documentation-only, retains ordinary CI and its
+actual latest main tip is monitored before handoff. Real dataset/scientific/hosted
+release acceptance remains independent; local M08.07 DONE does not close those gates.
