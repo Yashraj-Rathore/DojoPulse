@@ -1516,3 +1516,45 @@ plus this one separate case, 51 Edge browser passes, build/lint/types/schema/doc
 0021 migration/dump/restore/erasure. Seven real Docker tests require the dedicated CI job.
 No dependency/provider/real-recognition/hosting activation. M09.08 remains PARTIAL pending
 exact-source remote qualification; commit/push main and monitor actual final tip next.
+
+### 2026-10-05 - M09 source published directly on main, exact CI pending
+
+M09.01-.08, M01.05/.06 and M19.02: pushed source 621a16142a26105233c3c7d925faf43762cc5467
+(feat: implement M09 local recognition validation module) directly to main with CI enabled.
+Includes recovered final M12 qualification receipt. Earlier local 498 full + one separate
+PostgreSQL/OpenCV, 51 Edge/static/build/schema/docs and native 0021 recovery remain their dated
+scope. Monitor this exact source and final normal-CI qualification receipt; no earlier green
+run is substituted. Real recognition/calibration/G1/G2/provider/hosting approval remains closed.
+
+### 2026-10-05 - M09 source CI five jobs passed; runner cancellation retried
+
+M09.01-.08, M15.01/.06 and M19.02: source 621a161 run 37371312001 first attempt completed
+with five successful jobs. Downloaded backend artifact: 499 PostgreSQL passes / seven separate
+Docker skips, 506 cases, zero errors/failures, 302.185s. Native recovery passed. Completed
+frontend log: 51 Chromium passes in 49.5s; Terraform: three mocks passed. Audits/static/build/
+application-container startup passed. Media job 111968869023 was cancelled at 20:56:38 UTC:
+no assigned runner, no steps executed; annotation says hosted runner acquisition failed after
+multiple attempts. The workflow is therefore not green; no actual Docker test success is claimed.
+GitHub Status reports an ongoing hosted-runner assignment incident (2026-10-05, 20:39 UTC update).
+Retried only that cancelled job on the same exact source; five successful results are preserved.
+M09.08 remains PARTIAL pending media/source qualification and final ordinary-CI receipt checks.
+
+### 2026-10-05 - M09 source six-job qualification verified; final receipt retains ordinary CI
+
+M09.01-.08, M08.05/.06, M14.04/.05, M15.01/.06, M16.05, M18.07, M01.02/.05/.06 and M19.02:
+source 621a16142a26105233c3c7d925faf43762cc5467 passed all six jobs in run 37371312001 on
+attempt 2, completed 21:11:43 UTC. Watcher exited 0; fresh run/job metadata confirms exact SHA
+and six completed/success states. Downloaded artifacts confirm 499 PostgreSQL passes / seven
+separate Docker skips (506 cases, 302.185s, zero errors/failures) and **seven actual Docker/
+max-profile passes** (98.111s, zero skips/errors/failures). Completed log summaries confirm
+51 Chromium passes (49.5s) and three Terraform mocks. Static/schema/audits/build/standalone/
+unprivileged startup and native guarded 0021 recovery passed. Five original successes were
+preserved; only media was retried after GitHub cancelled it without acquiring any runner or
+executing steps. No source/test guard was changed to get green results.
+
+M09.08 DONE qualifies coherent local engineering only; M09 overall remains PARTIAL and actual
+observation implementations, calibration, expert reference timing/labels, G1/G2, review cost/
+capacity and hosted release remain required. Updated this log, PRODUCT_PROGRESS.md, M09 evidence
+and D036 qualification status. Publish this final receipt on main with CI enabled and monitor
+the actual final tip, with a clean local/remote/head/branch check. Scientific/provider/hosting
+activation and repository access-review/development-advisory work remain open.

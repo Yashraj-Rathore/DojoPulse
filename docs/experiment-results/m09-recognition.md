@@ -50,3 +50,42 @@ Real synthetic pixels were matched using OpenCV; the offline bridge emitted LOW-
 candidates with exact template/config pins, and the credentialed parser discarded them.
 Final Ruff/format226/mypy29 recheck passed. All local checks are complete; real Docker and
 exact source/latest-tip CI remain pending publication. No installed dependency versions changed.
+
+
+## Publication
+
+Source **621a16142a26105233c3c7d925faf43762cc5467** pushed directly to main with ordinary CI.
+[Source run 37371312001](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37371312001)
+is queued/running; exact six-job qualification and final receipt/latest-tip verification pending.
+
+
+## Source CI first attempt and infrastructure retry
+
+Run 37371312001 on **621a161** passed five jobs: downloaded **499 PostgreSQL passes / seven
+separate Docker skips**, 506 JUnit cases, zero errors/failures, 302.185s; native 0021 recovery;
+**51 Chromium passes in 49.5s**; **three Terraform mocks**; audits/static/build and unprivileged/
+standalone/quarantine startup. Media job 111968869023 was cancelled at 20:56:38 UTC after hosted
+runner acquisition failed repeatedly. It had no runner and no executed steps. There is no
+Docker test result from that attempt and the overall run is not green. Retried only that job
+on the same source, preserving five successes. [GitHub Status](https://www.githubstatus.com/)
+reported an active runner-assignment incident (20:39 UTC update). Actual Docker/source six-job
+qualification and final ordinary-CI receipt/latest-tip checks remain pending.
+
+
+## Exact source six-job qualification
+
+**621a16142a26105233c3c7d925faf43762cc5467** passed all six jobs in
+[run 37371312001](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37371312001),
+attempt 2, completed **2026-10-05 21:11:43 UTC**. Fresh run/job metadata confirms exact SHA
+and six completed/success states; watch --exit-status returned 0. Preserved five original
+successes and retried only the unassigned media job. Downloaded sandbox artifact confirms
+**seven actual Docker/max-profile passes in 98.111s**, zero skips/errors/failures. Earlier
+source artifact/log summaries above retain actual **499 PostgreSQL**, **51 Chromium** and
+**three Terraform** counts/timings; native guarded 0021 recovery, audits/static/schema/build/
+standalone/unprivileged startup passed. There is no local Docker execution claim and no claim
+that the initial runner-cancelled attempt passed. Code/tests were unchanged for the retry.
+
+M09.08 is DONE for coherent local engineering. Real M09 observation accuracy/calibration,
+qualified unseen G2, expert reference labels/timing, approved review capacity/cost and hosted
+qualification remain open. A final tracking receipt preserves ordinary CI; actual latest main
+checks must be monitored before verified delivery, even though the receipt changes only docs.
