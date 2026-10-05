@@ -146,3 +146,7 @@ jobs:
           test "$status" = "503"
           test "$(cat /tmp/dojo-health)" = '{"status": "QUARANTINED"}'
           curl --fail --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:8181/ >/dev/null
+          curl --fail http://127.0.0.1:8181/images/dojo-training.webp --output /tmp/dojo-hero.webp
+          cmp frontend/public/images/dojo-training.webp /tmp/dojo-hero.webp
+          curl --fail http://127.0.0.1:8181/icon.svg --output /tmp/dojo-icon.svg
+          cmp frontend/public/icon.svg /tmp/dojo-icon.svg

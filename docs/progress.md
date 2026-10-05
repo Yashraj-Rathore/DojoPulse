@@ -1634,3 +1634,36 @@ zero qualifying real captures, no verified in-game build/overlays/experts/indepe
 G1/G2 remain NOT_RUN. Publish this ordinary-CI tracking receipt, monitor its actual latest main
 SHA, then confirm local/remote/head/branch consistency and clean tree. No skip instructions,
 feature branches, game control, external collection, private transport or hosted release.
+
+### 2026-10-05 - Original DojoPulse visual system, local checks complete
+
+M13.01/.04/.07/.09, M16.02, M19.02 and M01.05/.06: owner prioritized UI improvement
+before real capture work and requested MetaPunish inspiration without an exact copy. Read
+root/frontend instructions and installed Next CSS/image guides. Inspected public reference
+HTML/CSS and original hero (connected browser unavailable); none of those assets/copy/code
+are distributed. Built-in imagegen created an original fictional martial artist/dojo;
+inspected PNG then format-only compressed to 169,594-byte WebP. Three Barlow fonts/OFL
+licences are self-hosted. Exact prompt/origins recorded in docs/design/visual-system.md.
+
+Changed globals.css, layout.tsx, page.tsx, training-journey.tsx, new fonts/public art/icon,
+new browser entry tests, Dockerfile.web and actual container HTTP/byte smoke checks.
+Graphite/ember surfaces, condensed headings, truthful scope/validation, responsive entry
+and training overview lead into existing tools. Authenticated training tools precede account/
+privacy controls; section links, token scrubbing, consent, unknowns and all scientific/
+provider gates remain. No backend/migration/dependency change or external feature activation.
+
+Actual checks: ESLint/types/Next production build pass; 54 complete Edge tests pass in 57.9s.
+Inspected desktop/mobile visitor and training previews plus mobile dataset view. Fixed narrow
+heading sentence spacing; direct CLI runs two entry tests successfully (7.7s). A prior npm
+filter invocation selected no tests because Windows dropped --grep; not counted as a pass.
+Visitor 320/390/768/1440px and player 390px overflow, image loading, hash navigation, disabled
+gates and skip-link keyboard checks pass. Selected body/muted/button/border/focus contrast
+ratios 17.02/8.50/8.96/3.11/11.57; not a whole-page accessibility audit. Local backend/Docker/
+Terraform not rerun for this UI-only implementation; full exact-source remote CI remains.
+
+Added M13.09 stable acceptance and local DONE; overall M13 stays PARTIAL. Updated both
+progress files, player-experience contract, UI receipt and D038. Native screen-reader,
+real-device/participant usefulness, real captures/G1-G6 and hosted/provider approval remain
+open. Remote/local main still 20f74cc and only main exists. Next: publish ordinary main
+commit, monitor exact source including container assets, then normal final receipt/latest-tip
+checks. Return to permitted exact-build capture/reviewer work after this UI delivery.

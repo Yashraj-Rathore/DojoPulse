@@ -1,10 +1,15 @@
 # M13 player experience — local implementation contract
 
-Updated 2026-10-01; Architecture 2.6.0. Available local M13 engineering is implemented.
+Updated 2026-10-05; Architecture 2.17.0. Available local M13 engineering is implemented.
 M13's release exit still requires permitted real providers, production accounts, validated
 knowledge/measurement and real usability/accessibility studies.
 
 ## Journey and scope
+
+The [original visual system](../design/visual-system.md) uses graphite panels, ember accents,
+self-hosted fonts and decorative generated dojo art. Visitor entry links to real local access
+controls; authenticated entry leads with training tools and retains account/privacy section links.
+The reference-inspired presentation never changes provider, consent, scientific or release gates.
 
 The workspace explains the candidate Jin/Jin scope, capture requirements, unavailable live
 identity services and the difference between metadata, attribution and reviewed gameplay.

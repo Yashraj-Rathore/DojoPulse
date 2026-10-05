@@ -2,7 +2,7 @@ import { displayTime } from "./workspace-api";
 
 type Plan = { id: string; assignment_id: string; specification?: { baseline_end?: string; followup_start?: string; followup_end?: string; baseline_membership?: unknown[] } };
 export default function TrainingJourney({ events, assignments, plans, practice, evaluations, zone }: { events: number; assignments: number; plans: Plan[]; practice: number; evaluations: number; zone: string }) {
-  return <section className="wide" aria-labelledby="journey-heading"><h2 id="journey-heading">Your training path</h2>
+  return <section className="wide training-path" id="training-path" aria-labelledby="journey-heading"><div className="eyebrow">From your first capture to follow-up</div><h2 id="journey-heading">Your training path</h2>
     <ol className="journey"><li><a href="#evidence">Observe a baseline</a><p>{events} reviewed events available. A weakness needs compatible, reachable opportunities; unknown outcomes do not count as misses.</p></li>
       <li><a href="#practice">Choose an approved drill</a><p>{assignments} assignments. Draft drills stay unavailable until expert approval.</p></li>
       <li><a href="#compare">Freeze the plan before practice</a><p>{plans.length} frozen plans. Include complete baseline captures and predeclare follow-up dates.</p></li>

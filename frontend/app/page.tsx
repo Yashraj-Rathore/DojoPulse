@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import MatchHistory from "./match-history";
 import WorkspaceTools from "./workspace-tools";
 import EvidenceBrowser from "./evidence-browser";
@@ -68,19 +69,30 @@ export default function Home(){
   const completed=await transfer.start(file,metadata);if(completed){chooseFile(null);await refresh();}
  }
  const picked=selected;
- return <main>
+ return <main className={`player-workspace ${authenticated?"is-authenticated":"is-visitor"}`}>
   {authenticated&&<a className="skip-link" href="#workspace-content">Skip to workspace</a>}
-  <header><span className="brand">Performance Lab<span style={{color:"#809255"}}> /</span></span><span className="tag">LOCAL RESEARCH PROTOTYPE</span></header>
-  <div className="intro"><div className="eyebrow">Tekken 8 · One measured situation</div><h1>Practice with a question.<br/>Return with evidence.</h1><p>Observe a defensive response, practice it, and measure the same situation in later matches. An uncertain result is a useful result.</p></div>
-  <div className="notice">Gameplay validation is pending. Automated judgments and the draft drill are gated until capture, knowledge and reviewer checks pass.</div>
+  <header className="site-header">
+   <Link href="/" className="brand" aria-label="DojoPulse home"><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M3 17h6l4-10 6 18 4-8h6" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/></svg></span><span>DOJO<span className="brand-accent">PULSE</span><small>Your training workspace</small></span></Link>
+   <nav className="header-nav" aria-label="Main navigation"><a href={authenticated?"#training-path":"#training-method"}>The training loop</a><a href={authenticated?"#workspace-content":"#sign-in"}>Workspace <span aria-hidden="true">↗</span></a></nav>
+   <span className="tag prototype-tag">LOCAL RESEARCH PROTOTYPE</span>
+  </header>
+  <div className="hero">
+   <Image className="hero-art" src="/images/dojo-training.webp" alt="" fill sizes="(max-width: 740px) 100vw, 1280px" preload/>
+   <div className="hero-shade" aria-hidden="true"/>
+   <div className="hero-copy"><div className="eyebrow"><span className="eyebrow-rule" aria-hidden="true"/>Tekken 8 · One measured situation</div><h1>MAKE EVERY<br/>SESSION <span>INTENTIONAL.</span></h1><p>Practice with a question. Return with evidence. Your matches, reviewed moments and next training session, in one place.</p>
+    <div className="hero-actions"><a className="button-link" href={authenticated?"#matches":"#sign-in"}>{authenticated?"Review your matches":"Open your workspace"}<span aria-hidden="true">↗</span></a><a className="text-link" href={authenticated?"#capture":"#training-method"}>{authenticated?"Capture guide":"Explore the training loop"}<span aria-hidden="true">→</span></a></div>
+    <p className="hero-note">One situation. Measured practice. Honest follow-up.</p>
+   </div>
+   <div className="hero-caption" aria-hidden="true"><span>THE NEXT ROUND STARTS IN THE LAB</span><span>DOJOPULSE / TRAINING SERIES 01</span></div>
+  </div>
+  <div className="scope-strip" aria-label="Workspace scope"><div><span>01 / FOCUS</span><strong>Tekken 8 defense</strong></div><div><span>02 / METHOD</span><strong>Capture. Review. Practice.</strong></div><div><span>03 / STANDARD</span><strong>Evidence before conclusions</strong></div></div>
+  <div className="notice validation-notice"><span className="notice-symbol" aria-hidden="true">!</span><div><strong>Gameplay validation is pending.</strong> Automated judgments and the draft drill are gated until capture, knowledge and reviewer checks pass.</div></div>
+  <div className="method-overview" id="training-method"><div className="method-heading"><span className="eyebrow">A deliberate training loop</span><h2>Less guesswork.<br/> A clearer next session.</h2></div><ol className="method-cards"><li><span className="method-number">01</span><h3>Find the moment</h3><p>Keep the match and its context. Separate reviewed evidence from what is still unknown.</p></li><li><span className="method-number">02</span><h3>Work the response</h3><p>Choose a reviewed drill, freeze your baseline and record repeatable practice.</p></li><li><span className="method-number">03</span><h3>Check the change</h3><p>Return to later matches. Compare the same situation, with uncertainty in view.</p></li></ol></div>
   {error&&<div role="alert" className="notice error">{error}</div>}
-  {ready&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
-  {!ready?<p>Connecting to local API…</p>:!authenticated?
-   <section className="login"><h2>Open your local workspace</h2><p className="muted">Sign in with your verified local account or an existing development account.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section>:
+  {!ready?<p role="status">Connecting to local API…</p>:!authenticated?
+   <div className="access-grid" id="sign-in"><section className="login"><span className="eyebrow">Enter the dojo</span><h2>Open your local workspace</h2><p className="muted">Sign in with your verified local account or an existing development account.</p><form onSubmit={login}><label htmlFor="username">Username</label><input id="username" name="username" autoComplete="username" required/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required/><button>Sign in</button></form></section><AccountAccess csrf={csrf} authenticated={authenticated}/></div>:
    <><nav className="steps" aria-label="Workspace sections"><a href="#workspace">Setup & account</a><a href="#matches">Player & matches</a><a href="#capture">01 Capture</a><a href="#evidence">02 Observe</a><a href="#diagnosis">Priorities</a><a href="#practice">03 Practice</a><a href="#compare">04 Compare</a><Link href="/pilots">Pilot studies</Link>{operator&&<><Link href="/knowledge">Knowledge review</Link><Link href="/datasets">Datasets</Link><Link href="/recognition">Recognition validation</Link><Link href="/operations">Operations</Link></>}</nav>
    <div className="grid" id="workspace-content" tabIndex={-1}>
-    <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
-    <AccountControls csrf={csrf}/>
     <TrainingJourney events={data.event_total??data.events.length} assignments={data.assignments.length} plans={data.plans} practice={data.practice.reduce((sum,p)=>sum+(p.available_attempts??p.attempts),0)} evaluations={data.evaluations.length} zone={zone}/>
     <MatchHistory csrf={csrf} zone={zone} onEvidence={id=>{setMatchEvidence(id);document.getElementById("evidence")?.scrollIntoView();}}/>
     <section id="capture"><h2>01 / Capture one situation</h2><p>Jin defending against Jin’s u/f+4 is the provisional target. Move identity and the response still require expert verification.</p><ol><li>Record Steam PC, English UI, 1920 × 1080 at constant 60 fps.</li><li>Show HUD, both input histories, frame information and battle status. Capture one continuous match or practice block.</li><li>Keep the source uncut, with no pauses, rewinds or missing overlays. Export SDR H.264 MP4, up to 10 minutes / 512 MiB.</li></ol>
@@ -127,7 +139,10 @@ export default function Home(){
      {ev.result.change_interval&&<p>Observed change: {points(ev.result.observed_change??0)}. Uncertainty range: {points(ev.result.change_interval[0])} to {points(ev.result.change_interval[1])}.</p>}
      </>}<p>{(ev.invalidated_at||ev.available===false)?"Evidence is no longer available or collection changed. Re-evaluate before using this historical result.":ev.result.next_action}</p><small>This observational comparison does not establish causation.</small>
     </div>)}</section>
+    <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
+    <AccountControls csrf={csrf}/>
    </div></>}
-   <footer>Private local research workspace · No automated move judgments · No model-training consent implied</footer>
+   {authenticated&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
+   <footer><span className="footer-brand">DOJOPULSE <span>/</span> BUILT FOR THE NEXT SESSION</span><span>Private local research workspace · No automated move judgments · No model-training consent implied</span></footer>
   </main>;
 }
