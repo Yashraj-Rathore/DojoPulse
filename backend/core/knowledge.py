@@ -78,7 +78,7 @@ FIELDS = {
             "setup",
             "native_practice",
         },
-        set(),
+        {"priority_assessment"},
     ),
     "compatibility": (
         {"game_build", "from_knowledge", "to_knowledge", "disposition", "rationale"},
@@ -199,6 +199,10 @@ def validate_payload(kind, build, payload):
     ):
         raise ValidationError("Distinct reviewed move versions are required")
     if kind == "drill":
+        if "priority_assessment" in payload:
+            from analysis.player_model import priority_assessment
+
+            priority_assessment(payload["priority_assessment"])
         if (
             type(payload["repetitions"]) is not int
             or not 1 <= payload["repetitions"] <= 200

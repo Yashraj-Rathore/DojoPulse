@@ -380,10 +380,17 @@ def test_owned_canonical_import_preserves_capture_and_invalidates_on_erasure(dat
     e.capture.match.refresh_from_db()
     assert e.capture.match.knowledge_revision == "original-unverified-capture/1"
     assert MatchContribution.objects.get().summary["denominator"] == 1
+    before = client(e.participant).get("/api/player-model?dataset_kind=synthetic")
+    assert before.status_code == 200 and before.data["card_total"] == 1
+    assert before.data["cards"][0]["scope"]["knowledge_revision"] == "test/knowledge/1"
+    assert before.data["cards"][0]["summary"]["denominator"] == 1
+    assert before.data["cards"][0]["drills"] == []  # Source grant is not a foreign drill grant.
     delete_asset(e.participant, e.capture.asset.pk)
     snapshot.refresh_from_db()
     event.refresh_from_db()
     assert snapshot.data == {} and event.deleted_at and not MatchContribution.objects.exists()
+    after = client(e.participant).get("/api/player-model?dataset_kind=synthetic")
+    assert after.status_code == 200 and after.data["cards"] == []
 
 
 def test_no_foreign_export_or_unscoped_canonical_publication(dataset_env):
@@ -578,3 +585,63 @@ def test_canonical_import_and_foreign_reviewer_withdrawal_serialize(dataset_env,
     assert snapshot.invalidated_at and snapshot.data == {}
     assert not GameplayEvent.objects.filter(deleted_at=None).exists()
     assert not MatchContribution.objects.exists()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_diagnosis_read_and_foreign_reviewer_withdrawal_serialize(dataset_env, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    from django.db import close_old_connections, connection
+
+    from backend.core import player_model_api
+
+    if connection.vendor != "postgresql":
+        pytest.skip("Actual PostgreSQL withdrawal/read lock ordering required")
+    e = dataset_env
+    snapshot = seal(e)
+    publish_annotations(
+        e.participant,
+        e.capture.run.pk,
+        e.capture.match.pk,
+        snapshot.data["sources"][0]["annotations"],
+        dataset_snapshot_id=snapshot.pk,
+    )
+    original = player_model_api.projection
+    entered, revoke_started = Event(), Event()
+
+    def measured(*args, **kwargs):
+        value = original(*args, **kwargs)
+        entered.set()
+        assert revoke_started.wait(10)
+        return value
+
+    monkeypatch.setattr(player_model_api, "projection", measured)
+
+    def reading():
+        close_old_connections()
+        try:
+            response = client(e.participant).get("/api/player-model?dataset_kind=synthetic")
+            assert response.status_code == 200 and response.data["card_total"] == 1
+        finally:
+            close_old_connections()
+
+    def revoking():
+        close_old_connections()
+        try:
+            assert entered.wait(10)
+            revoke_started.set()
+            pilots.withdraw(e.one, e.study.pk)
+        finally:
+            close_old_connections()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        read = executor.submit(reading)
+        revoked = executor.submit(revoking)
+        read.result(timeout=30)
+        revoked.result(timeout=30)
+    monkeypatch.setattr(player_model_api, "projection", original)
+    after = client(e.participant).get("/api/player-model?dataset_kind=synthetic")
+    assert after.status_code == 200 and after.data["cards"] == []
+    snapshot.refresh_from_db()
+    assert snapshot.invalidated_at and snapshot.data == {}

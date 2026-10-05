@@ -18,7 +18,7 @@ from backend.core.models import (
 from backend.core.ownership import lock_owner
 
 
-def as_opportunity(event):
+def as_opportunity(event, *, knowledge_available=None):
     from backend.core.knowledge import event_available, event_knowledge
 
     match = event.match
@@ -30,7 +30,11 @@ def as_opportunity(event):
     )
     deleted = deleted or match.metadata_state == "REVIEW_REQUIRED"
     deleted = deleted or bool(asset.retain_until and asset.retain_until <= timezone.now())
-    deleted = deleted or not event_available(event)
+    # A caller holding the owner/capacity locks may memoize the same source grant
+    # within that transaction. Ordinary consumers always recheck it here.
+    deleted = deleted or not (
+        event_available(event) if knowledge_available is None else knowledge_available
+    )
     return Opportunity(
         id=str(event.pk),
         played_key=f"{match.pk}:{event.played_key}",

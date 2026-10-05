@@ -1130,3 +1130,64 @@ with ordinary CI and monitor its actual latest main tip; source-code success doe
 not establish the documentation tip's check mark. Next: approved real evidence
 through M07/M08 before M09 recognition release; retain separate hosted/provider
 and source-access/dependency maintenance gates.
+
+
+## 2026-10-05 - M10 local diagnosis, priorities and history implementation
+
+Requirements: M10.01-M10.07, M07.05, M13.05/.07, M14.04/.05, M15.01/.06,
+M01.05/.06 and M19.02. Implemented a coherent engineering module across
+analysis/player_model.py, backend/core/player_model.py and player_model_api.py,
+canonical source-grant memoization in evidence.py, optional independently reviewed
+priority_assessment drill payload validation in knowledge.py, authenticated routing,
+frontend/app/player-model.tsx and home navigation/cards/styles. Extended tests for
+policy thresholds, unknowns, raw review agreement, version filtering/abstention,
+reanalysis, source/drill/consent withdrawal, ownership, data bounds and separate
+recorded result history. Added M07 assessment approval and M08 exact-source grant/
+withdrawal/read-race coverage plus five browser journeys. Updated architecture 2.13.0,
+ADR-021/D033, README, knowledge/player-model contracts and M10 qualification.
+
+Initial targeted PostgreSQL run: 61 passed in 40.14s before the later assessment/
+dataset/race additions; frontend lint, production build and TypeScript passed.
+Complete Python/browser suites and final static/schema/link checks are pending.
+No schema migration/new private cache; baseline snapshots and frozen M12 membership
+are unchanged. Missing/ambiguous assessments have no default weights; multiple
+measurement profiles remain unranked. Proposed policy and synthetic research scores
+do not establish real expert agreement, utility, independent sessions or improvement.
+Real diagnosis/ranking release stays disabled and G1-G6 remain NOT_RUN. Next:
+finish checks, update receipts, push directly to main with CI enabled and monitor
+its actual latest commit; then acquire permitted M07/M08 evidence and actual expert/
+player diagnosis qualification alongside the separate provider/hosting gates.
+
+
+## 2026-10-05 - M10 local qualification before main publication
+
+Requirements: M10.01-M10.07, M07.05, M13.05/.07, M14.04/.05, M15.01/.06,
+M01.05/.06 and M19.02. Initial full PostgreSQL suite passed 422 cases with seven
+separate Docker skips in 238.22s (429 JUnit cases, no failures/errors). This includes governed assessment approval and precedes
+the added dataset read-race test and final fingerprint/query bounds. Final
+focused diagnosis/knowledge/dataset run passed 82 cases in 150.99s, including exact
+source grants, independent assessment approval and actual read-versus-foreign-reviewer
+withdrawal serialization. All 40 Edge browser journeys passed in 36.6s; inspected
+390px mobile diagnosis screenshot with readable counts/reasons/provenance and no
+overflow. Production build, final lint/TypeScript, Ruff/format (204 files), mypy
+(25 modules), Django/no migration, nine-document links and diff checks passed.
+
+Final review bounded measurement groups before card computation, restricted matching
+drills in SQL and bounded their catalog; timing/review/measurement pins now enter
+the evidence hash. The complete M10/query-bound check is running after these final
+changes. No new dependency, schema or private cache; actual Docker/audits/Terraform/
+native recovery are independently checked in CI. Both progress files and M10 evidence
+remain current; direct-main publication/latest-tip CI is still pending. Real M10 and
+G1-G6 remain unvalidated. Next: verify final query bounds, publish ordinary commits
+and monitor the actual latest main tip before handoff.
+
+
+## 2026-10-05 - M10 final bounds qualification
+
+Requirements: M10.02/.04/.07, M15.01/.06, M01.05/.06. Final module run passed
+all 28 M10 policy/API/bounds cases in 13.12s (zero failures/errors/skips), after
+SQL drill matching, catalog bounds, early group limits and full evidence hashes.
+JUnit inspection confirms the earlier full run includes governed assessment approval,
+while the later 82-case run includes the added dataset read/withdrawal race. Scope
+corrections and final evidence are recorded in both trackers/qualification; publication
+and exact latest-main CI remain pending. Next: publish directly to main and monitor.

@@ -747,3 +747,28 @@ def test_worker_claim_and_foreign_reviewer_revocation_share_lock_order(env, monk
     result.run.refresh_from_db()
     assert result.run.status == "CANCELLED"
     assert result.run.rundispatch.status == "CANCELLED"
+
+
+def test_priority_assessment_requires_exact_independent_drill_release(env):
+    _, drill = bundle(env)
+    payload = {k: v for k, v in drill.payload.items() if k != "synthetic_only"}
+    payload["priority_assessment"] = {
+        "version": "priority-assessment/1",
+        "value": 0.7,
+        "trainability": 0.8,
+        "rationale": "Synthetic relative assessment; no actual player benefit claim.",
+    }
+    proposal = candidate(env, "drill", "test/priority-drill/1", payload)
+    with pytest.raises(ValidationError, match="Two independent"):
+        knowledge.publish(env.owner, proposal.pk)
+    approve(env, proposal)
+    published = knowledge.publish(env.owner, proposal.pk)
+    assert knowledge.effective(published, "synthetic", env.owner.pk)
+    assert published.payload["priority_assessment"] == payload["priority_assessment"]
+    bad = copy.deepcopy(payload)
+    bad["priority_assessment"]["value"] = True
+    with pytest.raises(ValueError, match="finite fractions"):
+        candidate(env, "drill", "test/invalid-priority/1", bad)
+    assert not knowledge.effective(published, "synthetic", env.foreign.pk)
+    knowledge.revoke(proposal, "ASSESSMENT_WITHDRAWN")
+    assert not knowledge.effective(published, "synthetic", env.owner.pk)

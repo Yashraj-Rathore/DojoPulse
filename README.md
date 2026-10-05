@@ -24,6 +24,12 @@ Local [pilot-management tools](docs/architecture/pilot-tools.md) are available a
 adjudication and G1–G6 evidence packs. Real participant intake remains disabled;
 synthetic reports do not approve scientific gates or gameplay publication.
 
+The home workspace includes [M10 diagnosis and priorities](docs/architecture/player-model.md):
+version-specific reviewed counts, uncertainty, timestamp evidence, transparent research
+scores when an independently reviewed drill assessment exists, and separate match-result
+history. Default real-data views remain empty until permitted evidence exists; synthetic
+fixtures and real diagnosis/utility qualification remain separate.
+
 Start with [Architecture V2](docs/architecture/architecture-v2.md),
 [verification results](docs/experiment-results/software-validation.md),
 [progress](docs/progress.md), and [pilot protocol](docs/pilot-protocol.md).

@@ -22,3 +22,6 @@ Twenty initial captures support exploration, not the release accuracy gate.
 Result template: hypothesis; dataset manifest hash; method/version; sample/exclusions;
 metric and uncertainty; success/failure threshold; result; decision; reviewer time/cost;
 artifacts; limitations. A missing result is never PASS.
+
+[M10 player diagnosis](m10-player-model.md) records local policy/API/UI qualification
+separately from actual expert agreement, real player utility and gameplay release.

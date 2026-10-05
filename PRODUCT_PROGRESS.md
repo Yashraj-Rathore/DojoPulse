@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-10-05** · Architecture: **2.12.0** · Current stage: **local research prototype**
+Last updated: **2026-10-05** · Architecture: **2.13.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -16,6 +16,7 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 
 | Area | Current position |
 |---|---|
+| Player diagnosis (M10) | Coherent local counts/thresholds/reviewed assessments/priority cards/filtered histories implemented; local checks pass; publication/latest-main CI pending. Actual expert and player utility remain unvalidated |
 | Core loop | Baseline → drill assignment → reviewed practice → later-match comparison implemented and tested synthetically |
 | Match acquisition | Player confirmation, consent, queued sync, source history and deletion work with two fictional providers |
 | Recording attribution | Resumable local UI/API preserves imported history, verifies bytes before queuing media validation and separate attribution/gameplay review; removal withdraws evidence |
@@ -29,12 +30,12 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Pilot preparation (M18) | Local consent, pseudonyms, prospective intake/allocation, blinded review/adjudication, canonical links, evidence packs and withdrawal/restore erasure delivered; `135464f`/clean reconciliation `2bbb645` passed all six CI jobs; real studies remain unrun |
 | Operations and economics (M17) | Local resource ledger, fenced measurements, staff dashboard/CLI alerts, time/cost observations, retention and synthetic saturation/outage checks implemented. Objectives are proposed; actual hosted costs, named response, real workloads and payment evidence remain open |
 | Hosting and release | M06 resumable/private storage engineering and M16 dispatch/recovery are implemented locally with controlled GCS/Terraform contracts. Native PostgreSQL recovery now includes pending upload erasure. Actual GCS, cloud media isolation, region/budget/IAM/CORS and production release remain gated |
-| Latest recorded checks | M08 d83f342 passed all six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37329783254) first attempt at 15:10:08 UTC on 2026-10-05: 394 PostgreSQL/Python (seven separately exercised Docker skips), 35 Chromium, seven Docker/max-profile, three Terraform mocks, native guarded migrations/dump/restore/dataset erasure, audits/static/build/schema and unprivileged startup |
-| Evidence for those checks | [M08 dataset qualification](docs/experiment-results/m08-datasets.md); earlier M07/M06/M18/M17/M16 receipts are separately scoped. Synthetic software does not establish real gameplay or production readiness |
+| Latest recorded checks | M10 local: initial full 422 PostgreSQL/Python passes with seven separate Docker skips; final 82 focused and 28 query-bound passes; 40 Edge, production build, final lint/typecheck/static/schema/link checks pass. Latest-main publication/CI pending; [M10 qualification](docs/experiment-results/m10-player-model.md) distinguishes scopes |
+| Evidence for those checks | [M10 diagnosis qualification](docs/experiment-results/m10-player-model.md); earlier M08/M07/M06 receipts remain separately scoped. Synthetic software does not establish real gameplay or production readiness |
 | Published delivery | M08 d83f342 pushed directly to main without force; all six [checks](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37329783254) verified 2026-10-05. Only main remains. This final progress receipt retains ordinary CI and its actual latest tip is monitored before handoff; no hosted/live integration enabled |
 | Repository delivery policy | Only `main` remains; all 15 inspected bot proposals closed/deleted and 16 stale local tracking entries pruned. Four Dependabot version-PR streams disabled and GitHub validator passed; automatic security PRs already off and unchanged. Audits remain active with weekly reviewed/tested patches directly on main. Previous receipt `e70a83e` skipped CI; current policy requires checks on every published tip, including progress receipts |
 | Source integrity finding | Remote `301ed0b` injected obfuscated Next config code, repaired by `1771eba`. Rewritten receipt `2a20380` reintroduced an obfuscated eval payload; its sole difference from verified `5c1e78c` was Next config. `2bbb645` retains remote ancestry with the qualified clean M18 tree; current main head verified after CI. Repository-access/prior-execution review remains open |
-| Publication validation | M08 code passed all six jobs first attempt; downloaded PostgreSQL/Docker JUnit and frontend/Terraform/recovery logs substantiate scopes. Final receipt keeps ordinary CI and latest-main verification. Source-access review, dev lint advisory and real/provider/hosted release gates remain open |
+| Publication validation | M10 actual local checks recorded; Final bounds pass; direct-main publication and latest-tip CI pending. Prior bca44c4 M08 final receipt passed all six jobs. Source-access review, dev lint advisory and real/provider/hosted release gates remain open |
 
 There is deliberately no overall completion percentage: implemented scaffolding, approved
 data access and demonstrated player benefit are different kinds of progress.
@@ -84,7 +85,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M07 | Reviewed game knowledge and supported situation | BLOCKED | Local governance module implemented; real current-build footage, permitted facts and independent Tekken experts still required |
 | M08 | Consented golden dataset and annotation operations | PARTIAL | Coherent local collection/version/split/independent-timing/snapshot/QA/canonical/erasure module implemented, locally qualified (M08.07 DONE); permitted representative real footage and qualified independent reviewers still needed |
 | M09 | Validated observation/event recognition | PARTIAL | M07–M08 and G1/G2; no released automatic detector yet |
-| M10 | Player model and weakness prioritization | PARTIAL | Real event validation and useful evidence-backed diagnosis |
+| M10 | Player model and weakness prioritization | PARTIAL | Coherent local diagnosis/priority/card/history module implemented; final qualification pending (M10.07). Real expert thresholds, agreement and player utility remain release gates |
 | M11 | Reviewed drills and measured practice | PARTIAL | Expert-approved drill and G4 |
 | M12 | Trustworthy longitudinal evaluation | PARTIAL | Real prospective chronology, comparability and G5/G6 |
 | M13 | Complete player-facing product experience | PARTIAL | Local engineering delivered across M13.01–M13.08; real provider/account/reviewer flows, participant usability, screen readers and real devices remain release dependencies |
@@ -233,12 +234,13 @@ Owner: analysis/product owner. Exit: supported weaknesses are measurable, contex
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M10.01 Binary/categorical rates with counts, uncertainty and unknowns | DONE | Local Beta/Dirichlet summaries; no global invented skill score |
-| M10.02 Context/version-specific selected contributions without double counting | DONE | Local contribution/evaluation tests; live comparability validation remains under M12 |
-| M10.03 Diagnose supported weakness from sufficient eligible observations | PARTIAL | Recommendation records and target logic exist; validate diagnosis against expert-reviewed real data |
-| M10.04 Rank a small number of priorities by frequency, value, certainty and trainability | NOT_STARTED | Explicit scoring policy, minimum samples, reviewer agreement and user utility; no rank-derived competence claims |
-| M10.05 Explain each priority using denominator, context, unknowns and timestamp evidence | PARTIAL | Local evidence/count UI exists; complete diagnostic cards and usability validation needed |
-| M10.06 Separate result-history metrics from conditional gameplay metrics | PARTIAL | Separation enforced; broader descriptive history trends/filters still need implementation and validation |
+| M10.01 Binary/categorical rates with counts, uncertainty and unknowns | DONE | Local Beta/Dirichlet summaries; diagnosis cards add descriptive failure intervals, both coverages and explicit unknowns; no global invented skill score |
+| M10.02 Context/version-specific selected contributions without double counting | DONE | Current canonical publications only; situation/metric/context/build/knowledge/hash/detector/platform/scope buckets, reanalysis evidence hashes and incompatible-profile abstention. Live comparability remains under M12 |
+| M10.03 Diagnose supported weakness from sufficient eligible observations | PARTIAL | Versioned proposed sample/session/coverage/independent-review policy and descriptive states implemented; real diagnosis remains gated on expert-reviewed real data and threshold qualification |
+| M10.04 Rank a small number of priorities by frequency, value, certainty and trainability | PARTIAL | Transparent versioned synthetic research score, at most three priorities within one compatible profile, immutable independently reviewed drill assessments; missing/ambiguous ratings remain null. Actual expert ratings, representative frequency, agreement and player utility remain unvalidated |
+| M10.05 Explain each priority using denominator, context, unknowns and timestamp evidence | PARTIAL | Local diagnostic cards show counts/coverage/uncertainty, context/version/hash pins, all reasons/factors and private timestamp samples/full-match links. Real participant usability/accessibility and expert explanation acceptance remain |
+| M10.06 Separate result-history metrics from conditional gameplay metrics | PARTIAL | Local date/context/build filters, recorded wins/losses/unknowns and monthly gameplay summaries are separate; versions are not pooled and frozen M12 comparisons remain unchanged. Real selection/retention bias and history utility still need validation |
+| M10.07 Complete local diagnosis, reviewed prioritization and history engineering | PARTIAL | Implemented [player-model contract](docs/architecture/player-model.md), [ADR-021](docs/adr/ADR-021-evidence-backed-player-diagnosis.md) and [qualification](docs/experiment-results/m10-player-model.md). Acceptance: bounded owner/consent/grant-safe current projections, versioned policy/assessments, cards/filter/trend UI, deletion/reanalysis/reviewer-withdrawal tests and checked main publication; final validation pending. Real gameplay/product/hosting qualification excluded |
 
 ## M11 — Reviewed drills and measured practice
 
@@ -443,6 +445,7 @@ tip, including this final receipt.
 M08 local dataset engineering is qualified (M08.07 DONE) and d83f342 passed all
 six CI jobs. Keep ordinary CI on this final receipt and verify the actual latest
 main tip before handoff. Real M08 remains gated.
+M10 local diagnosis/priority/history engineering is implemented; finish actual local/CI qualification (M10.07) before publication handoff. Real M10 thresholds, expert assessments and player utility remain gated.
 Then use the reviewed knowledge/dataset workflow to acquire permitted exact-build facts,
 representative captures and qualified independent labels before releasing M09 recognition. Hosting/provider gates below
 remain separate. Maintain weekly reviewed dependency patches and the tracked development
@@ -508,3 +511,5 @@ release gates still govern those actions. Do not let one external blocker stop i
 | 2026-10-05 | M08.01-M08.07, M07.05, M09.04, M12.02, M14.04/.05, M15.01/.06, M16.05, M18.07, M01.05/.06, M19.02 | Delivered M08 local collection/version/split/snapshot/QA/canonical import/erasure module; ADR-020/D032 and guarded migration 0018. Real M08 remains partial/blocked | 394 PostgreSQL/Python, 35 Edge, static/build/schema/links/audits and native guarded migration/dump/restore/erasure passed; latest main publication/CI pending |
 
 | 2026-10-05 | M01.05/.06, M08.07, M15.06, M19.02 | Verified M08 direct-main publication and complete first-attempt CI; recorded exact-head evidence and ordinary final receipt | d83f342 all six [jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37329783254) at 15:10:08 UTC: 394 Python/35 Chromium/seven Docker, three Terraform mocks, native recovery/erasure, audits/static/schema/build/startup; final receipt requires its own latest-tip checks |
+
+| 2026-10-05 | M10.01-M10.07, M07.05, M13.05/.07, M14.04/.05, M15.01/.06, M01.05/.06, M19.02 | Implemented coherent local M10 projection/policy/governed assessments/cards/history module, ADR-021/D033 and architecture 2.13.0; no new cache/migration or real diagnosis release | Initial 61 targeted PostgreSQL, frontend lint/build/typecheck pass; complete regression/browser/static/schema/link and latest-main publication checks pending |

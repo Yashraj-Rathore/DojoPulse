@@ -81,3 +81,9 @@ An owned retained source may import only its exact independently reviewed curren
 snapshot batch through the canonical operator publisher, with snapshot/definition hash
 pins. This does not make another workspace's synthetic definitions or drills generally
 available; dataset withdrawal invalidates derived active events and evaluations.
+
+M10 permits an optional `priority_assessment` on a **new** governed drill version.
+Its exact version, bounded relative value/trainability and rationale are sealed and reviewed
+by the same independent reviewers alongside the drill's sources/dependencies. Existing versions
+are not rewritten; missing or ambiguous assessments have no default weight. See the
+[player-model contract](player-model.md) and [ADR-021](../adr/ADR-021-evidence-backed-player-diagnosis.md).

@@ -10,6 +10,7 @@ from backend.core import (
     match_api,
     operations_api,
     pilot_api,
+    player_model_api,
     recording_api,
     upload_api,
 )
@@ -32,6 +33,7 @@ urlpatterns = [
     path("api/account/sessions/<uuid:session_id>", account_api.revoke_session),
     path("api/account/consent", account_api.consent),
     path("api/overview", api.overview),
+    path("api/player-model", player_model_api.player_model),
     path("api/knowledge", knowledge_api.proposals),
     path("api/knowledge/builds", knowledge_api.builds),
     path("api/knowledge/reanalysis", knowledge_api.reanalysis),

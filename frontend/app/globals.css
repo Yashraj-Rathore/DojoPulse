@@ -20,3 +20,4 @@ html{scroll-padding-top:20px}button,input,select,summary,a,textarea{touch-action
 .knowledge-workspace textarea { width: 100%; max-width: 100%; }
 .knowledge-workspace select { max-width: 100%; }
 .knowledge-workspace select[multiple] { min-height: 6rem; }
+.player-model article, .player-model dd, .player-model li { overflow-wrap: anywhere; }
