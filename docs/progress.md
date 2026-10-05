@@ -1191,3 +1191,27 @@ JUnit inspection confirms the earlier full run includes governed assessment appr
 while the later 82-case run includes the added dataset read/withdrawal race. Scope
 corrections and final evidence are recorded in both trackers/qualification; publication
 and exact latest-main CI remain pending. Next: publish directly to main and monitor.
+
+
+## 2026-10-05 - Verified M10 main publication and complete CI
+
+Requirements: M01.05/.06, M10.07, M15.06 and M19.02. Published
+**687f0f21dc1e888afcffbad03c17ef577bd5dc56** directly to main without force.
+All six [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37338207922)
+passed first attempt at **16:10:57 UTC**: 424 PostgreSQL/Python (148.667s JUnit;
+431 cases, seven separately exercised Docker skips, zero failures/errors), seven
+Docker/max-profile (110.163s, zero skips/failures/errors), 40 Chromium (42.5s),
+three Terraform mocks, native guarded migration/dump/restore/repeated-control/
+erasure, both Python lock and production npm audits, static/schema/loader/build
+and unprivileged application startup. Downloaded JUnit and browser/Terraform/
+recovery logs substantiate scopes; exact check-runs API confirms six successes
+and remote main is the checked SHA. Only main remains.
+
+M10.07 is locally DONE; real M10 remains PARTIAL pending actual expert thresholds,
+relative value/trainability, representative occurrence/reviewer agreement and
+player utility/usability. G1-G6 remain NOT_RUN; no recognizer/live provider/hosting
+or real diagnosis activated. This final receipt updates PRODUCT_PROGRESS, this
+log and M10 qualification with actual source-code checks; keep ordinary CI and
+monitor the actual latest main tip before handoff. Next: acquire permitted
+M07/M08 exact-build evidence and real expert/player diagnosis qualification before
+real M09/M10 release; provider/hosted/source-access/dependency gates remain separate.
