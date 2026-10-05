@@ -32,9 +32,30 @@ immutable-pin, dataset-scope and positive-reevaluation refinements; original JSO
 comparison uses the canonical digest. An earlier focused run had 113 passes and one
 list/tuple test expectation failure, corrected before this passing run. Final 43 Edge
 journeys passed in 54.2s; final production build/lint/TypeScript, Ruff/format (211 files),
-mypy (26 modules) and Django/no-pending-migration checks pass. Main publication/CI pending;
-Docker/max-profile, Terraform, current audits and container startup are exercised in CI.
+mypy (26 modules) and Django/no-pending-migration checks pass. Main implementation publication/all six CI jobs verified below; this final receipt retains ordinary CI and its actual latest-main checks are monitored before handoff.
 Proposed progression thresholds, session independence, source completeness, expert setup/response
 accuracy, actual player adherence/usefulness, accessibility and hosted performance remain
 unvalidated. Real progression abstains behind G4/expert qualification; follow-up guidance never
 changes frozen dates or claims causal improvement. No dependency/provider/cloud decision changes.
+
+
+## Verified main implementation
+
+Published **fd816af0d27b33cc08c92bb16460c3c4523e264a** (`feat: implement M11 reviewed practice workflow`)
+directly on main. [Run 37346263824](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37346263824) passed all six jobs first attempt on 2026-10-05
+(run record updated 17:16:13 UTC). Downloaded artifacts/logs substantiate:
+
+- 447 PostgreSQL/Python passes, seven separate Docker skips; 454 JUnit cases,
+  zero failures/errors, 271.538s.
+- 43 Chromium browser journeys in 42.8s, production frontend build/lint/type checks.
+- Seven real Docker/max-profile tests, zero failures/errors/skips, 127.716s.
+- Three Terraform mock contracts; unprivileged application/analysis builds and startup.
+- Guarded migration forward/reverse/forward through 0019 and actual native PostgreSQL
+  dump/restore, controls-before-reads and repeat replay; report/diagnosis erasure and
+  restored assignment cancellation asserted. Hosted RPO/RTO NOT_MEASURED.
+- Both Python-lock and production npm audits clean; Ruff/format/mypy/Django/schema/loader
+  checks pass. Current development lint advisory remains separately tracked.
+
+M11.07 DONE is local engineering acceptance. Real drill reproducibility, independent expert
+qualification, actual participants, G4, utility/effectiveness and production remain unqualified.
+The final progress receipt also uses ordinary CI and actual latest-main verification.

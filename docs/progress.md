@@ -1260,3 +1260,26 @@ credentials, source/provider permissions, real participants, G4/utility or hoste
 invented. Reports remain adherence only and add zero comparison exposure. No endpoint,
 dependency or provider activation. Next: push directly to main with normal CI and monitor
 all six jobs, then publish/update the checked progress receipt and monitor the final tip.
+
+
+### 2026-10-05 - M11 main publication and six-job qualification verified
+
+M11.01-M11.07, M01.05/.06 and M19.02: published **fd816af0d27b33cc08c92bb16460c3c4523e264a**
+(`feat: implement M11 reviewed practice workflow`) directly on main. [CI run 37346263824](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37346263824)
+completed successfully first attempt (run record updated 17:16:13 UTC); all six jobs have
+completed/success conclusions. Downloaded logs/JUnit confirm 447 Python passes/seven separate
+Docker skips (454 JUnit cases, zero failures/errors, 271.538s), 43 Chromium in 42.8s, seven
+real Docker/max-profile cases in 127.716s and three Terraform mocks. Native guarded fresh
+forward/reverse/forward/dump/restore/repeated erasure passes through migration 0019;
+report/diagnosis erasure and cancelled restored assignments are asserted. Both Python locks
+and production npm audit report no known vulnerabilities; static/Django/schema/loader,
+production build/type checks and unprivileged container startup pass. Existing development
+lint advisory and hosted/source-access reviews remain separately tracked.
+
+Changed PRODUCT_PROGRESS.md, docs/progress.md and docs/experiment-results/m11-practice.md
+for this receipt. M11.07 DONE qualifies the complete local engineering module; M11 overall
+remains PARTIAL and real drill reproducibility, actual expert/player review, G4 and effectiveness
+remain NOT_RUN. No production/provider/recognizer activation. This receipt is published with
+ordinary CI and the actual latest main tip is monitored before handoff. Next: acquire
+permitted exact-build M07/M08 evidence and qualified experts for real M09/M10/M11/G1/G4;
+provider/hosting/security/dependency gates remain separate.
