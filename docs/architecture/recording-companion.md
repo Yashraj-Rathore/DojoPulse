@@ -1,7 +1,7 @@
 # ID search and private recording sync
 
 Updated 2026-10-06; Architecture 2.19.0. Status: local developer preview implemented (M22.02-06),
-qualification ongoing. No live provider transport, signed installer, hosted admission or game
+coherent local engineering qualified on source 7635a3c (all seven CI jobs). No live provider transport, signed installer, hosted admission or game
 automation is enabled. [Run the source helper](../../companion/README.md).
 Decision: [ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md).
 
@@ -88,8 +88,9 @@ anti-cheat bypass, memory hooks, unattended account use or collection of other u
 
 ## Implementation order and acceptance
 
-M22.01 records this choice. Implement pairing/revocation and a completed-file sync vertical
-slice (M22.02-M22.06) against existing local evidence services first, with controlled fixtures.
+M22.01 records this choice. Pairing/revocation and completed-file sync (M22.02-M22.06)
+are implemented and qualified against the existing local evidence services with controlled
+fixtures; M22.10 records the coherent local module and source CI evidence.
 Then qualify real Windows packaging/device privacy/capture compatibility and resource behavior
 (M22.07-M22.08). Live EWGF activation is parallel M04/M05 work and not a prerequisite for
 upload-only recordings. Evaluate in-client automatic replay capture separately (M22.09).
@@ -114,7 +115,7 @@ one-use/ten-minute, device lifetime 30 days, and browser pairing controls retain
 Every transfer rechecks owner, device, consent and target under the owner lock. Withdrawal,
 account recovery/logout-all and restore revoke devices; pending bytes use M06 fenced purge.
 RecordingReceipt stores an owner-keyed byte suppression digest, surviving deletion; duplicate
-bytes on another device return only DUPLICATE/REMOVED, never another device?s capability.
+bytes on another device return only DUPLICATE/REMOVED, never another device's capability.
 
 HTTPS origins are explicitly configured; local development allows only loopback port 8000.
 No redirects, cookies, environment proxies, arbitrary upload URLs or GCS capabilities enter

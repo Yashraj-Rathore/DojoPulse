@@ -1,7 +1,9 @@
 # M22 recording sync qualification
 
-Date: 2026-10-06. Architecture 2.19.0. Scope: local developer preview; final
-local checks recorded below; source 60d55ac published; first CI has two failures, corrections under qualification. No supported game/recorder, signed installation,
+Date: 2026-10-06. Architecture 2.19.0. Scope: coherent local developer-preview engineering
+qualified on source 7635a3c161d8614b91dcb75e1035ee6b524617db. All seven
+[CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37488902056) passed,
+completed 15:47:52 UTC. Final ordinary receipt retains exact latest-tip monitoring. No supported game/recorder, signed installation,
 provider permission, cloud deployment, gameplay recognition or G1–G6 approval.
 
 ## Delivered behavior
@@ -29,17 +31,21 @@ provider permission, cloud deployment, gameplay recognition or G1–G6 approval.
 |---|---|
 | Focused PostgreSQL/transfer/attribution suite | Final affected suite 94 passed / one symlink-privilege skip, 38.89s. Initial focused 88 pass retained as dated earlier scope |
 | Actual controlled MP4 | Generated black 1080p60 H.264/0.2s, local FFprobe → helper → real PostgreSQL uploads → existing local worker/parser → authenticated byte-range playback; no Match/events. This is synthetic media, not Tekken footage |
-| Windows credential/file behavior | Actual current-user DPAPI roundtrip/encrypted-at-rest/tamper rejection and writer-excluding share mode pass locally; Linux CI must skip this Windows-only check |
+| Windows credential/file behavior | Actual current-user DPAPI roundtrip/encrypted-at-rest/tamper rejection, writer-excluding share mode and controlled linked-root rejection pass. Dedicated Windows CI: 17 pass/no skips (1.358s); platform-specific Linux skip is exercised here. Signed delivery/broader real device compatibility is separate |
 | New browser flows | Three Edge tests pass: pairing/code privacy/revocation/mobile, attribution without re-upload, remote deletion/original disclosure |
-| Full browser regression | Final 57 Edge pass (1.1m) with all recording endpoints mocked; narrow mobile screenshot inspected; no horizontal overflow |
+| Full browser regression | Local final 57 Edge pass (1.1m), narrow mobile screenshot inspected/no overflow. Exact-source CI 57 Chromium pass (58.5s) |
 | Static/build | Ruff checks/248 formatted Python files, mypy 35, Django check/schema, production Next build/lint/types and final typecheck pass; seven-job CI YAML valid; 312 local Markdown links and 157 unique valid requirement rows checked |
-| Full PostgreSQL/native restore | Initial full 553 pass / one same-transaction mock test failure / seven separate Docker skips (773.65s); corrected interleaving case and final changes pass in affected 93 suite. First source Linux job stopped at platform typing before backend tests; corrected-source complete CI pending. Native dump/restore, guarded forward/reverse/forward, restored device invalidation and pending upload erasure pass; migrations 0022/0023 applied locally |
-| Exact latest-main publication/CI | Source 60d55ac [run 37487810089](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37487810089): five jobs passed, Linux typing and production audit failed. Corrected source qualification pending |
+| Full PostgreSQL/native restore | Exact source: 557 PostgreSQL/Python pass (580.176s), eight skips (seven Docker plus one Windows-specific check exercised by separate jobs). Native dump/restore, guarded forward/reverse/forward, restored device invalidation, manual-copy suppression retention and pending upload erasure pass; migrations 0022/0023 applied locally. Actual hosted RPO/RTO not measured |
+| Source publication/CI | Corrected source 7635a3c [run 37488902056](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37488902056): all seven jobs successful, watcher exit 0. XML/logs downloaded and checked; remote source head/only-main inventory match. Final ordinary receipt requires actual latest-tip monitoring |
+
+Initial full local backend run: 553 pass/one mocked same-transaction revocation failure/
+seven separate Docker skips (773.65s); corrected the interleaving test, then final affected
+and exact-source complete CI pass. This earlier run is not described as a full pass.
 
 Initial scoped SQLite failures identified auth withdrawal error shaping and pytest local
 parser settings; fixed before 88 PostgreSQL pass. A new same-transaction mocked revocation
 test was corrected to interleave revocation between authentication and service admission,
-matching the actual boundary; the corrected case passes in the final affected suite. A final pause-during-local-inspection fence and redirect credential isolation are also tested. Windows symlink privilege is unavailable locally; that check is skipped explicitly, with actual reparse qualification retained as a delivery gate.
+matching the actual boundary; the corrected case passes in the final affected suite. A final pause-during-local-inspection fence and redirect credential isolation are also tested. Windows symlink privilege is unavailable locally; that local check is skipped explicitly, but the controlled linked-root case passes in actual Windows CI. Broader real reparse/device acceptance remains a delivery gate.
 
 ## Remaining acceptance
 
@@ -53,8 +59,9 @@ Run instructions and exact limits: [source helper](../../companion/README.md).
 Design: [companion contract](../architecture/recording-companion.md).
 
 The source adds a Windows CI job exercising protected state, exclusive file access and
-offline transfer controls. This is regression coverage, not signed installation/real recorder
-qualification. Latest main SHA and all seven CI results will be recorded after publication.
+offline transfer controls. Actual Windows regression is green; signed installation/real
+recorder qualification remains separate. The source is qualified above; the final ordinary
+receipt is also monitored on its exact latest main SHA before handoff.
 
 A pre-publication manual-copy deduplication repair retains an explicit suppressed server
 receipt even when the helper encounters a file first uploaded manually. Existing reserved
@@ -68,4 +75,14 @@ platform typing is corrected using sys.platform guards; explicit Linux/Windows m
 passes 35 files. Local final helper/controlled-media suite: 17 pass/one OS privilege skip
 (15.91s). Compatible sharp 0.35.5/native libvips and source-map-js 1.2.2 patches clear the
 production audit; existing five development audit findings remain tracked. Production build/lint/types and native sharp PNG encoding pass;
-corrected-source all-seven CI remains pending; no release gate was bypassed.
+corrected-source all-seven CI is green, with no release gate bypassed.
+
+Downloaded source artifacts verify 557 backend passes/eight separately exercised platform
+and Docker skips, 17 Windows/no skips and seven actual Docker/max-profile/no skips
+(123.229s). Completed logs verify 57 Chromium (58.5s), three Terraform mock contracts,
+both Python lock audits and zero production npm findings, static/build/type/schema/
+contracts, unprivileged application startup and HTTP asset bytes, and guarded native
+recovery. The first source 60d55ac failed Linux typing and the sharp/source-map-js audit;
+7635a3c corrects both and passes. M22.02-06/.10 DONE means local engineering only;
+M22 remains PARTIAL. Next: M22.07-08 Windows distribution, real recorder/device/privacy
+and resource/hosted acceptance; provider/gameplay gates are retained.

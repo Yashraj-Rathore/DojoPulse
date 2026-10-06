@@ -92,8 +92,10 @@ The owner-selected [recording-companion design](recording-companion.md), recorde
 [ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md), combines reviewed
 per-ID metadata with private owner-created video. EWGF is the first metadata candidate;
 the first Windows stage syncs completed recordings, with in-client automatic replay capture
-conditional on separate review. M22 tracks this new scope. No companion, live transport,
-public-media sharing or game automation is enabled by the design decision.
+conditional on separate review. M22 tracks this new scope. D041 implements the local
+Windows source helper, scoped pairing and private recording inbox through M06, with
+explicit operator/development gates. Live provider transport, public-media sharing, game
+automation, signed desktop delivery and hosted admission remain separately gated.
 
 The local UI now supports explicit player selection, consent, queued metadata sync, source-aware
 history and deletion. A separate PostgreSQL-backed match worker processes only synthetic

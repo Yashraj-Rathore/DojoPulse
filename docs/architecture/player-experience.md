@@ -31,8 +31,9 @@ The selected next acquisition direction is [ID search plus private recording syn
 Future ID search shows reviewed-provider metadata and offers Play only for a recording the
 requesting owner is authorized to access. Missing, pending, expired and incompatible media
 remain explicit; public identity lookup never exposes another owner's videos. The Windows
-companion design starts with opt-in completed-file sync, not ID-only video retrieval. No
-companion UI or live search was implemented in this design change.
+companion starts with opt-in completed-file sync. The local companion UI/private inbox
+is now implemented and qualified under D041; live search and ID-only video acquisition
+remain gated.
 
 History supports owner/player, inclusive UTC date range, character, reviewed situation/outcome
 and evidence state. Event search supports match, UTC dates, character, purpose, situation,

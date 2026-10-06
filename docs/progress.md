@@ -1845,3 +1845,42 @@ Updated PRODUCT_PROGRESS.md and M22 receipt; architecture/provider/real/hosted g
 
 Advisories: [sharp](https://github.com/advisories/GHSA-wq5f-xc86-pv6w),
 [source-map-js](https://github.com/advisories/GHSA-68fv-2mgg-jv7q).
+
+### 2026-10-06 - Corrected M22 source qualification and final receipt
+
+M22.02-07/.10, M06.02/.03/.06, M13.03/.06, M14.03-05, M15.01/.04/.06,
+M16.05, M01.05/.06 and M19.02: corrected source
+7635a3c161d8614b91dcb75e1035ee6b524617db passed all seven jobs on
+[run 37488902056](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37488902056),
+completed 15:47:52 UTC; watcher exit 0. Downloaded backend, Windows and media JUnit and
+completed job logs verify **557 PostgreSQL/Python passes (580.176s)**, eight Linux skips
+(seven Docker plus one actual Windows test, exercised by dedicated jobs), **17 actual
+Windows passes/no skips (1.358s)**, **57 Chromium passes (58.5s)**, **seven actual
+Docker/max-profile passes/no skips (123.229s)** and three Terraform mock contracts.
+Production npm and both Python lock audits, Ruff/248 formatted files/mypy35, Django
+check/schema/migrations/contracts, build/lint/types, unprivileged application startup/
+HTTP asset checks and native guarded 0022/0023 migration/dump/restore all pass. Restore
+revokes devices, preserves manual-copy suppression and erases pending uploads; actual
+production RPO/RTO remains NOT_MEASURED. Local final image dependency encode and explicit
+Linux/Windows typing also pass. Initial source failures remain above, rather than claiming
+the first publication was green. Fresh remote source matches local and only main exists.
+
+Updated PRODUCT_PROGRESS.md, this log, experiment-results/m22-recording-sync.md, current
+architecture-v2/recording-companion/player-experience wording and D041 evidence. M22.02-06/.10 DONE applies
+to the coherent local engineering module only. Overall M22 remains PARTIAL: installer/
+signing/update/uninstall, real supported recorder/device fixtures, independent desktop/
+privacy/security review, measured resources and hosted admission are M22.07-08. Live
+M04/M05, automatic replay creation M22.09, native X01 and real G1-G6 are unchanged. The
+helper needs existing owner-created recordings; no automatic game capture is implied.
+
+Publish this final receipt with ordinary CI, monitor its actual latest main SHA and verify
+clean matching local/remote head plus only main before handoff. No runtime code changed
+for this receipt; documentation links/requirements/whitespace are checked before commit.
+Next implementation is Windows delivery/recorder/privacy/resource qualification, alongside
+permitted provider fixtures and exact-build footage/independent review. No provider key,
+private endpoint, signed distribution purchase, game control or live cloud deployment added.
+
+Final receipt checks: 311 local Markdown links across root/companion/docs, all 157
+milestone plus 12 optional stable IDs/status/table cells and architecture 2.19.0
+consistency pass; git diff --check passes. Runtime tests not rerun for documentation
+changes locally; the final receipt keeps ordinary full CI on its exact SHA.
