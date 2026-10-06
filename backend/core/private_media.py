@@ -52,6 +52,23 @@ def asset_response(asset, range_header, *, authorize=None):
         return HttpResponse(status=404)
     if UploadSession.objects.filter(asset=asset).exclude(state="COMPLETE").exists():
         return HttpResponse(status=404)
+    if (
+        asset.metadata.get("unattributed_recording")
+        or asset.metadata.get("capture_tool") == "dojopulse-companion/1"
+    ):
+        from backend.core.models import AnalysisRun
+
+        run = (
+            AnalysisRun.objects.filter(asset=asset, owner_id=asset.owner_id)
+            .order_by("-created_at")
+            .first()
+        )
+        if (
+            not run
+            or run.status not in {"REVIEW_REQUIRED", "PARTIAL", "COMPLETED"}
+            or run.result.get("source", {}).get("source_sha256") != asset.source_sha256
+        ):
+            return HttpResponse(status=404)
     size = asset.bytes
     if asset.storage_provider == "LOCAL":
         path = private_path(asset.storage_key)

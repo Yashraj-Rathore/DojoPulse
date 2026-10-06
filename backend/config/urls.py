@@ -4,6 +4,7 @@ from django.urls import path
 from backend.core import (
     account_api,
     api,
+    companion_api,
     comparison_api,
     dataset_api,
     experience_api,
@@ -21,6 +22,15 @@ from backend.core.cloud_api import dispatch_task
 from backend.core.deployment import health
 
 urlpatterns = [
+    path("api/recording-devices", companion_api.devices),
+    path("api/recording-devices/<uuid:device_id>", companion_api.revoke),
+    path("api/companion/pair", companion_api.redeem),
+    path("api/companion/uploads", companion_api.device_uploads),
+    path("api/companion/uploads/<uuid:session_id>", companion_api.device_session),
+    path("api/companion/uploads/<uuid:session_id>/chunk", companion_api.device_chunk),
+    path("api/companion/uploads/<uuid:session_id>/complete", companion_api.device_complete),
+    path("api/synced-recordings", companion_api.recordings),
+    path("api/synced-recordings/<uuid:session_id>/attach", companion_api.attach),
     path("health/ready", health),
     path("internal/dispatch", dispatch_task),
     path("admin/", admin.site.urls),

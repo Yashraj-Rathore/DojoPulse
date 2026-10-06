@@ -17,7 +17,7 @@ cloud = ["google-auth>=2.59.1,<3", "requests>=2.34.2,<3", "gunicorn>=26.2,<27"]
 dev = ["pytest>=8,<10", "pytest-django>=4.9,<5", "ruff>=0.9,<1", "mypy>=1.14,<2", "types-jsonschema", "types-psutil"]
 
 [tool.setuptools.packages.find]
-include = ["analysis*", "backend*", "tools*", "ingestion*"]
+include = ["analysis*", "backend*", "tools*", "ingestion*", "companion*"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "backend.config.settings"
@@ -36,7 +36,7 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["analysis", "tools", "ingestion"]
+files = ["analysis", "tools", "ingestion", "companion"]
 ignore_missing_imports = true
 check_untyped_defs = true
 disallow_untyped_defs = true

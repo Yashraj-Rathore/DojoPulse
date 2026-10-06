@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.17.0. Decision date: 2026-10-05. Status: local engineering approved;
+Version: 2.19.0. Decision date: 2026-10-06. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -87,6 +87,13 @@ successful metadata ingestion. Match.asset is now optional; migrations backfill 
 while preserving existing match/event/evaluation facts. Local synthetic imports are implemented;
 network adapters and native replay decoding remain disabled. See [research](../research/tekken-match-sources.md)
 and [ADR-013](../adr/ADR-013-provider-neutral-match-ingestion.md).
+
+The owner-selected [recording-companion design](recording-companion.md), recorded in
+[ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md), combines reviewed
+per-ID metadata with private owner-created video. EWGF is the first metadata candidate;
+the first Windows stage syncs completed recordings, with in-client automatic replay capture
+conditional on separate review. M22 tracks this new scope. No companion, live transport,
+public-media sharing or game automation is enabled by the design decision.
 
 The local UI now supports explicit player selection, consent, queued metadata sync, source-aware
 history and deletion. A separate PostgreSQL-backed match worker processes only synthetic

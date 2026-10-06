@@ -206,6 +206,13 @@ def delete_account(owner, storage=None, *, password=None):
 
         erase_knowledge(owner.pk)
         profile, _ = Profile.objects.select_for_update().get_or_create(user=owner)
+        from backend.core.companion import revoke_all
+
+        revoke_all(owner)
+        from backend.core.models import DevicePairing, RecordingDevice
+
+        DevicePairing.objects.filter(owner=owner).update(label="")
+        RecordingDevice.objects.filter(owner=owner).update(label="")
         profile.deleted_at = timezone.now()
         profile.processing_consent_at = None
         profile.training_consent_at = None

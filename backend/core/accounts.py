@@ -186,6 +186,9 @@ def consume_challenge(token, purpose, password=None):
 
 
 def revoke_sessions(owner):
+    from backend.core.companion import revoke_all
+
+    revoke_all(owner)
     profile, _ = Profile.objects.get_or_create(user=owner)
     profile.session_epoch += 1
     profile.save(update_fields=["session_epoch"])

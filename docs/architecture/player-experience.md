@@ -1,6 +1,6 @@
 # M13 player experience — local implementation contract
 
-Updated 2026-10-05; Architecture 2.17.0. Available local M13 engineering is implemented.
+Updated 2026-10-06; Architecture 2.19.0. Available local M13 engineering is implemented.
 M13's release exit still requires permitted real providers, production accounts, validated
 knowledge/measurement and real usability/accessibility studies.
 
@@ -26,6 +26,13 @@ linking practice. Canonical services enforce definitions, chronology, full-captu
 exposure and immutable memberships. All six outcomes and withdrawn results remain visible.
 
 ## Search and evidence
+
+The selected next acquisition direction is [ID search plus private recording sync](recording-companion.md).
+Future ID search shows reviewed-provider metadata and offers Play only for a recording the
+requesting owner is authorized to access. Missing, pending, expired and incompatible media
+remain explicit; public identity lookup never exposes another owner's videos. The Windows
+companion design starts with opt-in completed-file sync, not ID-only video retrieval. No
+companion UI or live search was implemented in this design change.
 
 History supports owner/player, inclusive UTC date range, character, reviewed situation/outcome
 and evidence state. Event search supports match, UTC dates, character, purpose, situation,
@@ -97,3 +104,8 @@ Remaining: permitted IDs/providers (M04/M05), hosted accounts/recovery/privacy (
 knowledge/measurement and real participant adherence/comparison (M07–M12/M18), manual screen-reader
 checks, real mobile devices, additional browsers, caption/visual-evidence accessibility review,
 hosted query/load limits and beta usability. No release gate is waived.
+
+The local [recording-sync inbox](recording-companion.md) adds explicit paired-computer controls,
+private validated playback and reuse of existing attribution forms. Unassigned recordings
+create no canonical match facts; upload time is not original play time. Companion admission
+stays disabled by default and real Windows/hosted acceptance remains separate.

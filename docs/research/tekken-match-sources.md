@@ -5,6 +5,11 @@ and one documented Wavu API response. No private Tekken endpoint was called, aut
 reproduced or implemented. No playable replay payload was acquired. Findings are bounded to
 the evidence below, not a declaration of commercial permission or full coverage.
 
+Follow-up: [direct native replay investigation, 2026-10-06](native-tekken-replay-access-2026-10-06.md)
+inspects archived metadata fetchers, an in-client recorder and an unverified file-watcher claim.
+Tekken's replay backend exists; external playable-payload acquisition and standalone rendering
+remain UNVERIFIED, rather than proven impossible. This older report's observations stay dated.
+
 ## Findings that determine the design
 
 1. Match metadata can remove the upload requirement for history/results and aggregate matchup

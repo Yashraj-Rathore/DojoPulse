@@ -58,6 +58,10 @@ pending = begin(pending_owner, uuid.uuid4(), len(content), hashlib.sha256(conten
      'source_kind': 'ranked', 'dataset_kind': 'synthetic', 'characters': ['jin', 'jin']})
 write_chunk(pending_owner, pending.pk, 0, content)
 request_completion(pending_owner, pending.pk)
+from backend.core.models import RecordingDevice, DevicePairing, RecordingReceipt
+device = RecordingDevice.objects.create(owner=pending_owner, label='private fixture label', token_digest='e'*64, expires_at=timezone.now()+timedelta(days=1))
+DevicePairing.objects.create(owner=pending_owner, label='fixture pairing', token_digest='f'*64, expires_at=timezone.now()+timedelta(minutes=10))
+RecordingReceipt.objects.create(owner=pending_owner, device=device, key_digest='b'*64, session=pending)
 from backend.core import knowledge
 from backend.core.models import Game, GameBuild, KnowledgeProposal
 settings.DEBUG = True
@@ -148,6 +152,10 @@ from backend.core.models import UploadSession
 assert UploadSession.objects.count() == 1
 assert not UploadSession.objects.exclude(state='CANCELLED').exists()
 assert not UploadSession.objects.exclude(expected_sha256='', expected_md5='', claim_digest='').exists()
+from backend.core.models import RecordingDevice, DevicePairing, RecordingReceipt
+assert RecordingDevice.objects.count() == RecordingReceipt.objects.count() == 1
+assert not RecordingDevice.objects.filter(revoked_at=None).exists()
+assert not DevicePairing.objects.filter(consumed_at=None).exists()
 from backend.core.models import KnowledgeProposal, KnowledgeReview, KnowledgeEvidence, DefinitionVersion
 assert KnowledgeProposal.objects.count() == 1
 assert not KnowledgeProposal.objects.exclude(state='WITHDRAWN', payload={}, provenance={}).exists()

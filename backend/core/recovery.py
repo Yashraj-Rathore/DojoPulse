@@ -35,6 +35,10 @@ def apply_restore_controls():
         AccountSession.objects.all().delete()
         AccountChallenge.objects.all().delete()
         UploadAdmission.objects.all().delete()
+        from backend.core.models import DevicePairing, RecordingDevice
+
+        DevicePairing.objects.all().update(consumed_at=now)
+        RecordingDevice.objects.all().update(revoked_at=now)
         pending = UploadSession.objects.exclude(state__in=["COMPLETE", "CANCELLED"])
         ReplayAsset.objects.filter(uploadsession__in=pending).update(deleted_at=now, metadata={})
         pending.update(state="PURGING", fence=F("fence") + 1, verification_lease=None)

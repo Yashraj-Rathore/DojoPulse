@@ -1699,3 +1699,108 @@ clean local/remote/head/branch state. Original art/fonts and prompts are in the 
 no copied reference assets, private endpoint, cloud provisioning, gameplay/data activation
 or real-player claim. After UI delivery, resume permitted exact-build footage and independent
 review using the existing preparation tools.
+
+### 2026-10-06 - Selected ID search and private recording-companion architecture
+
+M22.01–M22.09, M04.01, M05.01/.03 and M01.02/.05: owner delegated the choice of an
+ID-to-playback approach. Choose reviewed per-ID metadata plus opt-in Windows recording sync.
+EWGF is the first metadata candidate because its documented operation is player-scoped;
+Wavu remains a metadata alternative. Rechecked public EWGF API/terms, Wavu API and community
+recorder documentation. No substantive usage terms or authenticated schema fixtures obtained,
+and no documented video-download service established. Provider activation remains blocked.
+
+Added ADR-026 and architecture/recording-companion.md; updated architecture-v2.md to 2.18.0,
+match-ingestion.md, player-experience.md, decision-log.md (D039), PRODUCT_PROGRESS.md and this
+log. M22.01 is DONE for design only; M22.02–M22.08 are NOT_STARTED and M22.09 BLOCKED pending
+separate in-client replay automation review. Initial sync still requires creation/export of
+a completed recording; its goal is removing repeated manual upload. Public ID lookup never
+authorizes another owner's private recordings. Reuse M06 resumable media and attribution;
+no companion path may directly publish canonical gameplay or coach from metadata alone.
+
+Actual checks: final 176 local Markdown links across all eight changed documents passed;
+nine unique M22 requirement IDs/statuses, architecture-version consistency, decision reference
+and personal-profile-ID exclusion passed. git diff --check passed. Runtime/backend/browser/
+Docker tests were not rerun for this documentation-only decision; earlier software qualification
+remains separately dated 2026-10-05. No credentials, subscription, contact, copied recorder code,
+game automation, private endpoint, footage acquisition, hosted deployment or publication.
+
+Next: M22.02 owner/device pairing and revocation, then a completed-file sync vertical slice
+through existing local evidence services (M22.03–M22.06), with meaningful controlled privacy,
+interruption/retry/deletion checks. In parallel obtain usage evidence, privately configured key
+and permitted identity/schema fixtures for M04/M05, plus exact-build footage and independent
+review for M07/M08. Real Windows/hosting and in-client capture remain separate qualifications;
+G1–G6 and native replay X01 are unchanged. The supplied player's identifiers are not committed.
+
+### 2026-10-06 - Direct Tekken replay API and native-payload research
+
+X01, M22.01/.09, M05.10 and M01.02/.05: owner requested deeper direct-API research before
+building the selected companion. Searched public documentation/repository inventories and
+inspected pinned EWGF WavuService/Battle/PolarisProxyService, Cathesilta recorder and GamesDat
+Tekken watcher/test exclusions. Read Wavu/EWGF public descriptions, a YouTube-index project,
+official replay/patch behavior and the EULA linked for the Steam game. No game backend call,
+login, credential, payload/video acquisition, external contact or third-party code execution.
+
+Added research/native-tekken-replay-access-2026-10-06.md. Updated the older source report with
+a dated follow-up link, ADR-026, recording-companion.md, match-ingestion.md, D040, tracker and
+this log. Existing earlier 2026-10-06 design changes remain uncommitted on main; no branches
+created or publication claimed. Direct game replay-list access exists; externally obtained
+playable bytes, actual format/input/event decoding and a supported renderer remain UNVERIFIED,
+not proven impossible. GamesDat's support badge is an untested broad file watcher, not a
+decoder. The community recorder captures in-client playback, and the inspected EWGF paths
+process metadata/profile/leaderboard data. No inference is made about every private code path.
+
+Final local validation: 189 local links across all ten changed Markdown documents passed;
+requirement IDs/statuses, pinned evidence/provider classes, whitespace and personal-profile-ID
+exclusion passed; git diff --check passed. Runtime/backend/browser/Docker tests not run:
+this is public-source research and documentation only. No scientific or real-game qualification
+added; G1–G6 remain NOT_RUN. M22 remains PARTIAL/design only, M22.09/X01 and live M04/M05
+gates remain blocked. The report distinguishes technical feasibility, permitted usage and
+version-dependent rendering, rather than converting search absence into impossibility.
+
+Next for direct acquisition: obtain an allowed operation/usage contract and identity-to-payload
+fixtures, then supported-runtime/format/expiry/rendering evidence before any game request/client
+implementation. ADR-026 remains a staged fallback, not the sole possible architecture; the
+canonical Match/ReplaySource/GameplayEvent/player-model pipeline remains provider-independent.
+
+## 2026-10-06 ? M22 local recording companion implementation
+
+Requirements: M22.02-06/.10; M06.02/.03/.06, M14.03-05, M15.01/.06, M16.05,
+M13.03/.06, M01.05/.06 and M19.02. Owner authorized implementation, main publication
+and monitoring. Implemented `companion/` Windows source GUI/DPAPI/selected-folder sync;
+`backend/core/companion.py` and `companion_api.py`, guarded migration 0022, device/upload
+URLs and defaults; M06 unassigned-byte verification/parser/private media integration,
+consent/account/deletion/restore fences and allowlisted export/native recovery fixture;
+`frontend/app/recording-sync.tsx`, reused attribution form and home entry; controlled backend/
+helper/browser fixtures, README and architecture/D041. Existing research/ADR-026 plan
+is included in this work. No user gameplay IDs or credentials added to repository.
+
+Focused initial SQLite run found authentication denial and local-parser test settings issues
+(29 passes/three failures); corrected. PostgreSQL focused 88 pass in 36.33s, including
+generated finalized 1080p60 MP4 -> helper -> resumable -> worker/media -> private range with no
+Match or GameplayEvent. Actual Windows DPAPI and writer-excluding share behavior pass.
+Three new Edge checks pass (9.2s); production build/lint/types and mypy 35 pass. Full browser
+57 pass (1.1m), then shared fixture routes updated to avoid unmocked local proxy requests.
+Initial full backend was stopped for a new-test import/export-route correction; final suite
+and native migration/recovery/static/links/publication are ongoing, recorded in the receipt.
+
+No real recorder/game capture, usage permission, installed/signable distribution, automatic
+replay recording, native game request, live EWGF key/activation, G1?G6, hosting or player
+benefit is established. Next: finish exact local/CI qualification, then M22.07-08 real
+Windows packaging/privacy/resource acceptance, preserving independent provider/native gates.
+
+### Final local qualification before main publication
+
+Final affected PostgreSQL suite: **93 passed / one OS symlink-privilege skip in 24.84s**.
+The earlier full run completed 553 pass/one same-transaction mocked revocation test failure/
+seven separate Docker skips (773.65s); corrected the test to revoke between authentication
+and service admission, then final affected suite passes. This is not represented as a final
+full-regression pass. Final source CI is authoritative for the complete final tree.
+Added pause-during-inspection admission fence, redirect credential isolation, linked-root
+checks (local Windows privilege unavailable), invalid-auth rate budget and a dedicated
+Windows CI job. Local pure Windows helper checks: 16 pass/one privilege skip in 0.84s.
+Final 57 Edge pass (1.1m), mobile screenshot inspected, production build/lint/types and
+final typecheck pass. Ruff/248 formatted files, mypy 35, Django check/no schema drift,
+seven-job CI YAML, 312 Markdown links/157 unique requirement statuses pass. Native
+PostgreSQL dump/restore and guarded forward/reverse/forward, repeated controls, restored
+device invalidation and pending upload erasure pass; local migration 0022 and draft loader
+run. No hosted recovery objectives measured. Source commit/push/latest-tip monitoring next.

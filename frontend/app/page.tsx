@@ -11,6 +11,7 @@ import ComparisonGuide from "./comparison-guide";
 import TrainingJourney from "./training-journey";
 import AccountAccess from "./account-access";
 import AccountControls from "./account-controls";
+import RecordingSync from "./recording-sync";
 import { useResumableUpload, UploadProgress } from "./resumable-upload";
 
 type Event = {id:string;mode:string;start_us:number;eligibility:string;outcome:string;source_asset_id:string};
@@ -141,6 +142,7 @@ export default function Home(){
     </div>)}</section>
     <WorkspaceTools csrf={csrf} onTimezone={setZone} onDeleted={()=>window.location.reload()} reportEvent={reportEvent}/>
     <AccountControls csrf={csrf}/>
+    <RecordingSync csrf={csrf} zone={zone}/>
    </div></>}
    {authenticated&&<AccountAccess csrf={csrf} authenticated={authenticated}/>}
    <footer><span className="footer-brand">DOJOPULSE <span>/</span> BUILT FOR THE NEXT SESSION</span><span>Private local research workspace · No automated move judgments · No model-training consent implied</span></footer>

@@ -1,6 +1,6 @@
 # DojoPulse product progress
 
-Last updated: **2026-10-05** · Architecture: **2.17.0** · Current stage: **local research prototype**
+Last updated: **2026-10-06** · Architecture: **2.19.0** · Current stage: **local research prototype**
 
 This is the authoritative current milestone and requirements tracker. Update it after **every
 implementation**, including fixes, migrations, integrations, UI changes and operational changes.
@@ -21,6 +21,7 @@ explicitly local scope. Most remaining milestones have foundations or designs, n
 | Longitudinal evaluation (M12) | Coherent local module qualified (M12.08 DONE): scheduled follow-up/retention, gap receipts, exact source/decoder pins, safe reproducible reports and baseline-only planning. Published code 8f2f57b passed all six CI jobs. Real cohort/source bias/retention/power/G5/G6 remain unvalidated |
 | Core loop | Baseline → drill assignment → reviewed practice → later-match comparison implemented and tested synthetically |
 | Match acquisition | Player confirmation, consent, queued sync, source history and deletion work with two fictional providers |
+| ID search and automatic recording sync (M22) | Local Windows source companion, scoped pairing, completed-MP4 sync, durable transfer, withdrawal/revocation and private unassigned inbox implemented through M06. Attribution reuses bytes and preserves imported UUID; no match time or players inferred. Local qualification ongoing; signed packaging, real recorder/device study and hosted activation remain M22.07-08. Direct native acquisition/rendering and in-game capture remain unverified/gated |
 | Recording attribution | Resumable local UI/API preserves imported history, verifies bytes before queuing media validation and separate attribution/gameplay review; removal withdraws evidence |
 | Player experience (M13) | Local flows plus original graphite/ember visual system, dojo artwork, self-hosted fonts and responsive player/operator surfaces implemented (M13.09 locally qualified). Training tools lead; account/privacy controls remain available. Real-user/device/accessibility release acceptance remains open |
 | Accounts and consent (M14) | Local signup/verification/recovery, email/password changes, session revocation, versioned consent and withdrawal, export/deletion extensions and explicit re-linking with known-match suppression implemented. External mail, policy approval and backup/provider erasure remain gated |
@@ -64,6 +65,7 @@ dated evidence-based waiver before removing a release requirement. Preserve stab
 | Local engineering prototype | M01–M03; reproducible local services and synthetic workflows | Reached |
 | Real closed-loop proof | Relevant M06–M12 requirements plus G1–G6 decisions and M18; credible real baseline/practice/follow-up, including nonpositive outcomes | Not reached |
 | Permitted real match import | M04–M05; real player identity and recent history without upload when metadata suffices | Not reached |
+| Selected automatic recording-sync experience | M22 with applicable M06/M14?M16 gates; owned completed recordings sync without repeated manual upload. Per-ID provider history also needs M04?M05; automatic replay creation remains separately conditional | Local developer preview implemented; Windows delivery and hosted release unqualified |
 | Hosted private beta | M13–M19 requirements for the declared supported scope, plus real-data/provider gates | Not reached |
 | Complete supported Tekken product release | M01–M20 exit conditions; permitted ingestion, evidence-backed coaching, verified practice, comparison, usable account lifecycle, secure hosting and support | Not reached |
 | Broader Tekken offering | M21; each additional character/situation/capture profile validated and explicitly released | Not started |
@@ -99,6 +101,7 @@ or access to native replay data. Expansion belongs to M21. The superseded V1's a
 | M19 | Hosted private beta and release qualification | PARTIAL | First remote software CI jobs passed; pilot decisions, staging and operational/security qualification remain |
 | M20 | Public supported release and commercial readiness | NOT_STARTED | Beta evidence, supported scope, support and commercial decisions |
 | M21 | Broader validated Tekken coverage | NOT_STARTED | First complete loop and measured value before expansion |
+| M22 | Opt-in Windows recording sync and ID-based private playback | PARTIAL | Local module implemented (M22.02-06), qualification ongoing (M22.10). Windows install/update/recorder/privacy and hosted/resource qualification remain M22.07-08; real providers and in-game recording separately gated |
 
 ## M01 — Product architecture and delivery governance
 
@@ -145,7 +148,7 @@ Owner: integration owner + product owner. Exit: a real submitted ID resolves to 
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M04.01 Review allowed identity lookup, purpose, upstream lineage and terms | BLOCKED | Dated approval/reference and expiry; [EWGF review](docs/research/ewgf-activation-review-2026-09-19.md) is not activation approval |
+| M04.01 Review allowed identity lookup, purpose, upstream lineage and terms | BLOCKED | EWGF selected as the first per-ID candidate in [ADR-026](docs/adr/ADR-026-id-search-and-private-recording-companion.md); 2026-10-06 public docs rechecked, no substantive terms obtained. Dated approval/reference and expiry still required; [EWGF review](docs/research/ewgf-activation-review-2026-09-19.md) is not activation approval |
 | M04.02 Verify TEKKEN ID, Polaris ID, numeric user ID, platform and formatting mappings | BLOCKED | Permitted current fixtures establish namespace/case/alias behavior; archived source is insufficient |
 | M04.03 Implement real exact-ID resolver and missing/ambiguous-profile behavior | NOT_STARTED | No invented endpoint, silent casing change, lossy IDs or first-result selection |
 | M04.04 Add permitted player-name lookup or expose its absence | PARTIAL | UI explicitly says unsupported now; actual name lookup needs a documented resolver and ambiguous-name tests |
@@ -158,9 +161,9 @@ Owner: integration/backend owner. Depends on M04. Exit: real recent matches impo
 
 | Requirement | Status | Remaining acceptance |
 |---|---|---|
-| M05.01 Approve one concrete public provider operation and product usage scope | BLOCKED | Usage/caching/retention/attribution/deletion terms, allowed endpoint, review owner and expiry |
+| M05.01 Approve one concrete public provider operation and product usage scope | BLOCKED | 2026-10-06 selects EWGF metadata evaluation, not video retrieval or activation. Usage/caching/retention/attribution/deletion terms, allowed endpoint, review owner and expiry remain required; [hybrid contract](docs/architecture/recording-companion.md) |
 | M05.02 Configure private server credential and verify effective service tier | BLOCKED | Owner-managed credential outside source/logs/browser; no purchased tier inferred or provisioned |
-| M05.03 Validate real response schema and provider error cases | BLOCKED | Permitted redacted fixtures for normal, zero matches, unknown ID, delayed/capped data and errors |
+| M05.03 Validate real response schema and provider error cases | BLOCKED | 2026-10-06 documented per-ID route/tier recheck is not an authenticated schema fixture. Permitted redacted fixtures for normal, zero matches, unknown ID, delayed/capped data and errors remain required |
 | M05.04 Implement allowed transport and normalization adapter | NOT_STARTED | Allowlisted origin/routes; bounded redirects, compression, bytes and timeout; preserve external IDs and raw versions |
 | M05.05 Enforce shared quotas, Retry-After, bounded retries and sync freshness | PARTIAL | Offline policy/local retries exist; global credential quota, reset handling and outage recovery need live integration tests |
 | M05.06 Keep provenance, immutable corrections, source coverage and pagination checkpoints | PARTIAL | Local persistence tested; validate actual provider caps/gaps and permitted raw-snapshot retention |
@@ -418,6 +421,30 @@ Owner: gameplay/product/analysis owners. Exit: each advertised expansion is inde
 | M21.05 Support additional capture profiles/platforms only after measurement | NOT_STARTED | New timing/visibility/error tests and known incompatibility rules |
 | M21.06 Operate ongoing patch updates and backward-compatible historical interpretation | NOT_STARTED | Compatibility matrix, targeted reanalysis, retired capabilities and re-baseline guidance |
 
+## M22 — Opt-in Windows recording sync and ID-based private playback
+
+Owner: desktop/backend/product owners. Selected 2026-10-06 in
+[ADR-026](docs/adr/ADR-026-id-search-and-private-recording-companion.md).
+Exit for the initial sync stage: explicitly paired users can sync completed supported recordings
+to their private workspace with reliable recovery, consent/deletion and reviewed attribution.
+Live metadata search depends on M04/M05; upload-only sync does not. Initial sync removes manual
+upload, not the need to create/export a recording. Automatic in-client replay creation is a
+separately conditional later stage and does not block initial sync acceptance or scientific work.
+This selected expansion does not waive the original M01–M20 release boundaries.
+
+| Requirement | Status | Remaining acceptance / evidence |
+|---|---|---|
+| M22.01 Select an honest ID-to-playback acquisition architecture | DONE | Design only: [companion contract](docs/architecture/recording-companion.md), ADR-026/D039, EWGF metadata candidate and private USER_UPLOAD sync. Follow-up D040/[research](docs/research/native-tekken-replay-access-2026-10-06.md) keeps external native acquisition/rendering UNVERIFIED, not impossible; staged fallback remains replaceable by a permitted source. Availability, attribution and gameplay approval stay separate; no activated real provider; local companion implementation tracked below |
+| M22.02 Implement owner-authorized device pairing and revocation | PARTIAL | Local one-use ten-minute pairing, 30-day upload-only device credential, five-active-device limit, owner/consent/expiry/revocation checks and HTTPS-origin pinning implemented; actual Windows DPAPI roundtrip checked. Focused cross-owner/reuse/gating cases pass. Final affected suite 93 pass/one OS-privilege skip; source publication/CI pending; external activation remains gated |
+| M22.03 Admit only completed supported files from the selected folder | PARTIAL | Source GUI provides explicit select/start/pause/cancel/close; nonrecursive/reparse/root checks, writer-excluding Windows handle, ten-second observation plus finalized MP4/media profile/hash checks. Existing files require opt-in; 500 entries/256 receipts/90-day terminal retention. Growing/changed/outside and controlled 1080p60 checks pass; final affected/static/restore checks pass; exact-source CI pending |
+| M22.04 Sync resumably with durable deduplication and bounded retries | PARTIAL | M06 owner reservations/integrity/admission reused; DPAPI owner/device receipts and confirmed offsets survive restart, response loss and pause. Serial <=8 MiB chunks, Retry-After/backoff/eight-failure cap, owner byte idempotency and account-lifetime server suppression; no new retry key for terminal rejection. Focused recovery/duplicate/quota checks pass; final affected/static/restore checks pass; exact-source CI pending |
+| M22.05 Respect withdrawal, deletion, cancellation and local-file boundaries | PARTIAL | Device and processing/sync consent rechecked under owner lock on each transfer; account recovery/logout-all/revocation/restore fence devices and pending uploads. Server suppression prevents removed bytes from reappearing; PC originals never erased remotely. Focused lifecycle/regrant checks pass; final race/export/native restore pass; exact-source CI pending |
+| M22.06 Present private playback availability and reviewed attribution | PARTIAL | Website device controls and latest-50 private recording inbox expose pending/available/expired/incompatible/error/removed states; successful isolated media validation precedes playback. Synced bytes attach using existing participant/slot/time/build/mode/revision claims on the imported UUID, with separate operator review and no automatic Match/GameplayEvent creation. Three focused browser tests pass; 57 Edge pass; exact-source CI pending |
+| M22.07 Qualify Windows delivery, capture compatibility and privacy | PARTIAL | Actual local DPAPI/exclusive file behavior and source-helper controls checked; Windows CI job added. Signed installation/update/uninstall, real supported recorder/game fixtures, actual Windows reparse privilege cases and independent desktop/security/privacy review remain. No certificate purchase or deployed distribution |
+| M22.08 Measure device/server limits and qualify external operation | NOT_STARTED | Real CPU/disk/network/bytes/retention and failure recovery; use M17 budgets and M16 private hosted storage acceptance. Controlled fixtures are separate from real device/hosted qualification; manual upload remains available |
+| M22.09 Review automatic in-client replay recording as a later stage | BLOCKED | [2026-10-06 code inspection](docs/research/native-tekken-replay-access-2026-10-06.md) confirms the community example records in-client playback and supplies no external-download/renderer proof. Actual separate technical/usage decision, permitted operation/code use, current runtime/build/expiry/hardware/overlays and cancellation evidence remain. No game control, private endpoint, memory hook or standalone decoder implementation before review; X01 remains independent |
+| M22.10 Qualify the coherent local recording-sync engineering module | PARTIAL | Scoped device/owner/consent boundaries, controlled MP4 transfer and parser/private playback, interruption/dedup/quota/revocation/deletion/attribution/restore tests, browser/static/migration checks and actual latest-main CI. Final affected 93 pass/one OS-privilege skip, 57 Edge, static/build/native restore and 312 links pass; source publication/all-seven CI pending. Initial full 553 pass/one corrected mock failure/seven separate Docker skips is not a final full-pass claim; local evidence never substitutes for M22.07-09 or real game/provider/hosted acceptance |
+
 ## Wider product vision — explicit optional requirements
 
 These preserve the broader original vision without making speculative features prerequisites
@@ -426,7 +453,7 @@ and a new milestone before implementation. None is currently released.
 
 | ID | Capability | Status | Required decision / completion conditions |
 |---|---|---|---|
-| X01 | Permitted native replay / structured-event source | BLOCKED | Technical and usage review, allowed payload acquisition, verified format/version/expiry, validated decoder; same canonical event gates as video |
+| X01 | Permitted native replay / structured-event source | BLOCKED | [2026-10-06 public-source review](docs/research/native-tekken-replay-access-2026-10-06.md) establishes game replay-list access, not externally acquired playable bytes or supported decoding/rendering. Direct access is UNVERIFIED, not impossible. Technical/usage approval, allowed acquisition, exact format/version/expiry and validated decoder still required; same canonical event gates as video |
 | X02 | Personal AI explanations/chat | DECISION | Deterministic reports useful first; evidence-only bundles, no invented facts, prompt-injection defenses, numeric/ID validation, cost cap and deterministic fallback |
 | X03 | Browser mechanics lab | DECISION | Define what the exercise actually measures, input/display latency and transfer; do not call browser performance verified in-game skill |
 | X04 | Advanced semantic replay search | DECISION | Typed filters/timestamp search first; evaluate semantic search only where it improves real retrieval, with owner/version/deletion constraints |
@@ -456,13 +483,24 @@ versions/artifacts, explicit UNKNOWN, all-source retrospective benchmarks, indep
 replacement/rollback/drift stop, manual fallback and revocable owner reproduction. The final
 tracking receipt preserves ordinary CI and actual latest-tip monitoring. No real detector is
 released by this software qualification.
-Current owner priority: original M13.09 visual system is locally and source-CI qualified on
-ec5e102 with all six [jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37385253136) successful first attempt.
-Publish the final normal-CI qualification receipt and verify its actual latest tip before
-returning to real capture work. Then resume permitted exact-build footage/facts and qualified
-independent reviewers for M07/M08 observability and G1/G2; predeclare true unseen evaluation
-before label access. Actual Tekken recognition still requires reviewed observations/calibration and expert
-reference timing. Hosting/provider access remains a separate decision and qualification.
+Current owner priority (2026-10-06): qualify and publish the implemented M22 completed-recording
+sync module, then complete actual Windows packaging/recorder/privacy/resource acceptance.
+Local pairing, folder admission and M06 transfer are implemented. This is useful independently of blocked live metadata access and does
+not create recordings by TEKKEN ID. Prepare EWGF as the first M04/M05 metadata candidate in
+parallel; its usage rights, credential and authenticated fixtures remain missing. In-client
+replay automation is a later reviewed stage, not part of initial folder sync. Design-only
+evidence is [ADR-026](docs/adr/ADR-026-id-search-and-private-recording-companion.md) and
+[the companion contract](docs/architecture/recording-companion.md).
+Owner requested deeper direct-API research before implementation. The subsequent
+[pinned public-source review](docs/research/native-tekken-replay-access-2026-10-06.md) is complete
+for that scope: replay-list backend confirmed, external playable acquisition/rendering remains
+UNVERIFIED. Keep direct acquisition eligible under X01 if permitted contract/fixtures/runtime
+evidence become available; no companion or private transport was implemented during the review.
+Earlier M13.09 source qualification on ec5e102 is dated 2026-10-05 above; no runtime tests
+were rerun for this documentation decision. Continue permitted exact-build footage/facts and
+independent M07/M08 reviewers in parallel; predeclare unseen evaluation before label access.
+Actual Tekken recognition needs reviewed calibration/expert timing. Hosting and provider
+activation remain separate decisions and qualifications.
 M08.08 now prepares the official-client recording procedure and derived G1 assessment. User
 confirmed no capture paths/reviewers and requested public/game discovery; 2026-10-05 research
 found an installed game but zero qualifying public or local captures. Obtain purpose-consented
@@ -470,8 +508,8 @@ recordings and independent exact-build review using the qualified preparation to
 Local M08.08 software and exact source e674342 are qualified with all six
 [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37380495040) successful
 on the first attempt. Its final 20f74cc receipt was also verified on the actual latest tip.
-The M13.09 UI delivery must independently follow the same normal-CI/latest-tip policy.
-No game automation, YouTube downloader, private endpoint, real-intake or detector release added.
+Every subsequent published delivery must follow the normal-CI/latest-tip policy.
+No companion, game automation, YouTube downloader, private endpoint, real-intake or detector release added.
 Then use the reviewed knowledge/dataset workflow to acquire permitted exact-build facts,
 representative captures and qualified independent labels before releasing M09 recognition or real M10 diagnosis/priorities. Hosting/provider gates below
 remain separate. Maintain weekly reviewed dependency patches and the tracked development
@@ -479,12 +517,13 @@ lint advisory. No purchase, external contact or activation is implied.
 
 | Priority | Next concrete outcome | Requirements | Needed input / owner |
 |---|---|---|---|
-| 1 | Prepare activation of one documented public provider | M04.01–M04.03, M05.01–M05.04 | Product owner obtains applicable usage evidence and privately configures a key; integration owner verifies permitted fixtures; never paste secrets into this tracker |
-| 2 | Acquire first consented captures and expert review | M07.02–M07.05, M08.02–M08.03 | Participants, exact-build evidence, Tekken expert, two reviewers and adjudicator |
-| 3 | Validate observability/practice before promoting recognition | M09, M11, G1/G4 then G2 | Dataset/review findings; select backup/narrow if required |
-| 4 | Qualify M16 hosting and account/security release boundaries | M13.01–M13.04/M13.06–M13.07, M14.01/M14.03–M14.06, M15.01–M15.07, M16 | Google Cloud confirmed; local M16 outbox/recovery and mocked adapters/templates delivered. Select region/budget/recovery objectives; review equivalent media isolation and independent durable controls, then authorize staging provisioning. Hosted routing/email/IAM/storage and source-integrity/privacy/security reviews remain; tracker alone authorizes no resources |
-| 5 | Qualify M17 operations and actual economics | M17.01–M17.07 | Local ledger/telemetry/dashboard/load module implemented. Approve supported workload/objectives and named response; measure real hosting/reviewer/support amounts, qualify alert delivery and current quota recovery, then run an approved actual offer with payment/repeat-use evidence |
-| 6 | Activate a reviewed real pilot using M18 tools, then qualify hosting/beta | M08, M12, M16–M19 | Local tooling implemented; approve rights/adult retention/sampling/comparator protocol, enroll permitted cohort and independent reviewers/expert, then collect real G1–G6 evidence |
+| 1 | Qualify the completed-recording companion module and Windows delivery | M22.02-08/.10, M06 | Finish actual local/full CI and native restore receipt, then qualify install/update/uninstall, real permitted recorder fixtures, independent privacy/security and device resources. Hosted activation and automatic in-game capture remain separate |
+| 2 | Prepare EWGF as the first documented per-ID metadata provider | M04.01–M04.03, M05.01–M05.04 | Product owner obtains applicable usage evidence and privately configures a key; integration owner verifies permitted fixtures; no video retrieval inferred and never paste secrets into this tracker |
+| 3 | Acquire first consented captures and expert review | M07.02–M07.05, M08.02–M08.03 | Participants, exact-build evidence, Tekken expert, two reviewers and adjudicator; parallel to M22/provider preparation |
+| 4 | Validate observability/practice before promoting recognition | M09, M11, G1/G4 then G2 | Dataset/review findings; select backup/narrow if required |
+| 5 | Qualify M16 hosting and account/security release boundaries | M13.01–M13.04/M13.06–M13.07, M14.01/M14.03–M14.06, M15.01–M15.07, M16, M22.08 | Google Cloud confirmed; local M16 outbox/recovery and mocked adapters/templates delivered. Select region/budget/recovery objectives; review equivalent media isolation and independent durable controls, then authorize staging provisioning. Hosted routing/email/IAM/storage and source-integrity/privacy/security reviews remain; tracker alone authorizes no resources |
+| 6 | Qualify M17 operations and actual economics | M17.01–M17.07 | Local ledger/telemetry/dashboard/load module implemented. Approve supported workload/objectives and named response; measure real hosting/reviewer/support amounts, qualify alert delivery and current quota recovery, then run an approved actual offer with payment/repeat-use evidence |
+| 7 | Activate a reviewed real pilot using M18 tools, then qualify hosting/beta | M08, M12, M16–M19 | Local tooling implemented; approve rights/adult retention/sampling/comparator protocol, enroll permitted cohort and independent reviewers/expert, then collect real G1–G6 evidence |
 
 The tracker is not authorization to purchase, contact providers, collect new personal data,
 enable undocumented endpoints or deploy externally. Existing user authorization and applicable
@@ -567,3 +606,11 @@ release gates still govern those actions. Do not let one external blocker stop i
 | 2026-10-05 | M13.09, M16.02, M19.02, M01.05/.06 | Published UI source ec5e102 directly to main with enabled CI after fresh remote-head review; only main exists | 133 local links, parsed CI YAML/six-job asset checks and packaging assertions pass. Python PyYAML unavailable; installed js-yaml used. Actual exact-source CI pending |
 
 | 2026-10-05 | M13.01/.04/.07/.09, M16.02, M19.02, M01.05/.06 | Source ec5e102 all six CI jobs verified first attempt; final ordinary-CI qualification receipt prepared. M13.09 DONE locally, overall M13 PARTIAL | 519 PostgreSQL/54 Chromium/seven actual Docker/three Terraform plus audits/static/build/native recovery and actual standalone asset byte checks; downloaded XML/logs verified. Final receipt/latest-tip monitoring required |
+
+| 2026-10-06 | M22.01–M22.09, M04.01, M05.01/.03, M01.02/.05 | Owner delegated ID-to-video approach selection; recorded hybrid EWGF metadata candidate plus private Windows completed-recording sync, ADR-026/D039 and architecture 2.18.0. M22 PARTIAL/design only; replay automation remains separately gated | Public documentation rechecked; final 176 local links across all eight changed documents, unique requirement/status/version/profile-ID checks and git diff whitespace pass. No runtime tests rerun, authenticated fixture, companion, video acquisition, live activation, publication or hosted qualification |
+
+| 2026-10-06 | X01, M22.01/.09, M05.10, M01.02/.05 | Owner requested deeper direct Tekken API research before implementation. Recorded pinned metadata/proxy/recording/watcher source findings and official playback/patch/EULA inputs; D040 clarifies native access is UNVERIFIED, not impossible. Hybrid remains staged fallback; gates unchanged | Public-source inspection; 189 local links across all ten changed Markdown documents, requirement/status/pinned-evidence/provider-class/profile-ID checks and git diff whitespace pass. No runtime tests, private game request, native bytes, video, credentials, contact, executable recorder, provider activation or hosting |
+
+| 2026-10-06 | M22.02-06/.10, M06.02/.03/.06, M14.03-05, M15.01/.06, M16.05, M13.03/.06, M01.05/.06, M19.02 | Implemented local Windows source companion and private unassigned recording inbox using M06; guarded migration 0022, scoped credentials, DPAPI receipts, owner-lock lifecycle and existing-UUID attribution; architecture 2.19.0. Product M22 remains PARTIAL | Focused 88 PostgreSQL tests and three new Edge tests pass; actual DPAPI/exclusive-file checks and generated supported MP4/worker/private-range flow checked. Final full regression/static/native recovery/exact-tip publication ongoing; no native game access, provider activation, signed installer or cloud provisioning |
+
+| 2026-10-06 | M22.02-07/.10, M14.03-05, M16.05, M01.05/.06 and M19.02 | Final local companion qualification recorded; source helper starts paused, account recovery revokes devices, exported receipts omit secrets, native restore revokes restored devices; new Windows CI job. Publication pending | Final affected 93 PostgreSQL pass/one symlink-privilege skip (24.84s); 57 Edge, actual DPAPI/share locks, controlled MP4, 248 Ruff-format/35 mypy, build/lint/types/schema, native recovery and 312 links/157 requirement checks. Initial full 553 pass/one corrected mock failure/seven separate Docker skips retained honestly; final complete source CI pending |

@@ -826,6 +826,34 @@ class UploadSession(Owned):
         ]
 
 
+class RecordingDevice(Owned):
+    label = models.CharField(max_length=60)
+    token_digest = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True)
+    last_seen_at = models.DateTimeField(null=True)
+
+
+class DevicePairing(Owned):
+    label = models.CharField(max_length=60)
+    token_digest = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField(db_index=True)
+    consumed_at = models.DateTimeField(null=True)
+
+
+class RecordingReceipt(Owned):
+    device = models.ForeignKey(RecordingDevice, on_delete=models.PROTECT)
+    # Keyed byte identity remains as a suppression receipt after remote deletion.
+    key_digest = models.CharField(max_length=64)
+    request_id = models.UUIDField(default=uuid.uuid4)
+    session = models.OneToOneField(UploadSession, on_delete=models.PROTECT, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "key_digest"], name="recording_byte_receipt")
+        ]
+
+
 class PilotStudy(Owned):
     title = models.CharField(max_length=80)
     dataset_kind = models.CharField(max_length=12)

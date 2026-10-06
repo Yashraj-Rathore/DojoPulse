@@ -22,6 +22,7 @@ from backend.core.ownership import lock_owner
 
 POLICY_VERSION = "local-research-2026-09/1"
 POLICIES = {
+    "RECORDING_SYNC": "Allow a paired computer to sync completed recordings from a folder you explicitly select. Sync starts only when you enable it locally. Uploaded recordings remain private; match attribution and gameplay review are separate. Revocation stops future device access and pending transfers. Deleting remote recordings does not delete originals on your computer. Re-enable by explicitly pairing again; old devices and removed recordings are not restored.",
     "TERMS": "This local research prototype has no validated automatic coaching. An account does not prove ownership of a Tekken identity. Public service terms require separate release review.",
     "PROCESSING": "Process the matches and recordings you choose to provide for your private training workspace. Retained recordings expire under the stated capture policy. Withdrawal stops new processing and queued work; existing records remain available for export or deletion. Re-enabling does not restart cancelled jobs or restore deleted data.",
     "TRAINING": "Optional permission to use eligible retained evidence to improve DojoPulse recognition models. No model-training service is enabled. Withdrawal stops future use; any real training operation still requires reviewed data rights and a separate release decision. This choice is not required for workspace processing.",
@@ -68,6 +69,10 @@ def record_consent(owner, scope, action, version, request_id, source="ACCOUNT"):
         request_id=request_id,
     )
     now = timezone.now()
+    if action == "WITHDRAW" and scope in {"PROCESSING", "RECORDING_SYNC"}:
+        from backend.core.companion import revoke_all
+
+        revoke_all(owner)
     if scope == "PROCESSING":
         profile.processing_consent_at = now if action == "GRANT" else None
         profile.processing_withdrawn_at = now if action == "WITHDRAW" else None

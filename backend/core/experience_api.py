@@ -298,11 +298,21 @@ def export_account(request):
         PilotSession,
         PracticeLog,
         RecognitionRun,
+        RecordingDevice,
+        RecordingReceipt,
         RunBudget,
         UploadSession,
     )
 
     tables = {
+        "recording_devices": (
+            RecordingDevice.objects.filter(owner=user),
+            ["id", "label", "expires_at", "revoked_at", "last_seen_at", "created_at"],
+        ),
+        "recording_receipts": (
+            RecordingReceipt.objects.filter(owner=user),
+            ["id", "device_id", "session_id", "created_at"],
+        ),
         "detector_versions": (
             DetectorVersion.objects.filter(owner=user),
             [

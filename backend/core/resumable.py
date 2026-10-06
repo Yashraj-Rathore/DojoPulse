@@ -441,7 +441,7 @@ def verify(session_id, *, storage=None):
             )
             if match:
                 create_recording_source(match, current.asset, claim)
-            else:
+            elif not claim.get("unattributed_recording"):
                 match = Match.objects.create(
                     owner=current.owner,
                     asset=current.asset,

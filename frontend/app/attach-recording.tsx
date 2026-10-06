@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { displayTime } from "./workspace-api";
+import { displayTime, workspaceRequest } from "./workspace-api";
 import { useResumableUpload, UploadProgress } from "./resumable-upload";
 
 export type RecordingTarget = {
@@ -9,11 +9,12 @@ export type RecordingTarget = {
   opponent_ids: { namespace: string; value: string }[];
 };
 
-export default function AttachRecording({ csrf, match, onComplete, onCancel, zone = "UTC" }: {
+export default function AttachRecording({ csrf, match, onComplete, onCancel, zone = "UTC", syncedSession }: {
   csrf: string;
   match: { id: string; played_at: string; mode: string; game_build: string | null; dataset_kind: string; recording_target: RecordingTarget };
   onComplete: () => void; onCancel: () => void;
   zone?: string;
+  syncedSession?: string;
 }) {
   const [error, setError] = useState("");
   const transfer = useResumableUpload(csrf);
@@ -23,7 +24,7 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
     event.preventDefault(); setError("");
     const form = new FormData(event.currentTarget);
     const file = form.get("file") as File | null;
-    if (!file || !file.name.toLowerCase().endsWith(".mp4") || file.size === 0 || file.size > 536870912) {
+    if (!syncedSession && (!file || !file.name.toLowerCase().endsWith(".mp4") || file.size === 0 || file.size > 536870912)) {
       setError("Choose an MP4 recording up to 512 MiB."); return;
     }
     const metadata = {
@@ -33,7 +34,10 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
       session_id: form.get("session_id"), dataset_kind: form.get("dataset_kind"), characters: ["jin", "jin"], attribution_confirmed: true,
     };
     try {
-      if (await transfer.start(file, metadata, match.id)) onComplete();
+      if (syncedSession) {
+        await workspaceRequest(csrf, `synced-recordings/${syncedSession}/attach`, "POST", {match_id: match.id, metadata});
+        onComplete();
+      } else if (file && await transfer.start(file, metadata, match.id)) onComplete();
     } catch (problem) { setError(problem instanceof Error ? problem.message : "Upload failed."); }
   }
 
@@ -45,7 +49,8 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
     {error && <p className="notice error" role="alert">{error}</p>}
     <form onSubmit={submit}>
       <fieldset disabled={busy}>
-        <label htmlFor="attached-file">Gameplay recording</label><input id="attached-file" type="file" name="file" accept="video/mp4" required />
+        {!syncedSession && <><label htmlFor="attached-file">Gameplay recording</label><input id="attached-file" type="file" name="file" accept="video/mp4" required /></>}
+        {syncedSession && <p className="notice">Use the already synced recording. Confirm what is visible in the video; no file upload is needed.</p>}
         <div className="rows">
           <div><label htmlFor="recorded-player">Player ID visible in recording</label><input id="recorded-player" name="player_id" defaultValue={match.recording_target.player_id} required maxLength={200} /></div>
           <div><label htmlFor="recorded-opponent">Opponent ID visible in recording</label><input id="recorded-opponent" name="opponent_id" defaultValue={opponent?.value || ""} required maxLength={200} /></div>
@@ -58,7 +63,7 @@ export default function AttachRecording({ csrf, match, onComplete, onCancel, zon
         <label><input type="checkbox" required />I checked both players, their slots, the original play time, build and purpose. This recording shows Jin vs Jin and belongs to this match.</label>
         <label><input type="checkbox" required />I consent to processing and storing this recording for evidence review.</label>
         <label><input type="checkbox" required />This is one continuous, uncut capture without pauses or rewinds.</label>
-        <button>{["Upload paused", "Upload interrupted"].includes(transfer.phase) ? "Resume upload" : "Upload for attribution review"}</button>
+        <button>{syncedSession ? "Submit synced recording for attribution review" : ["Upload paused", "Upload interrupted"].includes(transfer.phase) ? "Resume upload" : "Upload for attribution review"}</button>
         <button type="button" className="secondary" onClick={onCancel}>Cancel attachment</button>
       </fieldset>
     </form>

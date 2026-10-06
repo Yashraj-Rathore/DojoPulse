@@ -12,6 +12,12 @@ frozen evaluations, verified-practice import and a thin Next.js UI are implement
 The sole drill is deliberately a draft; assignment requires an approved version.
 No LLM or hosted service is enabled.
 
+An opt-in [Windows recording companion](companion/README.md) and website recording
+inbox are implemented as a **local developer preview**. Pairing, selected-folder
+sync, resumable transfer, revocation and reviewed attribution reuse the existing
+private pipeline. Users still create/export recordings; there is no native Tekken
+API acquisition, automatic in-game capture, signed installer or hosted activation.
+
 DojoPulse now has a [provider-neutral match-ingestion design](docs/architecture/match-ingestion.md)
 and [source investigation](docs/research/tekken-match-sources.md). It covers player-name/TEKKEN-ID
 resolution, stable identities, automatic metadata imports and replay/video fallback. Typed adapter

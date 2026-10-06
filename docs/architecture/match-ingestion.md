@@ -1,9 +1,23 @@
 # Provider-neutral match ingestion / 1
 
-Architecture addition for DojoPulse, updated 2026-09-19. Status: offline contracts, relational
+Architecture addition for DojoPulse, updated 2026-10-06. Status: offline contracts, relational
 cutover, synthetic imports and local linking/sync/history UI/API implemented. Network ingestion remains disabled.
 Evidence: [source investigation](../research/tekken-match-sources.md).
 Decision: [ADR-013](../adr/ADR-013-provider-neutral-match-ingestion.md).
+
+The owner-selected [ID search and recording-companion direction](recording-companion.md)
+prefers EWGF for the first reviewed per-player metadata integration and opt-in Windows sync
+for owner-created recordings. [ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md)
+records the choice. Local recording sync is implemented as a developer preview; live
+EWGF/provider transports and hosted companion admission remain disabled. Initial folder sync
+removes repeated manual upload, not recording/export; in-client replay automation is a later
+reviewed stage. Search never grants access to another owner's private recordings, and no
+reviewed API currently establishes ID-to-video retrieval.
+
+The [2026-10-06 native-access review](../research/native-tekken-replay-access-2026-10-06.md)
+distinguishes the existing game replay-list backend from externally acquired playable bytes
+and ready video. External native acquisition/rendering remains UNVERIFIED, not technically
+disproved. A future reviewed source still fits ReplaySource without provider-specific events.
 
 ## Product behavior
 
