@@ -1,6 +1,10 @@
 # ADR-026: ID search with a private Windows recording companion
 
-Date: 2026-10-06. Status: accepted product direction; local source companion implemented under D041, real integrations not activated.
+Date: 2026-10-06. Status: retained fallback; primary journey/order superseded by ADR-027; local source companion implemented under D041, real integrations not activated.
+
+Follow-up: [ADR-027](ADR-027-browser-only-replay-acquisition-feasibility.md) requires browser-only
+acquisition proof before desktop distribution. The initial implemented sync remains available
+as a fallback; customers should not need its setup for the target seamless journey.
 
 ## Context
 

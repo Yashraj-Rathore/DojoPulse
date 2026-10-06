@@ -1884,3 +1884,43 @@ Final receipt checks: 311 local Markdown links across root/companion/docs, all 1
 milestone plus 12 optional stable IDs/status/table cells and architecture 2.19.0
 consistency pass; git diff --check passes. Runtime tests not rerun for documentation
 changes locally; the final receipt keeps ordinary full CI on its exact SHA.
+
+### 2026-10-06 - Browser-only replay acquisition priority and bounded qualification tooling
+
+M22.01/.09/.11-.14, M13.10, M01.05 and M19.02: owner requires a seamless website
+without customer downloads/folder/file setup. ADR-027/D042 and Architecture 2.20.0 make
+sign in -> ID once -> available matches -> Analyze the primary target. M22.01 reopened;
+M22.09 moves ahead of desktop distribution. Preserve the qualified companion/upload as
+fallbacks; define real first-replay and console/managed-service acceptance separately.
+
+Implemented ingestion/acquisition.py and tools/qualify_replay_acquisition.py: strict offline
+plan and bounded referenced-file/hash checks; separate browser/identity/match/acquisition/
+playback/capture/private-delivery/attribution evidence, real/synthetic and failed denominators,
+exact declared builds/expiry, zero manual external actions, retry/time/byte limits, scoped
+review expiry, console and cost/control gaps. Reports cannot activate adapters or approve
+permissions/game semantics/media/backend/science/release; no ORM writes or game/network calls.
+tests/test_replay_acquisition.py exercises these boundaries with controlled synthetic bytes.
+
+Read/initialized Computer Use skill; import succeeded but list_apps failed with absent native
+pipe/os error 2. No game input or actual replay trial occurred. Rechecked public recorder,
+Steam EULA and official replay-invalidation notes; no managed usage grant established.
+Initialized private zero-trial plan; actual CLI report hash
+bbb7f09e13267560dbfb1109940a9ea217931bb995c9725ad318681f337bb5da, assessed
+16:38:21 UTC, remains NOT_RUN with review/native/console/rate/cost and all fault-control gaps.
+
+Changed README, tracker, ADR-026 follow-up, ADR-027, current architecture-v2/match-ingestion/
+player-experience/recording-companion, new replay-acquisition contract/qualification receipt
+and decision log. Initial decorator typo corrected; 54 focused and expanded 82 controlled
+checks pass, final suite includes linked-ancestor regression. Ruff/253 formatted files and
+Linux/Windows mypy37 pass. Final affected results and docs/publication validation follow.
+
+Previous final receipt 10c5817 also passed all seven actual latest-tip CI jobs at 16:04:52 UTC
+(run 37491296773); recorded that previously verified delivery without borrowing its checks
+for this new implementation. No native/private provider transport, real replay capture,
+managed service, scientific study or hosted activation added. Next: technical/usage review
+and supported native control, then actual permitted ID-to-private-playback proof; product UI
+and managed Windows/runtime decisions follow real evidence.
+
+Final local affected suite: 82 pass/one Windows symlink privilege skip (1.45s). Linux CI will exercise actual evidence-file and root/ancestor symlink rejection. Final Ruff/253 formatted files and Linux/Windows mypy37 pass. Actual CLI report has zero trials and all approval flags false. No frontend, runtime schema or dependency changes; full local runtime/browser/container suites not rerun for this isolated offline module, ordinary full source CI follows.
+
+Documentation checks: 336 local Markdown links, 162 milestone plus 12 optional unique requirements/status/table cells and Architecture 2.20.0 consistency pass; git diff --check passes. Work stays on main; publish the source with ordinary CI and monitor its exact SHA. No approval or real capture is inferred from that software delivery.

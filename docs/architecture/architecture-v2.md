@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.19.0. Decision date: 2026-10-06. Status: local engineering approved;
+Version: 2.20.0. Decision date: 2026-10-06. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -88,14 +88,16 @@ while preserving existing match/event/evaluation facts. Local synthetic imports 
 network adapters and native replay decoding remain disabled. See [research](../research/tekken-match-sources.md)
 and [ADR-013](../adr/ADR-013-provider-neutral-match-ingestion.md).
 
-The owner-selected [recording-companion design](recording-companion.md), recorded in
-[ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md), combines reviewed
-per-ID metadata with private owner-created video. EWGF is the first metadata candidate;
-the first Windows stage syncs completed recordings, with in-client automatic replay capture
-conditional on separate review. M22 tracks this new scope. D041 implements the local
-Windows source helper, scoped pairing and private recording inbox through M06, with
-explicit operator/development gates. Live provider transport, public-media sharing, game
-automation, signed desktop delivery and hosted admission remain separately gated.
+[ADR-027](../adr/ADR-027-browser-only-replay-acquisition-feasibility.md) makes browser-only
+replay acquisition the primary target: sign in, confirm TEKKEN ID once, available matches,
+Analyze. M22.09/.11-.14 require real permitted lookup/acquisition, compatible playback,
+automatic capture and private delivery before a live acquisition UI; console PC-playback and
+managed usage/runtime/cost require separate qualification. D042 adds bounded offline
+[evidence tooling](replay-acquisition-feasibility.md), not an acquisition transport; zero
+real trials occurred and the native control helper failed to connect. No provider is activated.
+The qualified [Windows recording sync](recording-companion.md) under ADR-026/D041 remains
+an optional fallback through M06, with explicit operator/development gates. Its signed delivery
+and hosted qualification remain tracked. Public IDs never grant private media or gameplay approval.
 
 The local UI now supports explicit player selection, consent, queued metadata sync, source-aware
 history and deletion. A separate PostgreSQL-backed match worker processes only synthetic

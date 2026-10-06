@@ -12,8 +12,14 @@ frozen evaluations, verified-practice import and a thin Next.js UI are implement
 The sole drill is deliberately a draft; assignment requires an approved version.
 No LLM or hosted service is enabled.
 
+The primary acquisition target is **website sign-in -> TEKKEN ID once -> available matches -> Analyze**
+with no required desktop setup or manual uploads. [Replay acquisition qualification](docs/architecture/replay-acquisition-feasibility.md)
+provides a bounded offline plan/checksum/report tool; real automatic acquisition is not implemented
+or permitted by that report. Zero actual replay trials have been run. Current provider/native
+control and managed-use evidence gaps must be resolved before a live transport or capture queue.
+
 An opt-in [Windows recording companion](companion/README.md) and website recording
-inbox are implemented as a **local developer preview**. Pairing, selected-folder
+inbox are implemented as an optional **local developer preview fallback**. Pairing, selected-folder
 sync, resumable transfer, revocation and reviewed attribution reuse the existing
 private pipeline. Users still create/export recordings; there is no native Tekken
 API acquisition, automatic in-game capture, signed installer or hosted activation.

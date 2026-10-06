@@ -1,6 +1,6 @@
 # ID search and private recording sync
 
-Updated 2026-10-06; Architecture 2.19.0. Status: local developer preview implemented (M22.02-06),
+Updated 2026-10-06; Architecture 2.20.0. Status: local developer preview implemented (M22.02-06),
 coherent local engineering qualified on source 7635a3c (all seven CI jobs). No live provider transport, signed installer, hosted admission or game
 automation is enabled. [Run the source helper](../../companion/README.md).
 Decision: [ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md).
@@ -10,7 +10,12 @@ keeps external playable-payload retrieval UNVERIFIED, not impossible. This is a 
 a subsequently permitted and validated native source can supply evidence through the same
 canonical pipeline. Public-source research does not activate any private game operation.
 
-## Selected product journey
+## Optional fallback journey
+
+[ADR-027](../adr/ADR-027-browser-only-replay-acquisition-feasibility.md) supersedes this primary
+journey and order: prove [browser-only replay acquisition](replay-acquisition-feasibility.md)
+first. The steps below describe the implemented recording fallback; they are not required
+setup for the target supported browser-only experience.
 
 1. Enter a TEKKEN ID and explicitly confirm an approved provider's matching profile.
 2. Import recent metadata through the existing provider-neutral match pipeline. Show source,
@@ -91,9 +96,10 @@ anti-cheat bypass, memory hooks, unattended account use or collection of other u
 M22.01 records this choice. Pairing/revocation and completed-file sync (M22.02-M22.06)
 are implemented and qualified against the existing local evidence services with controlled
 fixtures; M22.10 records the coherent local module and source CI evidence.
-Then qualify real Windows packaging/device privacy/capture compatibility and resource behavior
-(M22.07-M22.08). Live EWGF activation is parallel M04/M05 work and not a prerequisite for
-upload-only recordings. Evaluate in-client automatic replay capture separately (M22.09).
+The owner reprioritized M22.09/.11-.14 real acquisition feasibility ahead of Windows packaging.
+M22.07-M22.08 delivery/device/privacy/resource work remains tracked for this optional fallback.
+Live EWGF activation is separate M04/M05 work and not a prerequisite for upload-only recordings.
+Offline evidence preparation does not implement actual in-client acquisition or capture.
 
 Meaningful checks must cover cross-owner pairing/upload isolation; expired/reused/revoked
 tokens; selected-root escapes and a growing/changed file; interrupted/restarted transfers;

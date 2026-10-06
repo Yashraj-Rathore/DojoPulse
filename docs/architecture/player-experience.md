@@ -1,6 +1,6 @@
 # M13 player experience — local implementation contract
 
-Updated 2026-10-06; Architecture 2.19.0. Available local M13 engineering is implemented.
+Updated 2026-10-06; Architecture 2.20.0. Available local M13 engineering is implemented.
 M13's release exit still requires permitted real providers, production accounts, validated
 knowledge/measurement and real usability/accessibility studies.
 
@@ -27,13 +27,13 @@ exposure and immutable memberships. All six outcomes and withdrawn results remai
 
 ## Search and evidence
 
-The selected next acquisition direction is [ID search plus private recording sync](recording-companion.md).
-Future ID search shows reviewed-provider metadata and offers Play only for a recording the
-requesting owner is authorized to access. Missing, pending, expired and incompatible media
-remain explicit; public identity lookup never exposes another owner's videos. The Windows
-companion starts with opt-in completed-file sync. The local companion UI/private inbox
-is now implemented and qualified under D041; live search and ID-only video acquisition
-remain gated.
+The primary target is [browser-only acquisition](replay-acquisition-feasibility.md): sign in,
+confirm TEKKEN ID once, choose an available match and Analyze without installing/pairing tools,
+choosing folders or creating/uploading recordings. M13.10 stays blocked on real permitted
+acquisition and M22 console/managed-service qualification. Prepare actual proof before adding
+a capture queue or promising video from metadata. Existing missing/pending/expired/incompatible
+states remain honest. Public IDs never expose another owner's private videos. The qualified local
+[recording companion/inbox](recording-companion.md) and manual upload remain optional fallbacks.
 
 History supports owner/player, inclusive UTC date range, character, reviewed situation/outcome
 and evidence state. Event search supports match, UTC dates, character, purpose, situation,

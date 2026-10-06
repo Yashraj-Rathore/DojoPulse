@@ -5,14 +5,13 @@ cutover, synthetic imports and local linking/sync/history UI/API implemented. Ne
 Evidence: [source investigation](../research/tekken-match-sources.md).
 Decision: [ADR-013](../adr/ADR-013-provider-neutral-match-ingestion.md).
 
-The owner-selected [ID search and recording-companion direction](recording-companion.md)
-prefers EWGF for the first reviewed per-player metadata integration and opt-in Windows sync
-for owner-created recordings. [ADR-026](../adr/ADR-026-id-search-and-private-recording-companion.md)
-records the choice. Local recording sync is implemented as a developer preview; live
-EWGF/provider transports and hosted companion admission remain disabled. Initial folder sync
-removes repeated manual upload, not recording/export; in-client replay automation is a later
-reviewed stage. Search never grants access to another owner's private recordings, and no
-reviewed API currently establishes ID-to-video retrieval.
+The primary target is [browser-only replay acquisition](replay-acquisition-feasibility.md)
+under [ADR-027](../adr/ADR-027-browser-only-replay-acquisition-feasibility.md). Real permitted
+ID-to-private-playback proof precedes acquisition UI and managed rendering. EWGF remains the
+first reviewed per-ID metadata candidate; it is not a verified video source. The qualified
+[recording companion](recording-companion.md) under ADR-026 remains optional fallback.
+Provider transports, automatic game control and hosted admission remain disabled. Public ID
+knowledge is not private-media authorization. No change introduces provider-specific gameplay.
 
 The [2026-10-06 native-access review](../research/native-tekken-replay-access-2026-10-06.md)
 distinguishes the existing game replay-list backend from externally acquired playable bytes
