@@ -3,6 +3,7 @@
 import ctypes
 import json
 import os
+import sys
 from ctypes import wintypes
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,7 @@ class Blob(ctypes.Structure):
 
 
 def crypt(data: bytes, *, decrypt: bool = False) -> bytes:
-    if os.name != "nt":
+    if sys.platform != "win32":
         raise ValueError("WINDOWS_CREDENTIAL_STORAGE_REQUIRED")
     buffer = ctypes.create_string_buffer(data)
     source = Blob(len(data), ctypes.cast(buffer, ctypes.POINTER(ctypes.c_ubyte)))

@@ -6,6 +6,7 @@ import json
 import os
 import re
 import stat
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -142,7 +143,7 @@ def signature(info: os.stat_result) -> tuple[int, int, int, int]:
 
 @contextmanager
 def locked_recording(path: Path) -> Any:
-    if os.name == "nt":
+    if sys.platform == "win32":
         import ctypes
         import msvcrt
         from ctypes import wintypes

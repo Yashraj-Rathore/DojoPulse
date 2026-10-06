@@ -1,7 +1,7 @@
 # M22 recording sync qualification
 
 Date: 2026-10-06. Architecture 2.19.0. Scope: local developer preview; final
-local checks recorded below; exact-source publication/CI pending. No supported game/recorder, signed installation,
+local checks recorded below; source 60d55ac published; first CI has two failures, corrections under qualification. No supported game/recorder, signed installation,
 provider permission, cloud deployment, gameplay recognition or G1–G6 approval.
 
 ## Delivered behavior
@@ -33,8 +33,8 @@ provider permission, cloud deployment, gameplay recognition or G1–G6 approval.
 | New browser flows | Three Edge tests pass: pairing/code privacy/revocation/mobile, attribution without re-upload, remote deletion/original disclosure |
 | Full browser regression | Final 57 Edge pass (1.1m) with all recording endpoints mocked; narrow mobile screenshot inspected; no horizontal overflow |
 | Static/build | Ruff checks/248 formatted Python files, mypy 35, Django check/schema, production Next build/lint/types and final typecheck pass; seven-job CI YAML valid; 312 local Markdown links and 157 unique valid requirement rows checked |
-| Full PostgreSQL/native restore | Initial full 553 pass / one same-transaction mock test failure / seven separate Docker skips (773.65s); corrected interleaving case and final changes pass in affected 93 suite. Full final source CI pending. Native dump/restore, guarded forward/reverse/forward, restored device invalidation and pending upload erasure pass; migrations 0022/0023 applied locally |
-| Exact latest-main publication/CI | Not published yet |
+| Full PostgreSQL/native restore | Initial full 553 pass / one same-transaction mock test failure / seven separate Docker skips (773.65s); corrected interleaving case and final changes pass in affected 93 suite. First source Linux job stopped at platform typing before backend tests; corrected-source complete CI pending. Native dump/restore, guarded forward/reverse/forward, restored device invalidation and pending upload erasure pass; migrations 0022/0023 applied locally |
+| Exact latest-main publication/CI | Source 60d55ac [run 37487810089](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37487810089): five jobs passed, Linux typing and production audit failed. Corrected source qualification pending |
 
 Initial scoped SQLite failures identified auth withdrawal error shaping and pytest local
 parser settings; fixed before 88 PostgreSQL pass. A new same-transaction mocked revocation
@@ -61,3 +61,11 @@ receipt even when the helper encounters a file first uploaded manually. Existing
 or verified manual copies never grant device access to the manual session. Guarded 0023
 prevents removal of suppression history; a new-device/deletion regression and native restore
 fixture cover the boundary. Updated native dump/restore, migration forward/reverse/forward, device revocation and manual suppression retention pass.
+
+Initial Windows CI artifact confirms **17 passes, zero skips/failures/errors (1.324s)**,
+including protected state, writer exclusion and controlled linked-root rejection. Linux
+platform typing is corrected using sys.platform guards; explicit Linux/Windows mypy each
+passes 35 files. Local final helper/controlled-media suite: 17 pass/one OS privilege skip
+(15.91s). Compatible sharp 0.35.5/native libvips and source-map-js 1.2.2 patches clear the
+production audit; existing five development audit findings remain tracked. Production build/lint/types and native sharp PNG encoding pass;
+corrected-source all-seven CI remains pending; no release gate was bypassed.

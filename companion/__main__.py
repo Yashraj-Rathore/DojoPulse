@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import os
 import queue
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -24,7 +25,7 @@ def main() -> None:
         help="Allow only http://127.0.0.1:8000 for local qualification",
     )
     args = parser.parse_args()
-    if os.name != "nt":
+    if sys.platform != "win32":
         parser.error("The recording companion requires Windows per-user credential storage")
     origin = server_origin(args.server, args.local_development)
     root = Path(os.environ["LOCALAPPDATA"]) / "DojoPulse" / "companion"

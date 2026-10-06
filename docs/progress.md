@@ -1762,7 +1762,7 @@ fixtures, then supported-runtime/format/expiry/rendering evidence before any gam
 implementation. ADR-026 remains a staged fallback, not the sole possible architecture; the
 canonical Match/ReplaySource/GameplayEvent/player-model pipeline remains provider-independent.
 
-## 2026-10-06 ? M22 local recording companion implementation
+## 2026-10-06 - M22 local recording companion implementation
 
 Requirements: M22.02-06/.10; M06.02/.03/.06, M14.03-05, M15.01/.06, M16.05,
 M13.03/.06, M01.05/.06 and M19.02. Owner authorized implementation, main publication
@@ -1784,7 +1784,7 @@ Initial full backend was stopped for a new-test import/export-route correction; 
 and native migration/recovery/static/links/publication are ongoing, recorded in the receipt.
 
 No real recorder/game capture, usage permission, installed/signable distribution, automatic
-replay recording, native game request, live EWGF key/activation, G1?G6, hosting or player
+replay recording, native game request, live EWGF key/activation, G1-G6, hosting or player
 benefit is established. Next: finish exact local/CI qualification, then M22.07-08 real
 Windows packaging/privacy/resource acceptance, preserving independent provider/native gates.
 
@@ -1820,3 +1820,28 @@ restore and main publication/CI next. No external release boundary changed.
 Final suppression guard test passes (one PostgreSQL check, 6.81s), and updated native
 0022/0023 migration/recovery rehearsal passes, retaining the suppressed receipt while
 revoking restored devices and erasing pending uploads. Main publication/CI remains next.
+
+### 2026-10-06 - Initial publication and cross-platform/security correction
+
+M22.03/.07/.10, M15.04/.06, M01.05/.06 and M19.02: published 2679bc3 and
+60d55ac directly to main with ordinary CI. First run 37487810089 passed Windows companion,
+frontend, media sandbox, Terraform and application containers. Linux mypy rejected
+Windows-only attributes because os.name is not a recognized typing platform guard;
+changed companion/{credentials,sync,__main__}.py to sys.platform guards, retaining
+runtime denial on unsupported systems. mypy --platform linux and --platform win32
+both pass all 35 source files; Ruff/format pass. Actual Windows CI JUnit confirms
+17 passes/no skips, including the controlled linked-root case. Local final helper
+plus synthetic real-MP4 transfer checks: 17 passes/one unavailable symlink privilege
+in 15.91s; this does not represent game/recorder or signed delivery qualification.
+
+The production npm audit found sharp GHSA-wq5f-xc86-pv6w and source-map-js
+GHSA-68fv-2mgg-jv7q. Checked the primary advisories; updated frontend/package-lock.json
+compatibly to sharp 0.35.5 (including matching native/libvips packages) and
+source-map-js 1.2.2. Production audit now reports zero findings; five existing development
+findings remain separately tracked, with no audit suppression or forced major upgrade.
+Next build/lint/types and sharp 0.35.5 native PNG encoding pass; corrected source
+publication and all-seven exact-tip CI must succeed before M22.10 local qualification.
+Updated PRODUCT_PROGRESS.md and M22 receipt; architecture/provider/real/hosted gates unchanged.
+
+Advisories: [sharp](https://github.com/advisories/GHSA-wq5f-xc86-pv6w),
+[source-map-js](https://github.com/advisories/GHSA-68fv-2mgg-jv7q).
