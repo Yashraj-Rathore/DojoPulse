@@ -845,6 +845,7 @@ class RecordingReceipt(Owned):
     device = models.ForeignKey(RecordingDevice, on_delete=models.PROTECT)
     # Keyed byte identity remains as a suppression receipt after remote deletion.
     key_digest = models.CharField(max_length=64)
+    suppressed = models.BooleanField(default=False)
     request_id = models.UUIDField(default=uuid.uuid4)
     session = models.OneToOneField(UploadSession, on_delete=models.PROTECT, null=True)
 

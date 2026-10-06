@@ -314,6 +314,37 @@ def test_regrant_requires_new_pairing_and_old_upload_is_not_resurrected(workspac
     }
 
 
+def test_existing_manual_copy_remains_suppressed_after_remote_and_local_receipt_removal(workspace):
+    from backend.core.resumable import begin, request_completion, write_chunk
+    from tests.test_resumable_uploads import CLAIM
+
+    owner, web = workspace
+    checks = upload_body()
+    manual = begin(owner, uuid4(), len(CONTENT), checks["sha256"], checks["md5"], dict(CLAIM))
+    write_chunk(owner, manual.pk, 0, CONTENT)
+    request_completion(owner, manual.pk)
+    assert verify(manual.pk)
+    device, _ = paired(web)
+    assert device.post("/api/companion/uploads", checks, format="json").data == {
+        "state": "DUPLICATE"
+    }
+    assert RecordingReceipt.objects.get().suppressed
+    delete_asset(owner, manual.asset_id)
+    # A fresh helper/device has no old local receipt; server suppression still applies.
+    another, _ = paired(web)
+    assert another.post("/api/companion/uploads", checks, format="json").data == {
+        "state": "DUPLICATE"
+    }
+    assert ReplayAsset.objects.count() == 1 and RecordingReceipt.objects.count() == 1
+    from django.apps import apps
+
+    guard = importlib.import_module(
+        "backend.core.migrations.0023_manual_recording_suppression"
+    ).guard_suppression
+    with pytest.raises(IrreversibleError):
+        guard(apps, None)
+
+
 def test_attribution_preserves_imported_uuid_and_requires_matching_reviewed_claim(workspace):
     owner, web = workspace
     client, _ = paired(web)

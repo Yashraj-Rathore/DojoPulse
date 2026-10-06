@@ -1804,3 +1804,19 @@ seven-job CI YAML, 312 Markdown links/157 unique requirement statuses pass. Nati
 PostgreSQL dump/restore and guarded forward/reverse/forward, repeated controls, restored
 device invalidation and pending upload erasure pass; local migration 0022 and draft loader
 run. No hosted recovery objectives measured. Source commit/push/latest-tip monitoring next.
+
+### Manual-upload deduplication repair before publication
+
+M22.04/.05/.10, M06.06, M14.05 and M16.05: found that an already manual-uploaded
+copy could be skipped without a durable server suppression receipt. Added an explicit
+RecordingReceipt.suppressed field and guarded migration 0023. Existing reserved or verified
+manual copies (including removed verified assets) now receive an owner-keyed tombstone,
+without granting a device access to the manual upload. Local receipt expiry/new pairing
+cannot revive it. Added manual deletion/new-device and irreversible-history coverage, plus
+actual native restore suppression fixture. Final affected 94 PostgreSQL pass/one OS symlink
+privilege skip in 38.89s; 0023 applied, schema/static/format/mypy pass. Focused guard/native
+restore and main publication/CI next. No external release boundary changed.
+
+Final suppression guard test passes (one PostgreSQL check, 6.81s), and updated native
+0022/0023 migration/recovery rehearsal passes, retaining the suppressed receipt while
+revoking restored devices and erasing pending uploads. Main publication/CI remains next.

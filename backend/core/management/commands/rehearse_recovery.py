@@ -62,6 +62,7 @@ from backend.core.models import RecordingDevice, DevicePairing, RecordingReceipt
 device = RecordingDevice.objects.create(owner=pending_owner, label='private fixture label', token_digest='e'*64, expires_at=timezone.now()+timedelta(days=1))
 DevicePairing.objects.create(owner=pending_owner, label='fixture pairing', token_digest='f'*64, expires_at=timezone.now()+timedelta(minutes=10))
 RecordingReceipt.objects.create(owner=pending_owner, device=device, key_digest='b'*64, session=pending)
+RecordingReceipt.objects.create(owner=pending_owner, device=device, key_digest='c'*64, suppressed=True)
 from backend.core import knowledge
 from backend.core.models import Game, GameBuild, KnowledgeProposal
 settings.DEBUG = True
@@ -153,7 +154,8 @@ assert UploadSession.objects.count() == 1
 assert not UploadSession.objects.exclude(state='CANCELLED').exists()
 assert not UploadSession.objects.exclude(expected_sha256='', expected_md5='', claim_digest='').exists()
 from backend.core.models import RecordingDevice, DevicePairing, RecordingReceipt
-assert RecordingDevice.objects.count() == RecordingReceipt.objects.count() == 1
+assert RecordingDevice.objects.count() == 1 and RecordingReceipt.objects.count() == 2
+assert RecordingReceipt.objects.filter(suppressed=True).count() == 1
 assert not RecordingDevice.objects.filter(revoked_at=None).exists()
 assert not DevicePairing.objects.filter(consumed_at=None).exists()
 from backend.core.models import KnowledgeProposal, KnowledgeReview, KnowledgeEvidence, DefinitionVersion

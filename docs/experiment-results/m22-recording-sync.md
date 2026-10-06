@@ -27,13 +27,13 @@ provider permission, cloud deployment, gameplay recognition or G1–G6 approval.
 
 | Check | Actual result |
 |---|---|
-| Focused PostgreSQL/transfer/attribution suite | Final affected suite 93 passed / one symlink-privilege skip, 24.84s. Initial focused 88 pass retained as dated earlier scope |
+| Focused PostgreSQL/transfer/attribution suite | Final affected suite 94 passed / one symlink-privilege skip, 38.89s. Initial focused 88 pass retained as dated earlier scope |
 | Actual controlled MP4 | Generated black 1080p60 H.264/0.2s, local FFprobe → helper → real PostgreSQL uploads → existing local worker/parser → authenticated byte-range playback; no Match/events. This is synthetic media, not Tekken footage |
 | Windows credential/file behavior | Actual current-user DPAPI roundtrip/encrypted-at-rest/tamper rejection and writer-excluding share mode pass locally; Linux CI must skip this Windows-only check |
 | New browser flows | Three Edge tests pass: pairing/code privacy/revocation/mobile, attribution without re-upload, remote deletion/original disclosure |
 | Full browser regression | Final 57 Edge pass (1.1m) with all recording endpoints mocked; narrow mobile screenshot inspected; no horizontal overflow |
 | Static/build | Ruff checks/248 formatted Python files, mypy 35, Django check/schema, production Next build/lint/types and final typecheck pass; seven-job CI YAML valid; 312 local Markdown links and 157 unique valid requirement rows checked |
-| Full PostgreSQL/native restore | Initial full 553 pass / one same-transaction mock test failure / seven separate Docker skips (773.65s); corrected interleaving case and final changes pass in affected 93 suite. Full final source CI pending. Native dump/restore, guarded forward/reverse/forward, restored device invalidation and pending upload erasure pass; migration 0022 applied locally |
+| Full PostgreSQL/native restore | Initial full 553 pass / one same-transaction mock test failure / seven separate Docker skips (773.65s); corrected interleaving case and final changes pass in affected 93 suite. Full final source CI pending. Native dump/restore, guarded forward/reverse/forward, restored device invalidation and pending upload erasure pass; migrations 0022/0023 applied locally |
 | Exact latest-main publication/CI | Not published yet |
 
 Initial scoped SQLite failures identified auth withdrawal error shaping and pytest local
@@ -55,3 +55,9 @@ Design: [companion contract](../architecture/recording-companion.md).
 The source adds a Windows CI job exercising protected state, exclusive file access and
 offline transfer controls. This is regression coverage, not signed installation/real recorder
 qualification. Latest main SHA and all seven CI results will be recorded after publication.
+
+A pre-publication manual-copy deduplication repair retains an explicit suppressed server
+receipt even when the helper encounters a file first uploaded manually. Existing reserved
+or verified manual copies never grant device access to the manual session. Guarded 0023
+prevents removal of suppression history; a new-device/deletion regression and native restore
+fixture cover the boundary. Updated native dump/restore, migration forward/reverse/forward, device revocation and manual suppression retention pass.

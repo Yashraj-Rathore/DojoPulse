@@ -19,7 +19,7 @@ from backend.core import companion, resumable
 from backend.core.api import handled
 from backend.core.cloud import CloudFailure
 from backend.core.consents import POLICIES, POLICY_VERSION
-from backend.core.models import RecordingDevice, RecordingReceipt, UploadSession
+from backend.core.models import RecordingDevice, RecordingReceipt, ReplayAsset, UploadSession
 from backend.core.recording_api import AttributionInput
 from backend.core.security import consume_budget
 from backend.core.upload_api import ChunkParser, unavailable
@@ -140,6 +140,8 @@ def device_uploads(request):
         ):
             return Response({"error": "Conflicting recording bytes"}, status=409)
         return Response(safe_status(owner, receipt.session_id))
+    if receipt and receipt.suppressed:
+        return Response({"state": "DUPLICATE"})
     if not receipt:
         if RecordingReceipt.objects.filter(owner=owner).count() >= settings.COMPANION_MAX_RECEIPTS:
             return Response(
@@ -148,7 +150,13 @@ def device_uploads(request):
                 headers={"Retry-After": "3600"},
             )
         # Also suppress a previously removed/manual-uploaded copy of these exact bytes.
-        if UploadSession.objects.filter(owner=owner, expected_sha256=values["sha256"]).exists():
+        if (
+            UploadSession.objects.filter(owner=owner, expected_sha256=values["sha256"]).exists()
+            or ReplayAsset.objects.filter(owner=owner, source_sha256=values["sha256"]).exists()
+        ):
+            RecordingReceipt.objects.create(
+                owner=owner, device=device, key_digest=key, suppressed=True
+            )
             return Response({"state": "DUPLICATE"})
         receipt = RecordingReceipt.objects.create(owner=owner, device=device, key_digest=key)
     elif receipt.device_id != device.pk:

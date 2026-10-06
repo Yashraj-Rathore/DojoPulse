@@ -124,3 +124,8 @@ storage-only; a deployment flag cannot activate an external service.
 See [source helper limits/controls](../../companion/README.md) and
 [qualification receipt](../experiment-results/m22-recording-sync.md). M22.07-08 still require
 real supported recorder/device and hosted/installer/update/privacy/resource acceptance.
+
+Manual copies encountered by sync also create an explicit owner-keyed suppressed receipt,
+without granting device access to the manual session. Verified removed manual assets are
+recognized by their existing hash. Guarded migrations 0022/0023 preserve device and byte
+suppression history; restore revokes credentials while retaining suppression.
