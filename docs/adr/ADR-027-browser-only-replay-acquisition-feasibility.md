@@ -29,6 +29,8 @@ The [Steam EULA](https://store.steampowered.com/eula/1778820_eula_0), rechecked 
 provides review inputs for personal use, hardware control and unauthorized tools; no managed
 commercial playback/capture grant is established. A local feasibility review cannot authorize
 a hosted service. No contact, account creation, purchase or usage approval occurred.
+The source investigation's video-policy follow-up provides an additional purpose-specific
+review input; recording rights and runtime/automation permission are distinct.
 
 ## Evidence-first implementation
 

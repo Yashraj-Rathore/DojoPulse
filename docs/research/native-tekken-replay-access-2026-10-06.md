@@ -95,3 +95,19 @@ owner-authorized contact task; no messages or account creation occurred here.
 Public-source research is complete for this scope; native endpoint execution and payload
 validation are not. M04/M05, M22.09, X01 and G1-G6 remain gated. The practical architecture
 can support direct acquisition later if those prerequisites are established.
+
+## Browser-only managed-capture usage follow-up, 2026-10-06
+
+The [official video policy](https://www.bandainamcoent.co.jp/english/videopolicy/), enacted
+2022-01-26 and retrieved 2026-10-06, covers individual noncommercial fan videos subject to
+game terms and third-party rights. It permits certain platform monetization functions,
+excludes legal-entity production/direction and allows game-specific policies to take priority.
+Our inference: those conditions do not establish permission for DojoPulse's automated
+managed playback/capture/analysis service. Personal fan recording and commercial runtime
+operation require separate scope review; this is not a legal opinion or a claim that all
+recording is prohibited. No publisher approval or contact occurred.
+
+[ADR-027](../adr/ADR-027-browser-only-replay-acquisition-feasibility.md) now prioritizes actual
+browser-only acquisition proof. Native app enumeration failed with an absent control pipe;
+zero game trials were run. The [offline qualification tool](../architecture/replay-acquisition-feasibility.md)
+cannot resolve these permissions or substitute synthetic evidence for actual replay access.

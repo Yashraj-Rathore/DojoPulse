@@ -108,6 +108,8 @@ access and an in-client recording lead. Neither supplies a qualified end-to-end 
 Computer Use initialization succeeded, but app enumeration failed because the native pipe was
 absent (`os error 2`). No game window, current build, ID resolution, console replay, capture,
 private delivery or automated recovery was observed. No EULA exception/usage approval exists.
+The linked source investigation also records the official video-policy review; no managed
+acquisition grant is established by fan-video conditions.
 
 The initialized current plan has zero trials; its report is NOT_RUN with review, native-control,
 console, rate, cost and all fault-control gaps. [Local qualification](../experiment-results/m22-replay-acquisition.md)

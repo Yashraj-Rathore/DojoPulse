@@ -1924,3 +1924,37 @@ and managed Windows/runtime decisions follow real evidence.
 Final local affected suite: 82 pass/one Windows symlink privilege skip (1.45s). Linux CI will exercise actual evidence-file and root/ancestor symlink rejection. Final Ruff/253 formatted files and Linux/Windows mypy37 pass. Actual CLI report has zero trials and all approval flags false. No frontend, runtime schema or dependency changes; full local runtime/browser/container suites not rerun for this isolated offline module, ordinary full source CI follows.
 
 Documentation checks: 336 local Markdown links, 162 milestone plus 12 optional unique requirements/status/table cells and Architecture 2.20.0 consistency pass; git diff --check passes. Work stays on main; publish the source with ordinary CI and monitor its exact SHA. No approval or real capture is inferred from that software delivery.
+
+Source 0b13e2b638131605a4ad213ff18ffb981aac48ff pushed directly to main with ordinary
+CI run 37497787495. Exact source checks are being monitored. Additional public official
+video-policy review recorded in native-tekken-replay-access-2026-10-06.md and linked from
+ADR-027/feasibility/qualification: personal fan video conditions do not establish our managed
+service approval. No publisher contact, authorization, game action or runtime change occurred.
+M22.09/.13-.14 and M20.02 remain purpose-specific usage gates; real trial count remains zero.
+
+Reset/reinitialized the native-control JavaScript kernel once during CI monitoring and retried
+app enumeration; the same absent pipe/os error 2 persisted. No game input on either attempt.
+This is a capability failure, not a usage approval rejection or real replay test failure.
+
+### Verified replay-feasibility source and final ordinary receipt
+
+Source 0b13e2b638131605a4ad213ff18ffb981aac48ff passed all seven CI jobs on
+[run 37497787495](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37497787495),
+completed 16:55:56 UTC; watcher exit 0/exact check-runs confirmed. Downloaded XML verifies
+585 PostgreSQL/Python passes (699.665s), eight Linux platform/media skips exercised separately,
+all 28 new acquisition checks/no skips including actual file/root-ancestor symlinks, 17 actual
+Windows helper passes/no skips (1.302s) and seven actual Docker/max-profile passes/no skips
+(143.929s). Completed logs verify 57 Chromium (59.4s), three Terraform mocks, both Python
+lock/production npm audits, Ruff/254 Linux formatted files/mypy37, Django schema/check/
+migrations/contracts, build/lint/types, unprivileged container startup/HTTP asset bytes and
+native PostgreSQL guarded migration/dump/restore/repeated controls/pending erasure. Actual
+production recovery objectives remain NOT_MEASURED; zero real replay trials/G1-G6 NOT_RUN.
+
+Updated source qualification, current-position/tracker M22.12/M19.02, D042 and dated public
+usage-review follow-up. This receipt changes docs only; no new runtime tests needed locally,
+but publish with ordinary CI and monitor its exact latest-main SHA. M22 remains PARTIAL,
+M22.13 actual acquisition and M13.10 actual browser journey blocked, managed/console use
+M22.14 unqualified. Native control absent on both attempts; no game/private endpoint or new
+provider enabled. Next dependent work is reviewed actual capture proof, not desktop setup.
+
+Final receipt validation: 341 local Markdown links, 174 unique requirements/status/table cells and Architecture 2.20.0 consistency pass; whitespace clean. Only seven documentation files differ from the qualified source; no runtime changes or skip-CI instruction.

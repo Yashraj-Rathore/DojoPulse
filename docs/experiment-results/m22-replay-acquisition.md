@@ -41,14 +41,14 @@ ignored local artifacts. No synthetic attempt is presented as actual Tekken prog
 Initial focused test collection found a decorator syntax typo; corrected before qualification.
 Initial 54 acquisition/ingestion checks pass in 1.40s. Expanded provider-boundary run passes
 82 in 1.51s, then linked-ancestor evidence protection/non-promotion checks were added and
-the final affected suite rerun: **82 passed / one local Windows symlink-creation privilege skip in 1.45s**. Linux source CI will exercise the latter; no actual-game tests ran.
+the final affected suite rerun: **82 passed / one local Windows symlink-creation privilege skip in 1.45s**. Source Linux CI exercises the latter; no actual-game tests ran.
 
 Meaningful controlled cases cover manual/already-downloaded-only capture, synthetic/unknown
 platform/origin, future/expired observations, incompatible builds, captured/delivered hash
 mismatch, missing lookup evidence, total timeout/retry ceilings, failed/absent denominators,
 review purpose/expiry, USER_UPLOAD fallback, traversal/checksum corruption/non-finite JSON,
-non-promoting complete declarations, redacted output and create-only CLI files. Linux CI will
-cover actual symlink/root-ancestor rejection where local Windows lacks creation privileges.
+non-promoting complete declarations, redacted output and create-only CLI files. Source Linux CI
+covers actual symlink/root-ancestor rejection where local Windows lacks creation privileges.
 Fixture bytes are intentionally synthetic and do not validate a playable video or real backend.
 
 Ruff full repository check and 253-file formatting pass; explicit Linux/Windows mypy each
@@ -69,4 +69,40 @@ The qualified companion/manual upload remain fallbacks, not required customer se
 
 Local documentation validation passes: 336 local Markdown links, 174 unique requirement IDs
 (162 milestone requirements plus 12 optional), status/table cells and Architecture 2.20.0
-consistency; git diff --check passes. Main source publication/ordinary exact-tip CI next.
+consistency and whitespace passed before source publication. Source/ordinary final-receipt checks follow below.
+
+## Publication and additional usage review
+
+Source `0b13e2b638131605a4ad213ff18ffb981aac48ff` published directly to main with ordinary
+CI: [run 37497787495](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/37497787495).
+All seven exact-source checks passed; the completed evidence is recorded below.
+The subsequent official video-policy review is retained in the
+[source investigation](../research/native-tekken-replay-access-2026-10-06.md); it establishes
+no managed acquisition approval. Runtime source is unchanged by this review/receipt.
+
+Native-control retry after resetting/reinitializing the JavaScript kernel returned the same
+absent-pipe/os error 2. No game input occurred on either attempt; the blocker persists.
+
+### Verified source qualification
+
+Source 0b13e2b passed all seven jobs on run 37497787495, completed **16:55:56 UTC**;
+watcher exit 0 and exact check-runs corroborated. Downloaded backend/Windows/media XML:
+**585 PostgreSQL/Python passes (699.665s)**, eight Linux skips exercised by dedicated
+Windows/media jobs; **all 28 acquisition checks pass/no skips**, including actual
+file and root/ancestor symlink rejection. **17 actual Windows helper passes/no skips
+(1.302s)** and **seven real Docker/max-profile passes/no skips (143.929s)**. Completed
+logs verify **57 Chromium passes (59.4s)**, three Terraform mocks, both Python lock
+and production npm audits, Ruff/254 Linux formatted files/mypy37, Django check/schema/
+migrations/contracts, production build/types/lint and unprivileged application-container
+startup/HTTP assets. Guarded native PostgreSQL dump/restore, forward/reverse/forward,
+controls before reads/repeat and pending upload erasure pass; production RPO/RTO NOT_MEASURED.
+Local formatting count is 253; Linux CI reports 254. These are separately recorded
+platform scopes, not an inferred inventory of generated files. No failed source CI run for this implementation.
+
+M22.11 design/M22.12 offline tooling DONE; overall M22 PARTIAL. Actual first replay,
+console/managed service and browser acquisition M22.13/.14/M13.10 remain blocked/unrun.
+Final documentation/usage-review receipt contains no runtime change, uses ordinary CI,
+and requires actual latest-main check verification at handoff. No approval is inferred
+from that delivery; it leaves the zero-trial report and real/hosted gates unchanged.
+
+Final receipt validation: 341 local Markdown links, 174 unique requirements/status/table cells and Architecture 2.20.0 consistency pass; whitespace clean. Only seven documentation files differ from the qualified source; no runtime changes or skip-CI instruction.
