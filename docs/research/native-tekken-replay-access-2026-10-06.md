@@ -111,3 +111,12 @@ recording is prohibited. No publisher approval or contact occurred.
 browser-only acquisition proof. Native app enumeration failed with an absent control pipe;
 zero game trials were run. The [offline qualification tool](../architecture/replay-acquisition-feasibility.md)
 cannot resolve these permissions or substitute synthetic evidence for actual replay access.
+
+## Current-build screenshot follow-up, 2026-10-12
+
+The [owner's UI evidence](replay-ui-evidence-2026-10-12.md) shows 3.02.02 (503521), an
+Online Replays ID-search control and My Replays & Tips rendering. The shown own-replay
+menu has no download/export action; the Online Replays image is a search dialog, not its
+match-action menu. The recorder README's download prerequisite is implementation-specific,
+not a requirement for rendering an already available own replay. No submitted ID lookup,
+public native payload, video export, automatic delivery or commercial approval was established.

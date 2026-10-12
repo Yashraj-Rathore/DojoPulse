@@ -106,3 +106,43 @@ and requires actual latest-main check verification at handoff. No approval is in
 from that delivery; it leaves the zero-trial report and real/hosted gates unchanged.
 
 Final receipt validation: 341 local Markdown links, 174 unique requirements/status/table cells and Architecture 2.20.0 consistency pass; whitespace clean. Only seven documentation files differ from the qualified source; no runtime changes or skip-CI instruction.
+
+## Manual UI evidence received 2026-10-12
+
+[Owner-supplied screenshots](../research/replay-ui-evidence-2026-10-12.md) establish displayed
+title/gameplay build 3.02.02 (503521 on title), a TEKKEN-ID search control and own My Replays
+& Tips selection/static rendering; playback is user-reported. No download/export is visible in
+the shown own-replay menu. Public-query results, persistent mapping, console-through-PC,
+full recording/profile, automatic capture/delivery and rights remain unverified. Corrected the
+universal download-before-play instruction; existing own replays need no assumed extra save.
+
+No new runtime test or game-control attempt performed; prior 2026-10-06 source/receipt CI
+remains dated software evidence. No screenshot copied into public git, approved real intake,
+new video or canonical event generated. M22.13 remains BLOCKED; these views improve manual
+feasibility evidence without completing the browser-only acquisition proof.
+
+### Actual manual recording inspected 2026-10-12
+
+The [owner's official Steam MP4](../research/replay-capture-evidence-2026-10-12.md) was
+located, hashed, probed, fully scanned for decoded timestamps and visually sampled at five
+points. It is 240,556,903 bytes, 158.516667 seconds, 1920 x 1080 HEVC/AAC with nominal
+60 fps, average metadata about 59.08 fps. All 9,363 decoded frames have increasing timestamps;
+68 inter-frame gaps exceed 25 ms, maximum 333.332 ms; no full-scan decoder errors.
+Current profile FAILS codec and gap conditions. No conversion to H.264 or retiming performed.
+
+Steam raw segments were initially remuxed into an ignored inspection-only copy with an
+end-fragment warning; official export is selected for actual evidence. Sources unchanged.
+Paths, raw identifiers, hashes, video and private previews/frame reports are not published.
+M22.13 still BLOCKED: manual video inspection is not automatic ID acquisition, private service
+delivery or verified attribution. No M06 backend admission, new runtime tests, canonical event,
+scientific approval or managed-use release. Prior source CI remains separately dated Oct 6.
+
+### Local compatibility implementation follow-up 2026-10-12
+
+[Recording normalization qualification](recording-normalization.md) now verifies an H.264
+preview of that owner export: every frame/PTS and AAC packet preserved, original unchanged,
+68 large gaps/1,403 total irregular intervals retained. No synthetic repair or scientific approval.
+Strict timing admission still fails; hosted private preview is M06.11. Local conversion tests
+and the unrelated required Next.js security patch have their own current qualification, not
+the earlier Oct 6 acquisition CI. M22.13 still requires actual permitted automatic acquisition,
+backend delivery and reviewed attribution; no automated trial added to the zero-trial plan.

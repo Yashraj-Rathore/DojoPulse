@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.20.0. Decision date: 2026-10-06. Status: local engineering approved;
+Version: 2.21.0. Decision date: 2026-10-12. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -70,6 +70,11 @@ synthetic activation, version rollback/drift stop and revocable private reproduc
 Real recognition/calibration/G1/G2 remain gated; candidates never publish canonical events.
 
 No LLM, neural player embedding, broker, vector store, warehouse, or native game integration.
+
+[ADR-028](../adr/ADR-028-source-preserving-recording-normalization.md) adds bounded trusted-local
+[recording normalization](recording-normalization.md). H.264 previews preserve original
+recorded frames/timestamps, audio and lineage; explicit quality intervals cannot approve
+precise gameplay. Hosted derivative lifecycle remains M06.11, strict admission unchanged.
 
 ## Implementation boundary
 

@@ -1958,3 +1958,133 @@ M22.14 unqualified. Native control absent on both attempts; no game/private endp
 provider enabled. Next dependent work is reviewed actual capture proof, not desktop setup.
 
 Final receipt validation: 341 local Markdown links, 174 unique requirements/status/table cells and Architecture 2.20.0 consistency pass; whitespace clean. Only seven documentation files differ from the qualified source; no runtime changes or skip-CI instruction.
+
+### 2026-10-12 - Owner replay UI evidence and download/export correction
+
+M22.09/.13, M13.10 and M01.05: inspected owner-supplied screenshots and manual playback
+report. Title displays 3.02.02 (503521); Online Replays search dialog exposes TEKKEN-ID
+search; own My Replays & Tips selection offers Play/profile/delete and gameplay view renders
+with input/frame/status/distance overlays. Two supplied gameplay screenshots show the same
+paused frame. No full-motion/profile/codec evidence, entered query/results/persistent mapping,
+public payload/video export, PC-console replay playback, automatic capture or private delivery
+established. No raw names, identifiers, match timestamps or screenshot bytes copied into git.
+
+Corrected the earlier broad download-before-play instruction: the own-replay action menu is
+not a public-replay menu; native in-game saving is not MP4 export. A missing download button
+does not block capture of an already renderable replay and does not prove all exports absent.
+Rechecked primary Cathesilta README and Valve Game Recording FAQ. Steam's documented local
+record/clip/video-export route is a personal developer candidate, not a qualified Tekken capture
+profile or browser-only integration. No install, settings change, game-control retry, private
+endpoint, video capture, upload or canonical event occurred.
+
+Changed PRODUCT_PROGRESS.md, this log, new replay-ui-evidence-2026-10-12.md, current
+feasibility procedure, ADR-027 evidence refinement, native-access follow-up and M22 qualification.
+Architecture remains 2.20.0: no product/operation decision changed. Requirements remain blocked
+for actual automatic acquisition; manual/static evidence is newly recorded, not discarded or
+promoted to real scientific/provider/hosted acceptance. Next: actual uninterrupted playback
+recording/profile/private path check and separately submitted public ID query/loading evidence;
+review usage/runtime before automatic capture/delivery. Oct 6 native-helper failure is historical;
+current helper was not retested. Runtime tests not rerun for this documentation-only correction.
+Documentation/link/status validation follows; source and final-receipt CI retain their Oct 6 scope.
+
+Local validation: 346 Markdown links, 174 unique requirements/status/table cells, preserved Architecture 2.20.0 and git diff whitespace pass. Seven documentation files changed; no runtime code. This evidence correction is recorded locally on main; no new commit/push or CI claim made for it.
+
+### 2026-10-12 - First owner recording located, official export inspected
+
+M06.02/.03, M22.07/.09/.13, M13.10 and M01.05: owner supplied their Steam recording
+folder. Bounded named-folder inventory found one app-1778820 recording and saved clip copy,
+standard static MPD/initialization plus 53 video/audio segments each, no standalone MP4.
+Inspected small manifests; no Steam protobuf/account data or game endpoints accessed. Made
+an ignored local HEVC stream-copy inspection artifact with file-only FFmpeg access; exit zero
+but end-fragment warning. Completeness not qualified. Sources unchanged; no code/client adapter.
+
+Owner then exported through Steam into their Videos folder. Located the current official MP4;
+only that export was probed/hashed/decoded, not other old recordings. Actual bytes 240,556,903,
+duration 158.516667s, 1920 x 1080 HEVC, BT.709/full-range declarations, AAC. Nominal 60 fps,
+average metadata ~59.08. Five private previews at 0/15/65/110/155s establish Tekken replay
+content/build 3.02.02, changing scenes, readable sampled input/frame/status overlays and
+end-of-round cinematic. Sparse previews do not certify complete normal playback/no pauses,
+cuts, rewinds/takeover or all critical-window coverage. Character pair outside provisional target.
+
+Full trusted-local FFprobe scan with two decoder threads/file-only protocols: 9,363 decoded
+frames/all timestamped, increasing timestamps, median gap 16,667us, 68 gaps >25,000us,
+maximum 333,332us. Exit zero/no decoder error output. Declared profile FAILS HEVC and gap
+limits; no acceptance silently relaxed, H.264 conversion, retiming or frame duplication.
+Official export selected over earlier raw remux. Private checksum/full path, inspection/frame
+JSON, previews and inspection copy under ignored private_data; no media or names/IDs in git.
+
+Updated PRODUCT_PROGRESS.md, this log, new replay-capture-evidence-2026-10-12.md, prior
+UI evidence, feasibility contract and M22 qualification. Architecture remains 2.20.0. First
+real manual recording is progress, not validated capture/scientific intake: M22.13 BLOCKED,
+G1-G6 NOT_RUN. No backend upload/private-service playback, attribution/GameplayEvent/player
+model publication, game control, provider activation, hosted usage approval or automatic
+ID-only acquisition. Actual media checks ran; product runtime tests not rerun for docs/artifacts.
+Next independent work: scoped safe codec/timestamp-quality handling or supported capture,
+plus submitted public ID query/loading and reviewed actual automatic acquisition/private delivery.
+
+Also refreshed README to acknowledge the first inspected recording rather than implying no real media exists. Local documentation validation: 353 Markdown links, 174 unique requirements/status/table cells, private inspection flags and whitespace pass. Actual file/media checks ran as above; product runtime code unchanged and regression tests not rerun. Changes remain local on main; no new publication or CI result claimed.
+
+### 2026-10-12 - Source-preserving recording compatibility implementation (qualification in progress)
+
+M06.01/.05/.09/.10/.11, M22.07/.13 and M19.02: added versioned normalization policy,
+analysis/normalization.py, analysis/timing.py and tools/normalize_recording.py. Trusted-local
+HEVC/H.264 normalization produces a new private H.264 preview, full timestamp map and
+source/derivative provenance report. Explicit irregular/gap intervals do not grant gameplay
+approval; strict worker admission remains unchanged. Extended bounded subprocess execution
+with output-file monitoring and final stderr bound. Tests cover actual synthetic codecs,
+shifted timestamps, gaps, AAC, source integrity, negative preservation checks and failure paths.
+Added ADR-028/D043 and architecture 2.21.0; new M06.09/.10 scope local engineering, M06.11
+tracks unmet hosted normalization/storage/quality UI. Qualification is in progress; no completed
+test result, owner-video conversion, publication or exact-tip CI claim made yet. No hosted
+worker/public endpoint invokes this trusted local tool. Next: resolve fixture failures, verify
+owner footage, finish documentation and publish on main with exact-tip CI monitoring.
+
+### 2026-10-12 - Qualification follow-up: conversion failure diagnostics and dependency patch
+
+M06.09/.10, M15.04 and M19.02: first whole owner-video normalization failed safely with no
+completed bundle and cleaned partial output; original untouched. Its first CLI only emitted a
+redacted general failure, so the exact failing check was not retained. Added allowlisted error
+codes (no paths/identifiers), retained decoder-error rejection and bounded cleanup. Raised the
+explicit trusted-local encoder limit from 600 to 900 seconds for retry/measurement; not a
+hosted SLA or automatic approval. Retrying with stage-level timing diagnostics privately.
+Focused scope: 39 passes/two Windows symlink-creation privilege skips in 20.22s before these
+CLI/report additions; full PostgreSQL regression ongoing, no success claim for whole video yet.
+
+Current audit independently found six Next.js advisories in locked 16.3.6. Read frontend/AGENTS.md
+and installed Next guides, verified registry release, updated frontend/package.json/lock to
+same-minor Next/eslint-config-next 16.3.8. Production npm audit zero, both Python locks zero
+known findings. Five prior braces development findings remain tracked; no force-fix/suppression.
+Updated security runbook/tracker; production build/typing/browser checks ongoing. No frontend
+product UX change or external deployment. Next: finish actual recording and regressions,
+update qualification receipts and publish/monitor exact main tip.
+
+### 2026-10-12 - Actual recording normalization and final local qualification
+
+M06.01/.05/.09/.10/.11, M22.07/.13, M15.04 and M19.02: measured owner-video retry succeeded.
+H.264 derivative 496,940,978 bytes/158.516667s, all 9,363 frames/PTS preserved (maximum error
+0us); AAC count/payloads and PTS/DTS/duration preserved (0us), full-range BT.709 declarations
+unchanged, original hash unchanged. 68 gaps >25ms/max333,332us retained; complete quality
+policy yields 1,403 irregular intervals including those 68. Full timestamp vectors/policy/source/
+derivative pins and report private under ignored capture directory. Two output PNGs at 65/110s
+viewed, readable sampled HUD/input/frame/status. Lossy conversion is not pixel equality,
+continuous-normal-play proof, expert facts or precise gameplay approval. Encode 265.20s wall/
+356.66 observed CPU seconds/304,640,000-byte observed peak RSS; complete run 433.92s on one
+owner capture, no capacity/SLA claim. Earlier failed run's exact reason remains unretained;
+new allowlisted CLI errors cannot expose arbitrary private values. No source files overwritten.
+
+Full local PostgreSQL regression: 619 passed/11 skipped in 1075.44s: seven real Docker checks not
+enabled and four OS file/ancestor link-creation privilege skips. Final focused media: 41 passed/
+two OS link skips in 43.48s includes final CLI/report additions, actual codecs, nonzero PTS, gaps,
+AAC/color, source changes, refusal/limits/cleanup and allowlisted diagnostics; no subsequent
+backend behavior changes. Static: 262 formatted/ruff/mypy 40 files/Django/schema checks pass.
+Next 16.3.8/matching lint patch passes production audit/lint/build/typing and 57 Edge checks in 1.3m;
+Python audits pass, five prior development braces findings remain. Added normalization receipt
+and refreshed both progress files, README, architecture/ADR/decision, dated research/feasibility/
+acquisition and security evidence. M06.09/.10 DONE only for defined trusted-local engineering;
+M06/M22 PARTIAL, M06.11 NOT_STARTED, M22.13 BLOCKED/G1-G6 NOT_RUN. Next: isolated private
+derivative lifecycle/quality UI and independent permitted automatic ID/replay acquisition review.
+Ordinary main publication/exact-tip CI pending; no new branches, live endpoints, hosted resources
+or canonical contributions. Local docs validation:177 requirement rows plus 6 scientific gate rows;
+all table statuses/links are being rechecked after final qualification updates.
+
+Final local documentation validation: 368 relative Markdown links, 177 unique requirement rows plus six scientific gates, current table statuses/Architecture 2.21.0, private non-promotion flags and whitespace pass. Normalized media remains ignored; ordinary main publication/CI pending.

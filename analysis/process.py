@@ -6,6 +6,7 @@ import time
 from collections.abc import Callable
 from contextvars import ContextVar
 from dataclasses import dataclass
+from pathlib import Path
 
 import psutil
 
@@ -26,10 +27,18 @@ def run_bounded(
     timeout: float = 30,
     max_output: int = 8_000_000,
     max_rss: int = 1_073_741_824,
+    file_limits: dict[Path, int] | None = None,
+    reject_stderr: bool = False,
 ) -> ProcessResult:
     start = time.monotonic()
     peak = 0
     cpu = 0.0
+
+    def check_files() -> None:
+        for path, maximum in (file_limits or {}).items():
+            if path.exists() and path.stat().st_size > maximum:
+                raise ValueError("DECODER_FILE_LIMIT")
+
     with tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
         check = execution_check.get()
         if check:
@@ -59,9 +68,15 @@ def run_bounded(
                     raise ValueError("DECODER_MEMORY_LIMIT")
                 if output.tell() > max_output or errors.tell() > max_output:
                     raise ValueError("DECODER_OUTPUT_LIMIT")
+                check_files()
                 time.sleep(0.02)
             if proc.returncode:
                 raise ValueError("DECODER_REJECTED_INPUT")
+            check_files()
+            if errors.tell() > max_output:
+                raise ValueError("DECODER_OUTPUT_LIMIT")
+            if reject_stderr and errors.tell():
+                raise ValueError("DECODER_REPORTED_ERRORS")
             output.seek(0)
             data = output.read(max_output + 1)
             if len(data) > max_output:

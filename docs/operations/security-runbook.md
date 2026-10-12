@@ -92,3 +92,19 @@ user input enters those globs. A patched braces version was not available at rev
 track upstream remediation, keep lint/config inputs trusted, and review/test its
 patch on main. Do not suppress the finding or downgrade Next/ESLint with force-fix.
 Production audit success does not close this development dependency finding.
+
+## Recording-normalization publication audit (2026-10-12)
+
+Production npm audit found six Next.js advisories affecting locked 16.3.6 through 16.3.7:
+[Draft Mode cache](https://github.com/vercel/next.js/security/advisories/GHSA-3w37-wq28-93x7),
+[SSG/ISR cache](https://github.com/vercel/next.js/security/advisories/GHSA-4jqv-mc3x-m676),
+[development MCP disclosure](https://github.com/vercel/next.js/security/advisories/GHSA-39w2-rjm5-chcv),
+[metadata image routes](https://github.com/vercel/next.js/security/advisories/GHSA-f87g-xv8r-7p7x),
+[cross-user cache poisoning](https://github.com/vercel/next.js/security/advisories/GHSA-mcj8-r9mp-w47p)
+and [image optimizer SSRF](https://github.com/vercel/next.js/security/advisories/GHSA-cjq9-62q9-8jv4).
+No exploit or deployed exposure is asserted. Applied verified available same-minor 16.3.8
+and matching pinned eslint-config-next directly on main, preserving reviewed sharp/source-map
+patches. Production npm audit returns zero findings; both Python lock audits also pass.
+Five existing development findings through braces remain open; no force-fix or suppression.
+Lint, production build, typing and all 57 Edge browser tests pass; final results belong in the dated
+recording-normalization receipt and progress log. No unrelated package migration or bot branch.

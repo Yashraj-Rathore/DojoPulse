@@ -1,7 +1,8 @@
 # Browser-only replay acquisition: bounded feasibility contract
 
-Updated 2026-10-06; Architecture 2.20.0. Decision: [ADR-027](../adr/ADR-027-browser-only-replay-acquisition-feasibility.md).
-Status: offline preparation implemented; zero actual replay trials. No game/network adapter,
+Updated 2026-10-12; Architecture 2.20.0. Decision: [ADR-027](../adr/ADR-027-browser-only-replay-acquisition-feasibility.md).
+Status: offline preparation implemented; owner-supplied replay screenshots and an actual
+Steam-exported recording inspected, zero automated end-to-end acquisition/delivery trials. No game/network adapter,
 capture automation, acquisition queue, hosted renderer or new player UI is enabled.
 
 ## Required customer journey
@@ -27,9 +28,11 @@ No provider approval is supplied by this document or its CLI.
 2. On a supported, owned official-client test environment, establish exact in-game build and
    capture profile. Resolve the consented target TEKKEN ID to persistent identity and preserve
    match/participant/external replay assertions privately. Names and capture timestamps are insufficient.
-3. Observe a recent public Online Replay, acquire it through a permitted operation, then play it
-   on a compatible build. The initial lookup/download must be demonstrated separately from
-   recording an already-downloaded replay. Unknown availability and unavailable history are outcomes.
+3. Observe a recent public Online Replay, select/load it through a permitted operation, then play
+   it on a compatible build. Record an explicit in-game save/download only if the current UI
+   actually offers it. Public ID lookup and replay acquisition/loading must be demonstrated
+   separately from rendering an existing My Replays & Tips item; no native-save-to-MP4 assumption.
+   Unknown availability and unavailable history are outcomes.
 4. After permitted automation is reviewed and implemented, run the full browser request without
    customer desktop steps or manual worker intervention. Record normal original-speed playback
    with no takeover/rewind; keep exact overlays/timing/profile for M07-M09 qualification separate.
@@ -103,6 +106,22 @@ records; retain it under the approved private study policy, not git.
 
 ## Actual current evidence and next action
 
+The [2026-10-12 owner screenshots](../research/replay-ui-evidence-2026-10-12.md) show title
+build 3.02.02 (503521), an Online Replays TEKKEN-ID search control and My Replays & Tips
+selection/rendering. They do not show a submitted ID query/results, exported video or automatic
+delivery. No download/export option is visible in the shown own-replay menu; this is not a
+selected public-replay action menu. Prioritize one actual playback recording/profile check,
+then separately verify public ID-to-replay loading. The developer manual check does not replace
+the required zero-intervention customer journey. Steam's documented built-in recording/export
+is a local capture candidate, not a qualified Tekken integration or managed-use approval.
+
+The subsequent [actual Steam export inspection](../research/replay-capture-evidence-2026-10-12.md)
+found 1080p HEVC, nominal 60 fps with uneven timestamps and 68 gaps above the current 25 ms
+limit. The owner-supplied video is readable but fails the present H.264/frame-gap profile.
+Capture conversion must preserve source lineage and cannot restore unseen frames; no codec
+or timestamp normalization was implemented at that initial inspection; acceptance was not silently relaxed. No backend
+admission, automatic acquisition, canonical publication or scientific promotion follows this check.
+
 The [dated research](../research/native-tekken-replay-access-2026-10-06.md) establishes metadata
 access and an in-client recording lead. Neither supplies a qualified end-to-end transport.
 Computer Use initialization succeeded, but app enumeration failed because the native pipe was
@@ -111,8 +130,14 @@ private delivery or automated recovery was observed. No EULA exception/usage app
 The linked source investigation also records the official video-policy review; no managed
 acquisition grant is established by fan-video conditions.
 
-The initialized current plan has zero trials; its report is NOT_RUN with review, native-control,
+The 2026-10-06 initialized plan has zero trials; its report is NOT_RUN with review, native-control,
 console, rate, cost and all fault-control gaps. [Local qualification](../experiment-results/m22-replay-acquisition.md)
 records software checks separately. The next dependent work is explicit technical/usage review
 and restoring supported native game control, then the bounded actual replay trial. Both remain
 required before implementing a live client adapter or presenting available recordings from ID alone.
+
+The subsequent [M06.09/.10 local normalization](recording-normalization.md) creates a
+source-preserving H.264 preview with all recorded timestamps and explicit quality gaps.
+This is operator media handling, not acquisition transport, backend admission or hosted
+playback. Current strict timing admission remains unchanged. M06.11 separately tracks
+isolated derivative storage/lifecycle/private preview and quality UI; M22.13 remains BLOCKED.

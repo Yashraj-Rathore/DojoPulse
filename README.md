@@ -15,8 +15,10 @@ No LLM or hosted service is enabled.
 The primary acquisition target is **website sign-in -> TEKKEN ID once -> available matches -> Analyze**
 with no required desktop setup or manual uploads. [Replay acquisition qualification](docs/architecture/replay-acquisition-feasibility.md)
 provides a bounded offline plan/checksum/report tool; real automatic acquisition is not implemented
-or permitted by that report. Zero actual replay trials have been run. Current provider/native
-control and managed-use evidence gaps must be resolved before a live transport or capture queue.
+or permitted by that report. An [owner-provided Steam recording](docs/research/replay-capture-evidence-2026-10-12.md)
+has now been inspected; its HEVC codec and uneven timing fail the current strict capture profile.
+Automated ID-to-private-playback acquisition remains unvalidated. Provider/runtime and
+managed-use evidence gaps must be resolved before a live transport or capture queue.
 
 An opt-in [Windows recording companion](companion/README.md) and website recording
 inbox are implemented as an optional **local developer preview fallback**. Pairing, selected-folder
@@ -168,6 +170,21 @@ The draft knowledge/situation/metric/drill records cannot be assigned as a relea
 After real validation, create new immutable versions with expert provenance and corresponding
 build/metric approval through a reviewed migration/curation change. Do not overwrite draft
 keys or edit status in the database to bypass release decisions.
+
+## Private recording compatibility
+
+For explicitly selected trusted local recordings, the [normalization tool](docs/architecture/recording-normalization.md)
+creates an H.264 preview while retaining the original recorded timestamps and gaps:
+
+```powershell
+.\.venv\Scripts\python.exe -m tools.normalize_recording private_data/capture.mp4 --output-dir private_data/normalized-preview --game-build YOUR_DECLARED_BUILD
+```
+
+The output directory must be new. It contains `preview.mp4`, a full `timeline.json` mapping
+and `report.json` with checksums, encoding provenance and timing-quality intervals. The
+original stays untouched. This is a trusted operator tool, not hosted ingestion. A recording
+with timing gaps remains rejected by the strict analysis profile; preview conversion grants
+no gameplay/scientific approval and does not retrieve videos from a TEKKEN ID.
 
 ## Local match-import rehearsal
 

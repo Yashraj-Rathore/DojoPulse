@@ -68,3 +68,8 @@ requires the actual browser experience. M22 remains PARTIAL, M04/M05 and X01 ret
 independent usage/technical gates, and G1-G6 remain NOT_RUN.
 
 See [qualification procedure](../architecture/replay-acquisition-feasibility.md).
+
+Evidence refinement, 2026-10-12: [owner screenshots](../research/replay-ui-evidence-2026-10-12.md)
+show current-build own-replay rendering and a public ID-search control. Require demonstrated
+public selection/loading, not a presumed universal download button. Native saving and video
+export remain distinct; this does not change browser-only, review or scientific acceptance.
