@@ -14,7 +14,7 @@ is compared; AAC packet payloads/counts/timestamps and color declarations are ve
 All semantic/scientific approval flags remain false. Strict worker admission was not relaxed.
 
 41 focused tests passed in 43.48s; two Windows symlink-creation tests skipped because the
-host lacks that OS privilege. This includes existing five media tests plus 38 new normalization
+host lacks that OS privilege. This includes existing four media tests plus 39 new normalization
 cases. Actual synthetic HEVC/H.264, full-range color, shifted nonzero PTS, missing-frame gaps
 and AAC conversions preserve frames/timestamps, while altered source, count, time, audio,
 color, unsupported media, oversize, timeout/partial-output cleanup and private error handling
@@ -23,7 +23,7 @@ fail safely. Linux CI must separately execute actual file/ancestor symlink check
 Full local PostgreSQL regression: 619 passed/11 skipped in 1075.44s (seven real Docker tests
 not enabled, four Windows file/ancestor link privilege skips). Final focused tests additionally
 cover the final CLI/report changes; no subsequent backend behavior changed. Static checks,
-262 formatted Python files, mypy over 40 files, Django checks and no migration drift pass.
+263 formatted Python files, mypy over 40 files, Django checks and no migration drift pass.
 No schema/HTTP/worker/storage/UI route changes were made for normalization.
 
 ## Actual owner footage
@@ -69,6 +69,23 @@ development findings remain tracked in the [security runbook](../operations/secu
 Read frontend instructions/version-matched guides; lint, production build, typing and all 57
 Edge browser checks passed (1.3m). No product UX changed and no scanner suppression used.
 
-Implementation is prepared on main; publication/exact-tip CI pending. The prior Oct 6 seven-job
-CI remains dated evidence for prior code. Ordinary CI, including Linux/PostgreSQL, Docker,
-Windows, browser, audit, container and Terraform checks, must verify the new published tip.
+Source `5d2f6820a8f2ce4a7853a1f0c2db62268bc7b874` published directly to main.
+All seven [source CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/38302844630)
+passed, completed 2026-10-12 20:27:53 UTC. Watcher exit 0 and seven exact-source completed
+successful check-runs verified; downloaded JUnit and full completed logs retained privately.
+
+| Source CI scope | Verified result |
+|---|---|
+| PostgreSQL/Python | 632 cases: 624 passed, eight Docker/platform skips, 718.024 seconds |
+| New normalization cases | All 39 passed, no skips; actual file/ancestor symlink refusal tested |
+| Windows helper | All 17 passed, no skips, 1.316 seconds |
+| Actual Docker/max-profile | All seven passed, no skips, 125.202 seconds |
+| Chromium | All 57 passed, 43.6 seconds |
+| Terraform | Three mocked contracts passed |
+| Remaining checks | Both Python audits/production npm, ruff/263 formatted files/mypy 40 files, Django/schema/contracts, patched production build, unprivileged container startup/private asset packaging and native guarded recovery passed |
+
+The eight backend skips are separately covered by actual Docker/Windows jobs. No skipped
+normalization case is counted as passed. Actual owner-footage evidence above remains local,
+not executed on GitHub or made public. Ordinary CI is also enabled on this documentation
+receipt; monitor its actual latest main tip before final publication handoff. The prior Oct 6
+CI remains historical evidence, not validation of this source.

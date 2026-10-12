@@ -2088,3 +2088,30 @@ or canonical contributions. Local docs validation:177 requirement rows plus 6 sc
 all table statuses/links are being rechecked after final qualification updates.
 
 Final local documentation validation: 368 relative Markdown links, 177 unique requirement rows plus six scientific gates, current table statuses/Architecture 2.21.0, private non-promotion flags and whitespace pass. Normalized media remains ignored; ordinary main publication/CI pending.
+
+### 2026-10-12 - Verified recording-normalization main publication
+
+M06.01/.05/.09/.10/.11, M22.07/.13, M15.04 and M19.02: implementation source
+5d2f6820a8f2ce4a7853a1f0c2db62268bc7b874 published directly to main; source CI run
+38302844630 completed 20:27:53 UTC with all seven jobs successful. Watcher exit 0 and exact
+source check-runs independently verified. Downloaded backend/Windows/Docker JUnit and full
+completed job logs under ignored reports/recording-normalization-ci-source; no footage/paths/
+participant IDs/checksums published. 632 backend cases: 624 passed/eight Docker-platform skips,
+718.024s; all 39 new normalization cases pass/no skips, including actual file/ancestor symlink
+refusal. Actual Windows 17/1.316s, Docker seven/max-profile 125.202s, Chromium 57/43.6s, three
+Terraform contracts pass. Audits/static 263 formatted/mypy 40 files/schema/contracts/Next 16.3.8
+build/unprivileged container startup/private assets and native guarded recovery pass. No
+normalization failure/skip silently counted as success; corrected the focused receipt count
+from an earlier counting error:39 new cases plus four existing media tests, 43 total cases.
+
+Updated PRODUCT_PROGRESS.md, normalization qualification, decision log and this history with
+exact-source evidence. Runtime tree unchanged in this receipt; M06.09/.10 complete only for
+trusted-local scope, actual H.264 preview retains all recorded timing gaps. M06/M22 PARTIAL,
+M06.11 hosted derivative jobs/quota/lifecycle/authenticated preview/quality UI NOT_STARTED;
+M22.13 automatic ID-to-private replay BLOCKED, G1-G6 NOT_RUN. Prior local/dating/research
+history preserved. This receipt uses ordinary CI; actual latest main tip must be monitored
+before final handoff. No feature/bot branches, cloud resources, native endpoint or canonical
+publication. Next implementation remains M06.11; real automatic acquisition/usage and expert
+scientific approvals stay independent.
+
+Receipt documentation validation: 368 relative Markdown links, 177 unique requirement rows/six scientific gates and current table statuses/Architecture 2.21.0; git diff whitespace pass. Only four documentation files differ from the verified source. Ordinary receipt CI will verify the latest tip before handoff.
