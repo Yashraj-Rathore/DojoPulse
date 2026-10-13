@@ -34,6 +34,18 @@ pre-final broad run passed673/16 platform-Docker skips/715.34s before the last
 cancellation/publication/guard edits; it is not claimed as final full-source
 qualification. Final Ruff280, Linux/Windows mypy42, schema/system checks and all
 102 Markdown local-link targets pass. Native final-source rehearsal is checked
-separately. Full exact-source main CI/publication is pending. Production flags remain false. The bounded
+separately. Source `d932fc0ed843a2f2611ba7361067b3b11d9107d6` published directly to main and passed all seven
+checks in [run38436918455](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/38436918455), completed
+2026-10-13 17:27:27 UTC. Independent check-run metadata confirms every successful
+check on the same SHA. Downloaded artifacts/logs show691 Python cases:679 passes,
+12 separate sandbox/platform skips, zero failures/errors,710.188s XML. All25
+ledger cases and30 private-preview cases pass with no skips. Actual Docker11/
+no skips/91.466s, Windows17/no skips/1.467s, Chromium62/1.1m and three Terraform
+mocks pass. Python/cloud/production npm audits, Ruff280/mypy42, schema/load,
+production web build, unprivileged containers and native independent-ledger
+post-backup erasure rehearsal pass. The live watcher was transiently throttled;
+completion was independently established from the completed run, seven check
+records, downloaded JUnit and completed logs. Ordinary final receipt retains
+CI and requires actual latest-tip monitoring; no check is skipped. Production flags remain false. The bounded
 file store does not prove replicated durability, protected capabilities, whole
 store freshness after SQL restore, actual late-write behavior or managed isolation.

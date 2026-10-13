@@ -2291,3 +2291,27 @@ mypy42, schema/system and all102 Markdown links pass. M06.13 DONE only for
 controlled engineering; M06.11 actual replicated durability/freshness and managed
 cloud acceptance remain PARTIAL. Ordinary main source publication and exact-tip
 CI follow; the Windows/Docker skips must be covered by their actual CI jobs.
+
+### 2026-10-13 - M06.13 exact-source publication receipt
+
+M06.13/M06.11/M15.06/M16.05/M19.02:source d932fc0ed843a2f2611ba7361067b3b11d9107d6
+published only on main, normal CI enabled. All seven checks passed in
+[run38436918455](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/38436918455),
+completed17:27:27 UTC. Independent check-runs all reference that exact SHA.
+Downloaded JUnit:691 PG/Python cases,679 passes/12 platform-sandbox skips,
+zero errors/failures/710.188s; all25 ledger and30 preview pass without skips.
+Actual Docker11/no skips/91.466s, Windows17/no skips/1.467s, Chromium62/1.1m,
+three Terraform and audits/static280/mypy42/schema/load/build/unprivileged
+container startup pass. Native guarded PostgreSQL dump/restore/repeated control,
+pending-upload/private-preview/post-backup independent-ledger erasure pass;
+production RPO/RTO not measured. Watcher terminated under transient GitHub
+throttling; completed metadata/checks/artifacts/logs independently establish
+success, not a watcher exit0 claim.
+
+Updated current-position/requirement/history/decision/qualification together and
+corrected old lifecycle wording from media POST to new resumable publication.
+Controlled M06.13 is DONE. Actual replicated freshness/encryption/key custody,
+multi-host CAS, hosted isolation/IAM/CORS/late-write/load/restore/region-budget
+remain M06.11 gates, with production flags false. No private game access or
+scientific approval. Final documentation receipt publishes with ordinary CI;
+verify the actual latest main tip's checks before handoff, not just this source.

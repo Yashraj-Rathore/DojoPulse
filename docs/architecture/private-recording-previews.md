@@ -113,9 +113,9 @@ ambiguous media POSTs without receipts stay blocked. Controlled correctness does
 not qualify independent replicated durability or actual cloud operation.
 
 GCS preview publication and managed runtime remain independently disabled, even
-when ordinary source storage is qualified. Controlled create-only media insertion
-uses the fixed official endpoint, ifGenerationMatch=0, bounded streamed body and
-response verification of bucket/key/size/MD5/generation; reads pin that generation.
+when ordinary source storage is qualified. Controlled resumable create-only publication
+uses the fixed official endpoint, ifGenerationMatch=0, independent session receipts,
+bounded chunks and bucket/key/size/MD5/generation verification; reads pin that generation.
 Prefix erasure enumerates all versions and rejects foreign/source object scope.
 Write intent is persisted before RPC and is not refunded on an ambiguous response.
 
