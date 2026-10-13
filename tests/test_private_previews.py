@@ -167,6 +167,25 @@ def test_source_and_derivative_capacity_and_idempotence(owner, settings):
         previews.enqueue_preview(owner, source2.pk, request_id)
 
 
+def test_finished_request_is_idempotent_and_fresh_retry_gets_a_new_run(
+    owner, tmp_path, monkeypatch
+):
+    source, preview = ready(owner, tmp_path, monkeypatch)
+    original_run = preview.run_id
+    original_key = preview.run.request_key.removeprefix("preview:")
+    client = APIClient()
+    client.force_authenticate(owner)
+    assert client.delete(f"/api/assets/{source.pk}/preview").status_code == 200
+    receipt = previews.enqueue_preview(owner, source.pk, original_key)
+    assert receipt.state == "PURGED" and receipt.run_id == original_run
+    assert AnalysisRun.objects.count() == 1
+    retry = previews.enqueue_preview(owner, source.pk, uuid4())
+    assert retry.state == "QUEUED" and retry.run_id != original_run
+    assert retry.run.status == "QUEUED" and retry.reserved_bytes == MAX_BYTES
+    with pytest.raises(ValidationError, match="superseded"):
+        previews.enqueue_preview(owner, source.pk, original_key)
+
+
 def test_stale_or_cross_pipeline_results_cannot_publish(owner):
     source = asset(owner)
     preview = previews.enqueue_preview(owner, source.pk, uuid4())

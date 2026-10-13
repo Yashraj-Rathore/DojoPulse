@@ -40,7 +40,11 @@ export default function PrivateRecordings({csrf, zone = "UTC"}: {csrf: string; z
   async function prepare(id: string) {
     setBusy(id); setError("");
     const requestId = requests.current[id] ??= crypto.randomUUID();
-    try {await workspaceRequest(csrf, `assets/${id}/preview`, "POST", {request_id: requestId}); hidden.current.delete(id); setMessage("Playback preparation queued. Your original recording is retained."); setRevision(v => v + 1);}
+    try {
+      const receipt = await workspaceRequest<Preview>(csrf, `assets/${id}/preview`, "POST", {request_id: requestId});
+      delete requests.current[id]; hidden.current.delete(id);
+      setMessage(receipt.state === "PURGED" ? "The earlier preparation ended. Retry to start a new conversion." : "Playback preparation requested. Your original recording is retained."); setRevision(v => v + 1);
+    }
     catch (problem) {setError(problem instanceof Error ? problem.message : "Playback preparation failed.");}
     finally {setBusy(null);}
   }

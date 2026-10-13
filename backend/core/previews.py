@@ -55,6 +55,8 @@ def enqueue_preview(owner, asset_id, request_id):
     preview = RecordingPreview.objects.filter(asset=asset).first()
     if prior and (prior.asset_id != asset.pk or not preview or preview.run_id != prior.pk):
         raise ValidationError("Preview request belongs to different or superseded evidence")
+    if prior:
+        return preview  # A completed receipt never resurrects its old job/state.
     if preview and preview.state in {"QUEUED", "READY"}:
         return preview
     if preview and preview.state == "PURGING":

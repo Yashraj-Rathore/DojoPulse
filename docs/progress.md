@@ -2168,3 +2168,26 @@ permitted browser-only identity/replay acquisition remain independent external w
 Final local focused rerun:26 passed/41.07s, no skips; shared-database collision resolved by sequential execution. Final schema/static and documentation checks precede ordinary main publication; actual Docker/CI remains pending.
 
 Documentation validation:391 relative Markdown links,178 unique requirements/six scientific gates, Architecture2.22.0 and whitespace pass. Private video/validation database/reports remain ignored; source publication and real Docker/exact-tip CI pending.
+
+### 2026-10-13 - Correct preview retry receipts and cross-platform CI failures
+
+M06.11/.12, M13.03, M15.06 and M19.02: initial main source a586914 entered ordinary
+CI run38421395882. Linux mypy rejected an inferred BufferedIOBase stdout handle;
+frontend59/60 passed but the cancellation assertion raced two transient status nodes.
+These failures are not qualification success. Pass integer descriptors to Popen and
+wait for the specific completion status; retain all bounds/semantics. Final review
+also found a finished request could reset a purged preview onto its old terminal run.
+An existing receipt now returns its current state idempotently; successful browser
+requests clear retry identity so later conversions use a fresh key/run. Added backend
+and browser regression cases; source byte hashes/canonical/scientific gates unchanged.
+
+Changed analysis/process.py, backend/core/previews.py, private-recordings UI/tests and
+private-preview Python tests, qualification and both trackers. Final focused PostgreSQL
+27 passes/37.42s; mypy42 files pass explicitly for Linux and Windows; Ruff273 pass.
+Four updated Edge cases passed20.7s before final targeted assertion rerun; final
+preview/upload eight-case rerun underway. Initial real Docker result pending; current
+source corrections are not yet published/qualified. Next: ordinary corrected-main
+publication, all exact-source jobs and final receipt/latest-tip monitoring. No cloud,
+provider/game-control activation, private artifacts or feature branches.
+
+Corrected preview/upload browser checks:8 passed/30.0s after the targeted status wait; lint/type checks pass. Corrected ordinary main publication follows, with exact-source CI still required.

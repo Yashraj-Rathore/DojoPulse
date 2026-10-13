@@ -69,3 +69,16 @@ attribution, uninterrupted normal-speed replay or scientific gate approval.
 M06.11 remains PARTIAL for actual hosted qualification; M06.12 local/controlled
 acceptance awaits completed evidence. G1-G6 remain NOT_RUN, M22.13 browser ID-to-private
 video remains BLOCKED, no live GCS/cloud preview/game provider has been enabled.
+
+## Initial publication failures and corrected local checks
+
+Initial source a586914 / run38421395882 failed Linux mypy's inferred file-handle
+Popen overload and one asynchronous cancellation locator (59/60 Chromium passed).
+Corrected with integer descriptors and a specific completion-status wait; no checks
+or resource/revocation limits disabled. Review also fixed finished-request resurrection:
+old receipts stay idempotent; fresh attempts get new IDs/runs after terminal conversion.
+Added backend/browser regression cases. Final local27 PostgreSQL/37.42s and explicit
+Linux/Windows mypy42 pass; corrected full source CI is still required. Earlier counts
+above retain their dated/tree scope. M06.12 remains in qualification.
+
+Corrected final local preview/upload browser suite:8 passed in30.0s; lint/TypeScript pass. No browser/backend assertion removed.

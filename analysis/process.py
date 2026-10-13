@@ -52,8 +52,8 @@ def run_bounded(
         proc = subprocess.Popen(
             argv,
             stdin=subprocess.DEVNULL,
-            stdout=output,
-            stderr=errors,
+            stdout=output.fileno(),
+            stderr=errors.fileno(),
             shell=False,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )

@@ -59,5 +59,19 @@ test("preparation retries keep identity and cancellation immediately removes pla
   await expect(region.locator("video")).toHaveCount(1);expect(keys[0]).toBe(keys[1]);
   await region.getByRole("button",{name:"Remove converted playback"}).click();
   await expect(region.locator("video")).toHaveCount(0);
-  await expect(region.getByRole("status")).toContainText("original recording remains");
+  await expect(region.getByRole("status").filter({hasText:"original recording remains"})).toBeVisible();
+});
+
+test("a finished conversion uses a fresh request for another preparation",async({page})=>{
+  await session(page);const keys:string[]=[];
+  await page.route("**/api/private-recordings",route=>route.fulfill({json:{recordings:[{...record,preview:{state:"PURGED",media_url:null}}]}}));
+  await page.route(`**/api/assets/${id}/preview`,route=>{
+    keys.push(route.request().postDataJSON().request_id);
+    return route.fulfill({json:{state:"PURGED",media_url:null}});
+  });
+  await page.goto("/");const region=page.getByRole("region",{name:"Private recordings",exact:true});
+  await region.getByRole("button",{name:"Prepare playback"}).click();
+  await expect(region.getByRole("status")).toContainText("earlier preparation ended");
+  await region.getByRole("button",{name:"Prepare playback"}).click();
+  await expect.poll(()=>keys.length).toBe(2);expect(keys[0]).not.toBe(keys[1]);
 });
