@@ -99,8 +99,12 @@ def begin(owner, request_id, size, sha256, md5_hash, metadata, match_id=None, *,
                 raise ValidationError("Remove the existing recording before attaching another")
         from backend.core.budgets import check_daily_capacity
 
-        check_daily_capacity(owner)
-        check_capacity(owner, size)
+        check_daily_capacity(
+            owner, "recording-preview/1" if metadata.get("preview_only") else "local-pipeline/1"
+        )
+        from analysis.preview_bundle import MAX_BYTES
+
+        check_capacity(owner, size + (MAX_BYTES if metadata.get("preview_only") else 0))
         admit_run(owner)
         capacity_lock()
         pending = UploadSession.objects.filter(state__in=PENDING)
@@ -134,6 +138,10 @@ def begin(owner, request_id, size, sha256, md5_hash, metadata, match_id=None, *,
             expected_md5=md5_hash,
             expires_at=timezone.now() + timedelta(seconds=settings.UPLOAD_SESSION_SECONDS),
         )
+        if metadata.get("preview_only"):
+            from backend.core.models import RecordingPreview
+
+            RecordingPreview.objects.create(asset=asset)
         record_consent(owner, "PROCESSING", "GRANT", POLICY_VERSION, asset_id, "UPLOAD")
     # Persist the reservation BEFORE the remote RPC. An ambiguous begin is never reissued.
     try:
@@ -454,13 +462,18 @@ def verify(session_id, *, storage=None):
                     context="jin/jin",
                 )
                 register_upload_source(match)
-            enqueue_run(
-                owner=current.owner, asset=current.asset, request_key=f"resumable:{current.pk}"
-            )
             current.state = "COMPLETE"
             current.error_code = ""
             current.verification_lease = None
             current.save(update_fields=["state", "verification_lease", "error_code"])
+            if claim.get("preview_only"):
+                from backend.core.previews import enqueue_preview
+
+                enqueue_preview(current.owner, current.asset_id, current.pk)
+            else:
+                enqueue_run(
+                    owner=current.owner, asset=current.asset, request_key=f"resumable:{current.pk}"
+                )
         return True
     except (OSError, ValueError, ValidationError, CloudFailure, Throttled) as error:
         # Never expose transport text, paths or capability URLs.

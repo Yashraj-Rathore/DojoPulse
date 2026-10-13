@@ -379,6 +379,32 @@ class AnalysisRun(Owned):
         ]
 
 
+class RecordingPreview(models.Model):
+    """Derivative lineage/capacity, never a canonical Match or gameplay approval."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    asset = models.OneToOneField(ReplayAsset, on_delete=models.CASCADE, related_name="preview")
+    run = models.OneToOneField(AnalysisRun, null=True, on_delete=models.PROTECT)
+    state = models.CharField(max_length=24, default="WAITING_UPLOAD")
+    reserved_bytes = models.PositiveBigIntegerField(default=547356672)
+    manifest = models.JSONField(default=dict)
+    quality = models.JSONField(default=dict)
+    source_sha256 = models.CharField(max_length=64, blank=True)
+    attempt_fence = models.PositiveIntegerField(default=0)
+    write_pending = models.BooleanField(default=False)
+    error_code = models.CharField(max_length=80, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(state__in=["WAITING_UPLOAD", "QUEUED", "READY", "PURGING", "PURGED"]),
+                name="preview_state_valid",
+            ),
+        ]
+
+
 class RunDispatch(models.Model):
     """Transactional intent; transport retries cannot create a second execution."""
 

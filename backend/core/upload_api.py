@@ -34,7 +34,8 @@ class SessionInput(serializers.Serializer):
     sha256 = serializers.RegexField(r"^[a-f0-9]{64}$")
     md5 = serializers.CharField(max_length=24)
     processing_consent = serializers.BooleanField()
-    single_continuous = serializers.BooleanField()
+    single_continuous = serializers.BooleanField(required=False, default=False)
+    preview_only = serializers.BooleanField(required=False, default=False)
     metadata = serializers.DictField()
     match_id = serializers.UUIDField(required=False)
 
@@ -42,7 +43,7 @@ class SessionInput(serializers.Serializer):
         if (
             not values["filename"].lower().endswith(".mp4")
             or not values["processing_consent"]
-            or not values["single_continuous"]
+            or (not values["single_continuous"] and not values["preview_only"])
         ):
             raise serializers.ValidationError(
                 "Confirm processing consent and one continuous MP4 capture"
@@ -52,6 +53,17 @@ class SessionInput(serializers.Serializer):
                 raise ValueError
         except ValueError:
             raise serializers.ValidationError("Invalid file integrity checksum") from None
+        if values["preview_only"]:
+            if values.get("match_id"):
+                raise serializers.ValidationError("Playback uploads cannot claim a canonical match")
+            claim = PreviewCaptureInput(data=values["metadata"])
+            claim.is_valid(raise_exception=True)
+            values["metadata"] = {
+                **claim.validated_data,
+                "unattributed_recording": True,
+                "preview_only": True,
+            }
+            return values
         claim = (AttributionInput if values.get("match_id") else CaptureInput)(
             data=values["metadata"]
         )
@@ -62,6 +74,13 @@ class SessionInput(serializers.Serializer):
         metadata["played_at"] = metadata["played_at"].isoformat()
         values["metadata"] = metadata
         return values
+
+
+class PreviewCaptureInput(serializers.Serializer):
+    game_build = serializers.CharField(max_length=80, required=False)
+    platform = serializers.ChoiceField(
+        choices=["steam", "ps5", "xbox_series", "unknown"], required=False
+    )
 
 
 def unavailable():

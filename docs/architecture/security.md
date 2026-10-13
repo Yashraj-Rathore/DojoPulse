@@ -96,3 +96,11 @@ provider permission cannot be inferred from public accessibility. Named incident
 privacy deputies must accept ownership before an external pilot. Operational procedures are
 in [the incident runbook](../operations/security-runbook.md); dated local results are in
 [M15 validation](../experiment-results/m15-security.md).
+
+Architecture 2.22.0 adds the [private preview boundary](private-recording-previews.md):
+independent 3 GiB/two-CPU offline container, readonly input-only mounts, exact bounded
+regular-file descriptor retrieval, no host HTTP decoding and shaped metadata. Source,
+consent, retention, restore and current attempt fences control private range/quality reads.
+Cancelled publishers cannot recreate bytes after local owner-serialized deletion; uncertain
+execution/write/erasure retains quota. Cloud preview storage/runtime qualification stays
+independently false. Controlled tests and local Docker do not establish equivalent hosting.

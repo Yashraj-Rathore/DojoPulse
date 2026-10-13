@@ -206,7 +206,11 @@ def review_recording(
         raise ValidationError("Recording is unavailable or attribution was already decided")
     if source_hash != source.asset.source_sha256 or source_hash != source.content_hash:
         raise ValidationError("Reviewed recording hash differs")
-    latest = source.asset.analysisrun_set.order_by("-created_at").first()
+    latest = (
+        source.asset.analysisrun_set.exclude(pipeline_version="recording-preview/1")
+        .order_by("-created_at")
+        .first()
+    )
     if (
         not latest
         or latest.status not in {"REVIEW_REQUIRED", "PARTIAL", "COMPLETED"}

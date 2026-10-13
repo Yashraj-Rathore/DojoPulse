@@ -57,6 +57,7 @@ def claim_run(run_id):
             "REVIEW_REQUIRED",
             "PARTIAL",
             "FAILED",
+            "PREVIEW_READY",
         }
     ):
         return None
@@ -129,7 +130,17 @@ def finish_run(run_id, fence, report):
     ):
         return False
     status = report["status"]
-    if status not in {"FAILED", "REVIEW_REQUIRED", "PARTIAL", "COMPLETED"}:
+    if run.pipeline_version == "recording-preview/1" and status not in {"FAILED", "PREVIEW_READY"}:
+        raise ValueError("Preview results cannot establish gameplay validation")
+    if status == "PREVIEW_READY" and (
+        report.get("opportunities") != []
+        or report.get("automatic_gameplay_validated") is not False
+        or report.get("precise_gameplay_analysis_approved") is not False
+    ):
+        raise ValueError("Invalid preview result")
+    if status not in {"FAILED", "REVIEW_REQUIRED", "PARTIAL", "COMPLETED"} and not (
+        status == "PREVIEW_READY" and run.pipeline_version == "recording-preview/1"
+    ):
         raise ValueError("Invalid terminal report status")
     run.result, run.status = report, status
     run.error_code = report.get("issues", [""])[0] if report.get("issues") else ""

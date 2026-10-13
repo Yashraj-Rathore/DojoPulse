@@ -77,6 +77,14 @@ def record_consent(owner, scope, action, version, request_id, source="ACCOUNT"):
         profile.processing_consent_at = now if action == "GRANT" else None
         profile.processing_withdrawn_at = now if action == "WITHDRAW" else None
         if action == "WITHDRAW":
+            from backend.core.models import RecordingPreview
+            from backend.core.previews import revoke
+
+            if scope == "PROCESSING":
+                revoke(RecordingPreview.objects.filter(asset__owner=owner))
+                AnalysisRun.objects.filter(
+                    owner=owner, pipeline_version="recording-preview/1"
+                ).update(status="CANCELLED", fence=F("fence") + 1, lease_until=None, result={})
             from backend.core.models import ReplayAsset, UploadSession
 
             pending = UploadSession.objects.filter(

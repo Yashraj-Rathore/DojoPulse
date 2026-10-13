@@ -112,15 +112,20 @@ def check_capacity(owner, incoming_bytes=0):
     now = timezone.now()
     reservations = UploadAdmission.objects.filter(expires_at__gt=now).exclude(pk=admission_id.get())
     assets = ReplayAsset.objects.filter(purge_completed_at=None)
-    for records, pending, limit in (
+    from backend.core.models import RecordingPreview
+
+    previews = RecordingPreview.objects.exclude(state="PURGED")
+    for records, pending, preview_scope, limit in (
         (
             assets.filter(owner=owner),
             reservations.filter(owner=owner),
+            previews.filter(asset__owner=owner),
             settings.OWNER_STORAGE_BYTES,
         ),
-        (assets, reservations, settings.GLOBAL_STORAGE_BYTES),
+        (assets, reservations, previews, settings.GLOBAL_STORAGE_BYTES),
     ):
         used = records.aggregate(total=Sum("bytes"))["total"] or 0
+        used += preview_scope.aggregate(total=Sum("reserved_bytes"))["total"] or 0
         held = pending.aggregate(total=Sum("reserved_bytes"))["total"] or 0
         if used + held + incoming_bytes > limit:
             audit("admission_rejected", "STORAGE_QUOTA")

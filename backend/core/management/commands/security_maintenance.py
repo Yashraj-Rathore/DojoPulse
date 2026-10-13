@@ -19,4 +19,7 @@ class Command(BaseCommand):
         cleanup_account_mail()
         AccountChallenge.objects.filter(expires_at__lte=now).delete()
         AccountSession.objects.filter(expires_at__lte=now).delete()
+        from backend.core.previews import reconcile_previews
+
+        reconcile_previews()
         self.stdout.write(f"Expired budgets: {budgets}; upload reservations: {slots}")

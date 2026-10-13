@@ -1,7 +1,9 @@
 # Recording normalization and timing quality
 
 Architecture 2.21.0; 2026-10-12. [ADR-028](../adr/ADR-028-source-preserving-recording-normalization.md).
-Scope: trusted local operator CLI. Hosted delivery remains M06.11.
+Scope: trusted local operator CLI. Architecture 2.22.0 separately integrates
+[private preview engineering](private-recording-previews.md) (M06.12); actual hosted delivery
+remains M06.11. This CLI itself still creates no website/storage/canonical records.
 
 `python -m tools.normalize_recording SOURCE.mp4 --output-dir NEW_PRIVATE_DIRECTORY`
 creates `preview.mp4`, `timeline.json` and `report.json`. Optionally pass `--game-build`

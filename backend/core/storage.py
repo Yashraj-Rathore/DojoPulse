@@ -116,6 +116,10 @@ def delete_asset(owner, asset_id, storage=None):
             availability="NOT_FOUND", content_hash="", attribution_state="WITHDRAWN", attribution={}
         )
         ReplayAsset.objects.filter(pk=asset.pk).update(metadata={})
+        from backend.core.models import RecordingPreview
+        from backend.core.previews import revoke
+
+        revoke(RecordingPreview.objects.filter(asset=asset))
         from backend.core.models import UploadSession
 
         UploadSession.objects.filter(asset=asset).update(
@@ -149,6 +153,12 @@ def delete_asset(owner, asset_id, storage=None):
         # A post-backup session capability may survive a restore without its URI.
         # Re-sweep its prefix until the documented upstream capability deadline.
         raise CloudFailure("UPLOAD_SESSION_EXPIRY_PENDING")
+    from backend.core.previews import purge_preview
+
+    for preview in RecordingPreview.objects.filter(asset=asset, state="PURGING"):
+        purge_preview(preview.pk)
+    if RecordingPreview.objects.filter(asset=asset).exclude(state="PURGED").exists():
+        return  # Active/ambiguous derivative work still owns bytes and erasure capacity.
     ReplayAsset.objects.filter(pk=asset.pk).update(
         upload_cancelled=True,
         upload_session="",

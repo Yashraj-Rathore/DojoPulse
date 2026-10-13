@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test";
 
 export const preferences = { username: "local-player", display_timezone: "UTC", onboarding_completed_at: "2026-09-23T12:00:00Z", analysis_notices: true, practice_notices: true, followup_notices: true, processing_consent_at: null, training_consent_at: null };
 export async function mockWorkspace(page: Page, companion = true) {
+  await page.route("**/api/private-recordings", route => route.fulfill({json:{recordings:[]}}));
   if (companion) {
     await page.route("**/api/recording-devices", route => route.fulfill({json: {enabled: false, devices: []}}));
     await page.route("**/api/synced-recordings", route => route.fulfill({json: {recordings: []}}));

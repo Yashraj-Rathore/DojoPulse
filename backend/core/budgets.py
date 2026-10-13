@@ -29,12 +29,17 @@ def totals(owner=None):
     }
 
 
-def check_daily_capacity(owner):
+def check_daily_capacity(owner, pipeline_version="local-pipeline/1"):
     """Caller holds owner lock; preview before reading a body and recheck at enqueue."""
     capacity_lock()
     if settings.OPTIONAL_PROCESSING_PAUSED:
         raise Throttled(wait=60, detail="Analysis is temporarily paused by the operator.")
-    media, processing = 600, settings.RUN_DEADLINE_SECONDS * settings.RUN_MAX_ATTEMPTS
+    seconds = (
+        settings.PREVIEW_DEADLINE_SECONDS
+        if pipeline_version == "recording-preview/1"
+        else settings.RUN_DEADLINE_SECONDS
+    )
+    media, processing = 600, seconds * settings.RUN_MAX_ATTEMPTS
     for scope_owner, media_limit, processing_limit in (
         (
             owner,
@@ -63,7 +68,7 @@ def reserve_run(run):
         if prior.state != "OPEN":
             raise Throttled(detail="This analysis budget is already settled.")
         return prior
-    media, processing = check_daily_capacity(run.owner)
+    media, processing = check_daily_capacity(run.owner, run.pipeline_version)
     if (
         AnalysisRun.objects.filter(asset=run.asset, created_at__date=timezone.localdate())
         .exclude(pk=run.pk)
@@ -75,7 +80,9 @@ def reserve_run(run):
         run=run,
         reserved_media_seconds=media,
         reserved_processing_seconds=processing,
-        attempt_seconds=settings.RUN_DEADLINE_SECONDS,
+        attempt_seconds=settings.PREVIEW_DEADLINE_SECONDS
+        if run.pipeline_version == "recording-preview/1"
+        else settings.RUN_DEADLINE_SECONDS,
         max_attempts=settings.RUN_MAX_ATTEMPTS,
     )
 

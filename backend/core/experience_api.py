@@ -299,12 +299,26 @@ def export_account(request):
         PracticeLog,
         RecognitionRun,
         RecordingDevice,
+        RecordingPreview,
         RecordingReceipt,
         RunBudget,
         UploadSession,
     )
 
     tables = {
+        "recording_previews": (
+            RecordingPreview.objects.filter(asset__owner=user),
+            [
+                "id",
+                "asset_id",
+                "run_id",
+                "state",
+                "reserved_bytes",
+                "quality",
+                "created_at",
+                "completed_at",
+            ],
+        ),
         "recording_devices": (
             RecordingDevice.objects.filter(owner=user),
             ["id", "label", "expires_at", "revoked_at", "last_seen_at", "created_at"],

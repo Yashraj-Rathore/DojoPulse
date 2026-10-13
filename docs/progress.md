@@ -2115,3 +2115,56 @@ publication. Next implementation remains M06.11; real automatic acquisition/usag
 scientific approvals stay independent.
 
 Receipt documentation validation: 368 relative Markdown links, 177 unique requirement rows/six scientific gates and current table statuses/Architecture 2.21.0; git diff whitespace pass. Only four documentation files differ from the verified source. Ordinary receipt CI will verify the latest tip before handoff.
+
+### 2026-10-13 - Private preview lifecycle implementation (qualification underway)
+
+M06.01/.02/.05-.07/.11/.12, M13.03/.06, M15.01/.06, M16.02/.05, M17.02/.03 and M19.02:
+added RecordingPreview lineage/capacity model and distinct recording-preview/1 jobs. New
+PREVIEW_READY cannot satisfy canonical gameplay/attribution status gates. Reuses existing
+AnalysisRun leases/fences, slots/outbox and snapshotted longer processing budgets. New isolated
+normalizer keeps bounded tmpfs alive for descriptor-checked regular-file binary retrieval;
+no host decoder or writable output mount. Private authenticated range playback/quality APIs
+and source-preserving manual preview upload/preparation/cancel/quality UI are implemented.
+Storage reservations remain through active/ambiguous writes and cleanup. Source deletion,
+processing withdrawal and restore handling are being completed/qualified. GCS write/runtime
+qualification switches default false independently of ordinary storage/runtime qualification;
+no cloud resources or live provider/game endpoint activated. Tests not run yet for this module;
+prior Oct 12 source/receipt CI remains separately dated. Architecture 2.22.0/ADR-029/D044 and
+migration/qualification documentation pending. Next: finish restore/export/sandbox safety,
+exercise pipeline/negative cases and actual owner footage, then publish/monitor only main.
+
+### 2026-10-13 - Private preview local qualification and lifecycle hardening
+
+M06.01/.02/.05-.07/.11/.12, M13.03/.06, M15.01/.06, M16.02/.05, M17.02/.03, M19.02:
+completed worker/API/UI/model/migration wiring and owner-serialized publication/cleanup.
+Added stale attempt erasure before retry, cancelled playback refresh suppression, bounded
+directory/file descriptors (symlink/FIFO/hardlink rejection), hostile report shape checks,
+source-preserving preview upload, ambiguous GCS write retention/restore block, shaped export,
+guarded rollback and restore sweep of unknown LOCAL preview asset prefixes. Cloud write/
+runtime gates remain independently false. ADR-029/D044/Architecture 2.22.0, lifecycle contract,
+README, security/storage docs and both trackers updated. No private assets published.
+
+Actual owner resumable/backend trial with an isolated validation account/database and
+trusted-local decoder:334.719s, private preview ready, original/source hash unchanged,
+9,363 frames/68 large gaps/1,403 irregular intervals retained, 497,481,471 derived bytes;
+206/4,096-byte private range, foreign 404, paged timing and zero canonical Match/events.
+Actual derivative decodes in Edge website player at 1920x1080/158.516667s/no error; UI/range
+route mocked, backend ownership tested separately. Private rendered screenshot visually
+inspected. Neither trial binds a real product account or approves scientific/hosted use.
+
+Broad local PostgreSQL 645 passes/15 explicit platform-Docker skips/867.25s (pre-final tree),
+focused 24/43.36s before final additions, all 60 Edge/1.4m plus final 7 preview/upload/26.5s,
+Ruff 273/mypy 42, Django/schema, lint/type/build and production Python/npm audits pass.
+Current full npm audit retains five high development-only findings. Native disposable
+PostgreSQL dump/restore, forward/reverse/forward, quarantine/repeated controls and explicit
+pending-upload/private-preview erasure pass. Initial test transaction/auth fixtures fixed;
+overlapping local PostgreSQL runs collided on shared test database cleanup, so final focused
+rerun is sequential. Actual Docker unavailable locally; new four preview cases run in CI
+alongside seven parser/max-profile checks. Current source/main publication and exact-tip
+CI pending; M06.12 in qualification, M06.11 PARTIAL, M22.13 BLOCKED, G1-G6 NOT_RUN.
+Next: complete final checks/source CI; hosted runtime/storage late-write acceptance and
+permitted browser-only identity/replay acquisition remain independent external work.
+
+Final local focused rerun:26 passed/41.07s, no skips; shared-database collision resolved by sequential execution. Final schema/static and documentation checks precede ordinary main publication; actual Docker/CI remains pending.
+
+Documentation validation:391 relative Markdown links,178 unique requirements/six scientific gates, Architecture2.22.0 and whitespace pass. Private video/validation database/reports remain ignored; source publication and real Docker/exact-tip CI pending.

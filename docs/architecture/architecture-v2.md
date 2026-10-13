@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.21.0. Decision date: 2026-10-12. Status: local engineering approved;
+Version: 2.22.0. Decision date: 2026-10-13. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -74,7 +74,15 @@ No LLM, neural player embedding, broker, vector store, warehouse, or native game
 [ADR-028](../adr/ADR-028-source-preserving-recording-normalization.md) adds bounded trusted-local
 [recording normalization](recording-normalization.md). H.264 previews preserve original
 recorded frames/timestamps, audio and lineage; explicit quality intervals cannot approve
-precise gameplay. Hosted derivative lifecycle remains M06.11, strict admission unchanged.
+precise gameplay. Strict admission remains unchanged.
+
+[ADR-029](../adr/ADR-029-private-recording-preview-lifecycle.md) integrates separate
+[private recording preview jobs](private-recording-previews.md), owned original/derivative
+lineage and reservations, bounded isolated artifact retrieval, authenticated range playback,
+paged quality and revocation/restore cleanup. M06.12 qualifies local/controlled engineering;
+M06.11 retains actual hosted isolation/storage/late-write/capacity acceptance. Playback-only
+uploads grant no Match, gameplay, attribution or scientific approval. GCS writes and cloud
+preview runtime remain independently disabled; browser-only ID acquisition stays separate.
 
 ## Implementation boundary
 

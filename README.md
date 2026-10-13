@@ -186,6 +186,21 @@ original stays untouched. This is a trusted operator tool, not hosted ingestion.
 with timing gaps remains rejected by the strict analysis profile; preview conversion grants
 no gameplay/scientific approval and does not retrieve videos from a TEKKEN ID.
 
+The website now offers **Private recordings** for an enabled local staff/operator account:
+add a permitted MP4 once, wait for verification/conversion, then watch the private H.264
+preview and inspect recorded timing gaps. This playback upload does not require character
+analysis metadata or a continuous-playback claim. Cancelling/removing converted playback
+retains the original; deleting the original or withdrawing processing revokes both.
+
+Apply migration 0024, enable the existing local operator upload configuration and run
+`python manage.py process_runs --once` plus ordinary upload/security maintenance. Default
+conversion requires the pinned offline Docker parser image; trusted-local decoding is only
+the existing explicit DEBUG/operator escape. See [setup/lifecycle](docs/architecture/private-recording-previews.md)
+and [qualification](docs/experiment-results/private-recording-previews.md). Source/derivative
+quota, physical staging and longer preview processing limits are separate from normal analysis.
+Actual GCS preview writes/cloud execution remain disabled. ID-to-replay acquisition, hosted
+release and frame-accurate coaching still require their independent evidence and approvals.
+
 ## Local match-import rehearsal
 
 Apply migrations, then import fake metadata for an existing local staff account. This does not

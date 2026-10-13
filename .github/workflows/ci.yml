@@ -79,7 +79,7 @@ jobs:
       - run: python -m pip install -r requirements.lock
       - run: docker build -f infrastructure/Dockerfile.analysis -t dojopulse-parser:ci .
       - run: echo "PARSER_TEST_IMAGE=$(docker image inspect dojopulse-parser:ci --format '{{.Id}}')" >> "$GITHUB_ENV"
-      - run: pytest tests/test_parser_sandbox.py -v --junitxml=reports/sandbox.xml
+      - run: pytest tests/test_parser_sandbox.py tests/test_preview_sandbox.py -v --junitxml=reports/sandbox.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:

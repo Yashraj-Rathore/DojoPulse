@@ -46,7 +46,7 @@ export function useResumableUpload(csrf: string) {
     return data;
   }
 
-  async function start(file: File, metadata: object, matchId?: string) {
+  async function start(file: File, metadata: object, matchId?: string, previewOnly = false) {
     if (inFlight.current) return null;
     if (!file.name.toLowerCase().endsWith(".mp4") || !file.size || file.size > 536870912) { setError("Choose an MP4 up to 512 MiB."); setPhase("Upload interrupted"); return null; }
     inFlight.current = true;
@@ -65,7 +65,7 @@ export function useResumableUpload(csrf: string) {
       signal.throwIfAborted();
       const sourceHash = bytesToHex(sha.digest());
       const md5Hash = btoa(String.fromCharCode(...checksum.digest()));
-      const fingerprint = bytesToHex(sha256(new TextEncoder().encode(JSON.stringify({ sourceHash, bytes: file.size, metadata, matchId }))));
+      const fingerprint = bytesToHex(sha256(new TextEncoder().encode(JSON.stringify({ sourceHash, bytes: file.size, metadata, matchId, ...(previewOnly ? {previewOnly: true} : {}) }))));
       const prior = receipt.current || savedReceipt();
       if (prior?.id) setSessionId(prior.id);
       if (prior && prior.fingerprint !== fingerprint) throw new Error("Resume the same file and details, or cancel the existing upload before starting another.");
@@ -74,7 +74,7 @@ export function useResumableUpload(csrf: string) {
       setPhase("Opening upload"); setPercent(0);
       let transfer = await api("", "POST", {
         request_id: saved.requestId, filename: file.name, bytes: file.size, sha256: sourceHash, md5: md5Hash,
-        processing_consent: true, single_continuous: true, metadata, ...(matchId ? { match_id: matchId } : {}),
+        processing_consent: true, single_continuous: !previewOnly, ...(previewOnly ? {preview_only: true} : {}), metadata, ...(matchId ? { match_id: matchId } : {}),
       }, signal);
       saved.id = transfer.id; setSessionId(transfer.id); saveReceipt(saved);
       const path = `/${transfer.id}`;

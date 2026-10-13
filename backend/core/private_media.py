@@ -47,12 +47,14 @@ class PrefetchedBody:
         self.chunks.close()
 
 
-def asset_response(asset, range_header, *, authorize=None):
+def asset_response(asset, range_header, *, authorize=None, artifact=None):
+    if artifact is not None and (authorize is None or not authorize()):
+        return HttpResponse(status=404)
     if asset.retain_until and asset.retain_until <= timezone.now():
         return HttpResponse(status=404)
     if UploadSession.objects.filter(asset=asset).exclude(state="COMPLETE").exists():
         return HttpResponse(status=404)
-    if (
+    if artifact is None and (
         asset.metadata.get("unattributed_recording")
         or asset.metadata.get("capture_tool") == "dojopulse-companion/1"
     ):
@@ -60,6 +62,7 @@ def asset_response(asset, range_header, *, authorize=None):
 
         run = (
             AnalysisRun.objects.filter(asset=asset, owner_id=asset.owner_id)
+            .exclude(pipeline_version="recording-preview/1")
             .order_by("-created_at")
             .first()
         )
@@ -69,10 +72,12 @@ def asset_response(asset, range_header, *, authorize=None):
             or run.result.get("source", {}).get("source_sha256") != asset.source_sha256
         ):
             return HttpResponse(status=404)
-    size = asset.bytes
+    size = artifact["bytes"] if artifact else asset.bytes
+    key = artifact["key"] if artifact else asset.storage_key
+    generation = artifact["generation"] if artifact else asset.storage_generation
     if asset.storage_provider == "LOCAL":
-        path = private_path(asset.storage_key)
-        if not path.is_file():
+        path = private_path(key)
+        if path.is_symlink() or not path.is_file() or (artifact and path.stat().st_size != size):
             return HttpResponse(status=404)
         size = path.stat().st_size
     elif not settings.GCS_STORAGE_QUALIFIED:
@@ -118,9 +123,7 @@ def asset_response(asset, range_header, *, authorize=None):
     chunks = (
         local_chunks()
         if asset.storage_provider == "LOCAL"
-        else storage_for(asset).range_stream(
-            asset.storage_key, asset.storage_generation, start, end, size, check
-        )
+        else storage_for(asset).range_stream(key, generation, start, end, size, check)
     )
     try:
         first = next(chunks, b"")  # Validate upstream status/headers before sending HTTP headers.

@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import time
 from collections.abc import Callable
+from contextlib import ExitStack
 from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,6 +30,7 @@ def run_bounded(
     max_rss: int = 1_073_741_824,
     file_limits: dict[Path, int] | None = None,
     reject_stderr: bool = False,
+    stdout_path: Path | None = None,
 ) -> ProcessResult:
     start = time.monotonic()
     peak = 0
@@ -39,7 +41,11 @@ def run_bounded(
             if path.exists() and path.stat().st_size > maximum:
                 raise ValueError("DECODER_FILE_LIMIT")
 
-    with tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
+    with ExitStack() as stack:
+        output = stack.enter_context(
+            stdout_path.open("xb") if stdout_path else tempfile.TemporaryFile()
+        )
+        errors = stack.enter_context(tempfile.TemporaryFile())
         check = execution_check.get()
         if check:
             check()
@@ -66,19 +72,21 @@ def run_bounded(
                     raise ValueError("DECODER_TIMEOUT")
                 if peak > max_rss:
                     raise ValueError("DECODER_MEMORY_LIMIT")
-                if output.tell() > max_output or errors.tell() > max_output:
+                if output.tell() > max_output or errors.tell() > min(max_output, 8_000_000):
                     raise ValueError("DECODER_OUTPUT_LIMIT")
                 check_files()
                 time.sleep(0.02)
             if proc.returncode:
                 raise ValueError("DECODER_REJECTED_INPUT")
             check_files()
-            if errors.tell() > max_output:
+            if errors.tell() > min(max_output, 8_000_000):
                 raise ValueError("DECODER_OUTPUT_LIMIT")
             if reject_stderr and errors.tell():
                 raise ValueError("DECODER_REPORTED_ERRORS")
+            if stdout_path and output.tell() > max_output:
+                raise ValueError("DECODER_OUTPUT_LIMIT")
             output.seek(0)
-            data = output.read(max_output + 1)
+            data = b"" if stdout_path else output.read(max_output + 1)
             if len(data) > max_output:
                 raise ValueError("DECODER_OUTPUT_LIMIT")
             return ProcessResult(data, time.monotonic() - start, cpu, peak)

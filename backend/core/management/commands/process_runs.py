@@ -1,6 +1,8 @@
 import json
 import os
+import tempfile
 import time
+from pathlib import Path
 
 import psutil
 from django.conf import settings
@@ -56,6 +58,9 @@ class Command(BaseCommand):
 
         reconcile_uploads()
         reconcile_runs()
+        from backend.core.previews import reconcile_previews
+
+        reconcile_previews()
         runs = (
             AnalysisRun.objects.filter(status="QUEUED")
             .select_related("asset")
@@ -93,25 +98,45 @@ class Command(BaseCommand):
                     pinned_hash = file_hash(source)
                     if run.asset.source_sha256 and run.asset.source_sha256 != pinned_hash:
                         raise ValueError("SOURCE_HASH_CHANGED")
-                    directory = source.parent / str(run.pk)
-                    directory.mkdir(exist_ok=True)
-                    metadata = directory / "metadata.json"
-                    metadata.write_text(
-                        json.dumps(
-                            {
-                                key: run.asset.metadata[key]
-                                for key in ("game_build", "build_confirmed", "overlays_confirmed")
-                                if key in run.asset.metadata
-                            }
-                        ),
-                        encoding="utf-8",
-                    )
-                    report = analyze(source, directory / "report.json", metadata)
+                    if run.pipeline_version == "recording-preview/1":
+                        from backend.core.models import RecordingPreview
+                        from backend.core.previews import attempt_prefix, process_preview
+                        from backend.core.storage import private_path
+
+                        preview = RecordingPreview.objects.select_related("asset").get(run=run)
+                        directory = private_path(attempt_prefix(preview, token) + "scratch")
+                        directory.mkdir(parents=True, exist_ok=True)
+                        with tempfile.TemporaryDirectory(
+                            dir=directory, ignore_cleanup_errors=True
+                        ) as scratch:
+                            report = process_preview(run, token, source, Path(scratch))
+                    else:
+                        directory = source.parent / str(run.pk)
+                        directory.mkdir(exist_ok=True)
+                        metadata = directory / "metadata.json"
+                        metadata.write_text(
+                            json.dumps(
+                                {
+                                    key: run.asset.metadata[key]
+                                    for key in (
+                                        "game_build",
+                                        "build_confirmed",
+                                        "overlays_confirmed",
+                                    )
+                                    if key in run.asset.metadata
+                                }
+                            ),
+                            encoding="utf-8",
+                        )
+                        report = analyze(source, directory / "report.json", metadata)
                     stopped = True
                     if "source" in report and report["source"]["source_sha256"] != pinned_hash:
                         raise ValueError("SOURCE_HASH_CHANGED")
             except (OSError, ValueError, CloudFailure) as error:
-                stopped = str(error) != "PARSER_CLEANUP_UNCONFIRMED"
+                stopped = str(error) not in {
+                    "PARSER_CLEANUP_UNCONFIRMED",
+                    "PREVIEW_CLEANUP_UNCONFIRMED",
+                }
                 codes = {
                     "SOURCE_HASH_CHANGED",
                     "RUN_REVOKED",
@@ -122,6 +147,9 @@ class Command(BaseCommand):
                     "DECODER_OUTPUT_LIMIT",
                     "INVALID_PARSER_REPORT",
                     "PARSER_CLEANUP_UNCONFIRMED",
+                    "PREVIEW_CLEANUP_UNCONFIRMED",
+                    "INVALID_PREVIEW_BUNDLE",
+                    "PREVIEW_MEDIA_REJECTED",
                 }
                 report = {
                     "status": "FAILED",
@@ -138,7 +166,11 @@ class Command(BaseCommand):
                 peak_rss=max(peak_rss, coordinator.memory_info().rss),
                 report=report,
             )
-            if finish_run(run.pk, token, report):
+            preview_finished = (
+                run.pipeline_version == "recording-preview/1"
+                and report["status"] == "PREVIEW_READY"
+            )
+            if preview_finished or finish_run(run.pk, token, report):
                 self.stdout.write(
                     json.dumps({"event": "analysis_terminal", "reason": report["status"]})
                 )
@@ -155,3 +187,15 @@ class Command(BaseCommand):
                 and ExecutionSlot.objects.filter(run=run, fence=token, runtime="LOCAL").exists()
             ):
                 acknowledge_stopped(run.pk, token)
+            if run.pipeline_version == "recording-preview/1":
+                from backend.core.models import RecordingPreview
+                from backend.core.previews import purge_preview, revoke
+
+                previews = RecordingPreview.objects.filter(run=run)
+                if not previews.filter(state="READY").exists():
+                    revoke(previews)
+                for preview in previews.filter(state="PURGING"):
+                    try:
+                        purge_preview(preview.pk)
+                    except (OSError, ValueError, CloudFailure):
+                        pass

@@ -55,6 +55,10 @@ def apply_restore_controls():
         AnalysisRun.objects.all().update(
             status="CANCELLED", fence=F("fence") + 1, lease_until=None, result={}, phase="CANCELLED"
         )
+        from backend.core.models import RecordingPreview
+        from backend.core.previews import revoke
+
+        revoke(RecordingPreview.objects.all())
         RunDispatch.objects.all().update(status="CANCELLED", lease_until=None)
         MatchSync.objects.all().update(
             status="CANCELLED",
@@ -161,6 +165,13 @@ def apply_restore_controls():
             delete_asset(asset.owner, asset.pk)
     finally:
         replaying.reset(token)
+    from backend.core.previews import purge_restored_previews
+
+    purge_restored_previews()
+    for asset in ReplayAsset.objects.filter(
+        deleted_at__isnull=False, purge_completed_at=None
+    ).select_related("owner"):
+        delete_asset(asset.owner, asset.pk)
     if ReplayAsset.objects.filter(deleted_at__isnull=False, purge_completed_at=None).exists():
         raise ValueError("RESTORE_PURGE_INCOMPLETE")
     return len(records)

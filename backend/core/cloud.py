@@ -100,7 +100,7 @@ class GoogleControl:
         # ALREADY_EXISTS means our deterministic task was already created.
         return name
 
-    def launch(self, run_id, fence, dispatch_id, generation):
+    def launch(self, run_id, fence, dispatch_id, generation, *, timeout_seconds=None):
         if not settings.CLOUD_MEDIA_RUNTIME_QUALIFIED:
             raise CloudFailure("CLOUD_MEDIA_RUNTIME_UNQUALIFIED", retryable=False)
         response = self.request(
@@ -110,7 +110,7 @@ class GoogleControl:
             json={
                 "overrides": {
                     "taskCount": 1,
-                    "timeout": f"{settings.RUN_DEADLINE_SECONDS}s",
+                    "timeout": f"{timeout_seconds or settings.RUN_DEADLINE_SECONDS}s",
                     "containerOverrides": [
                         {
                             "args": [
@@ -312,10 +312,95 @@ class GooglePrivateStorage:
 
     def delete_asset(self, key):
         self.object_url(key)
+        self.delete_prefix(self.prefix)
+
+    def delete_preview(self, prefix):
+        if not prefix.startswith(self.prefix + "previews/") or not prefix.endswith("/"):
+            raise ValueError("OBJECT_OWNERSHIP_MISMATCH")
+        self.object_url(prefix + "preview.mp4")
+        self.delete_prefix(prefix)
+
+    def create_preview_object(self, key, path):
+        """Qualified coordinator only; create-only official API, bounded response, no session URI."""
+        import hashlib
+
+        from analysis.process import execution_check
+
+        self.object_url(key)
+        if not key.startswith(self.prefix + "previews/"):
+            raise ValueError("OBJECT_OWNERSHIP_MISMATCH")
+        size = path.stat().st_size
+        if not 0 < size <= 536870912:
+            raise ValueError("INVALID_OBJECT_SIZE")
+        checksum = hashlib.md5(usedforsecurity=False)
+        with path.open("rb") as source:
+
+            class Body:
+                remaining = size
+
+                def __len__(self):
+                    return size
+
+                def read(self, count=-1):
+                    if count == 0:
+                        return b""
+                    check = execution_check.get()
+                    if check:
+                        check()
+                    if not self.remaining:
+                        if source.read(1):
+                            raise ValueError("MEDIA_SIZE_CHANGED")
+                        return b""
+                    block = source.read(min(65536, self.remaining, 65536 if count < 0 else count))
+                    if not block:
+                        raise ValueError("MEDIA_SIZE_CHANGED")
+                    checksum.update(block)
+                    self.remaining -= len(block)
+                    return block
+
+            payload = Body()
+            response = self.call(
+                "POST",
+                f"https://storage.googleapis.com/upload/storage/v1/b/{self.bucket}/o",
+                params={"uploadType": "media", "name": key, "ifGenerationMatch": "0"},
+                headers={
+                    "Content-Length": str(size),
+                    "Content-Type": "video/mp4" if key.endswith(".mp4") else "application/json",
+                },
+                data=payload,
+                stream=True,
+                accepted=(200, 201),
+            )
+            if payload.remaining:
+                response.close()
+                raise CloudFailure("INVALID_PREVIEW_OBJECT", ambiguous=True, retryable=False)
+        try:
+            body = bytearray()
+            for block in response.iter_content(chunk_size=16384):
+                body.extend(block)
+                if len(body) > 65536:
+                    raise CloudFailure("INVALID_PREVIEW_OBJECT", ambiguous=True, retryable=False)
+            info = json.loads(body)
+            generation = resource(str(info.get("generation", "")), r"[1-9][0-9]{0,29}")
+            if (
+                info.get("name") != key
+                or str(info.get("size")) != str(size)
+                or info.get("bucket") != self.bucket
+                or info.get("md5Hash") != base64.b64encode(checksum.digest()).decode()
+                or info.get("contentEncoding") not in {None, "identity"}
+            ):
+                raise CloudFailure("INVALID_PREVIEW_OBJECT", ambiguous=True, retryable=False)
+            return generation
+        finally:
+            response.close()
+
+    def delete_prefix(self, prefix):
+        if prefix != self.prefix and not prefix.startswith(self.prefix + "previews/"):
+            raise ValueError("OBJECT_OWNERSHIP_MISMATCH")
         token = None
         seen = set()
         for _ in range(100):
-            params = {"prefix": self.prefix, "versions": "true", "maxResults": 100}
+            params = {"prefix": prefix, "versions": "true", "maxResults": 100}
             if token:
                 params["pageToken"] = token
             response = self.call(
@@ -325,6 +410,8 @@ class GooglePrivateStorage:
                 raise CloudFailure("STORAGE_LIST_UNAVAILABLE")
             body = response.json()
             for item in body.get("items", []):
+                if not item["name"].startswith(prefix):
+                    raise CloudFailure("STORAGE_PREFIX_MISMATCH", retryable=False)
                 self.delete_object(item["name"], item["generation"])
             token = body.get("nextPageToken")
             if not token:

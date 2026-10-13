@@ -202,7 +202,10 @@ def receipt_session(owner, device, session_id):
 def recording_view(session):
     asset = session.asset
     run = (
-        AnalysisRun.objects.filter(owner=session.owner, asset=asset).order_by("-created_at").first()
+        AnalysisRun.objects.filter(owner=session.owner, asset=asset)
+        .exclude(pipeline_version="recording-preview/1")
+        .order_by("-created_at")
+        .first()
     )
     source = asset.replaysource_set.filter(
         match__owner=session.owner, match__deleted_at=None

@@ -113,6 +113,18 @@ ComparisonSession.objects.create(owner=manager, plan=comparison, phase='FOLLOWUP
     match_ids=[], content_hash='c'*64, input_hash='d'*64)
 ImprovementEvaluation.objects.create(owner=manager, plan=comparison, revision=1,
     result={'restore_fixture': True})
+from backend.core.previews import enqueue_preview, attempt_prefix
+# Erasure-only fixture: never a valid video, gameplay report or qualification grant.
+preview = enqueue_preview(owner, asset.pk, uuid.uuid4())
+preview_path = private_path(attempt_prefix(preview, 1)+'preview.mp4')
+preview_path.parent.mkdir(parents=True)
+preview_path.write_bytes(b'private derivative erasure fixture')
+preview.state, preview.reserved_bytes, preview.attempt_fence = 'READY', preview_path.stat().st_size, 1
+preview.manifest = {'preview.mp4': {'key': str(preview_path.relative_to(settings.PRIVATE_DATA_ROOT))}}
+preview.quality = {'private': 'must-erase'}
+preview.save()
+preview.run.status = 'PREVIEW_READY'
+preview.run.save(update_fields=['status'])
 
 """
 
@@ -183,10 +195,14 @@ from backend.core.models import ComparisonSession, ImprovementEvaluation
 assert not ComparisonSession.objects.exists()
 assert not ImprovementEvaluation.objects.filter(invalidated_at=None).exists()
 assert not DrillAssignment.objects.exclude(diagnosis={}, status='CANCELLED').exists()
+from backend.core.models import RecordingPreview
+assert RecordingPreview.objects.count() == 1
+assert not RecordingPreview.objects.exclude(state='PURGED', reserved_bytes=0, manifest={}, quality={}, source_sha256='', write_pending=False).exists()
 
 # Its immutable historical definition is retained; the restored grant is permanently revoked.
 for asset in ReplayAsset.objects.all():
     assert not private_path(asset.storage_key).exists()
+    assert not (private_path(asset.storage_key).parent/'previews').exists()
 for run in AnalysisRun.objects.all():
     assert claim_run(run.pk) is None
 assert Client().get('/api/overview').status_code == 503
@@ -334,6 +350,7 @@ class Command(BaseCommand):
                             "controls_before_reads": "PASS",
                             "repeat_replay": "PASS",
                             "pending_upload_erasure": "PASS",
+                            "private_preview_erasure": "PASS",
                             "production_rpo_rto": "NOT_MEASURED",
                         }
                     )

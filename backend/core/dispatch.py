@@ -70,6 +70,13 @@ def launch_dispatch(provider, dispatch_id, generation):
             return "IGNORED"
         if item.status not in {"PENDING", "RETRY", "ENQUEUED"}:
             return "IGNORED"
+        if (
+            run.pipeline_version == "recording-preview/1"
+            and not settings.CLOUD_PREVIEW_RUNTIME_QUALIFIED
+        ):
+            item.status, item.error_code = "ATTENTION", "CLOUD_PREVIEW_RUNTIME_UNQUALIFIED"
+            item.save(update_fields=["status", "error_code"])
+            return "ATTENTION"
         fence = claim_run(run.pk)
         if fence is None:
             return "CAPACITY"
@@ -78,7 +85,12 @@ def launch_dispatch(provider, dispatch_id, generation):
         ExecutionSlot.objects.filter(run=run, fence=fence).update(runtime="CLOUD_RUN")
     # LAUNCHING is durable before the RPC. Crash/timeout never triggers another launch.
     try:
-        operation = provider.launch(run.pk, fence, item.pk, generation)
+        if run.pipeline_version == "recording-preview/1":
+            operation = provider.launch(
+                run.pk, fence, item.pk, generation, timeout_seconds=run.runbudget.attempt_seconds
+            )
+        else:
+            operation = provider.launch(run.pk, fence, item.pk, generation)
     except CloudFailure as error:
         with transaction.atomic():
             locked_run(run.pk)

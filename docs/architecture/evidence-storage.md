@@ -3,6 +3,11 @@
 Architecture 2.10.0, ADR-018 / D030, 2026-10-03. Local and controlled-client scope.
 External uploads and real GCS use remain disabled; this is not staging approval.
 
+Architecture 2.22.0 adds [private recording previews](private-recording-previews.md):
+playback-only sessions reserve original plus derivative capacity, verify source bytes before
+the distinct preview pipeline and retain quota until confirmed child erasure. Ordinary
+canonical analysis/attribution uploads retain their stricter declarations and gates.
+
 ## Owner-scoped lifecycle
 
 UploadSession owns a unique (owner, request_id), a one-to-one ReplayAsset, optional
