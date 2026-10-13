@@ -10,10 +10,11 @@ def refuse_pending_writes(apps, schema_editor):
     holds = apps.get_model("core", "PreviewWriteHold")
     if holds.objects.exclude(state="ERASED", reserved_bytes=0).exists():
         raise RuntimeError("PREVIEW_WRITE_RESERVATIONS_PENDING")
-    if settings.PREVIEW_LEDGER_ROOT.exists() and any(
-        held_bytes(row) for row, _ in FileLedger().records().values()
-    ):
-        raise RuntimeError("PREVIEW_WRITE_RESERVATIONS_PENDING")
+    required = holds.objects.exists() or settings.PREVIEW_LEDGER_REQUIRED or settings.GCS_PREVIEW_WRITES_QUALIFIED
+    if required or settings.PREVIEW_LEDGER_ROOT.exists():
+        # Even erased mirrors cannot prove that a missing post-backup ledger is empty.
+        if any(held_bytes(row) for row, _ in FileLedger().records().values()):
+            raise RuntimeError("PREVIEW_WRITE_RESERVATIONS_PENDING")
 
 
 class Migration(migrations.Migration):

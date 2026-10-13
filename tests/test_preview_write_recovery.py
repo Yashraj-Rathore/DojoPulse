@@ -293,6 +293,21 @@ def test_reverse_migration_protects_both_sql_and_independent_holds(attempt):
     guard(apps, None)
 
 
+def test_reverse_migration_refuses_missing_ledger_even_with_erased_sql_holds(
+    attempt, settings, tmp_path
+):
+    preview, fence, directory, storage = attempt
+    preview_writes.plan(preview, fence, directory, storage.bucket)
+    preview_writes.recover_all()
+    assert not PreviewWriteHold.objects.exclude(state="ERASED", reserved_bytes=0).exists()
+    guard = importlib.import_module(
+        "backend.core.migrations.0025_preview_write_hold"
+    ).refuse_pending_writes
+    settings.PREVIEW_LEDGER_ROOT = tmp_path / "missing-independent-store"
+    with pytest.raises(LedgerFailure, match="UNAVAILABLE"):
+        guard(apps, None)
+
+
 @pytest.mark.parametrize("corruption", ["missing", "mutated", "tail", "namespace", "symlink"])
 def test_missing_tampered_or_incomplete_ledger_fails_before_refund(attempt, settings, corruption):
     preview, fence, directory, storage = attempt

@@ -49,3 +49,5 @@ records, downloaded JUnit and completed logs. Ordinary final receipt retains
 CI and requires actual latest-tip monitoring; no check is skipped. Production flags remain false. The bounded
 file store does not prove replicated durability, protected capabilities, whole
 store freshness after SQL restore, actual late-write behavior or managed isolation.
+
+Final rollback-guard correction:0025 now requires an available verified ledger whenever any SQL mirror or qualification requirement exists, including all-erased mirrors. Added missing-ledger/erased-mirror regression; final78 affected passes/one Windows symlink skip/79.23s (26 ledger cases,30 preview), native guard/restore recheck and static/schema pass. d932fc0 all-seven above remains prior scoped evidence; superseded88f04fd receipt CI cancelled. Corrected ordinary latest-main checks must be verified at handoff; they cannot be inferred from that earlier run. Production flags remain false.
