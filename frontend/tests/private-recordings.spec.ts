@@ -75,3 +75,22 @@ test("a finished conversion uses a fresh request for another preparation",async(
   await region.getByRole("button",{name:"Prepare playback"}).click();
   await expect.poll(()=>keys.length).toBe(2);expect(keys[0]).not.toBe(keys[1]);
 });
+
+test("playback upload leaves platform unknown and needs no match or continuity claim",async({page})=>{
+  await session(page);let submitted=false;
+  await page.route("**/api/upload-sessions",route=>{
+    const payload=route.request().postDataJSON();
+    expect(payload.preview_only).toBe(true);expect(payload.single_continuous).toBe(false);
+    expect(payload.metadata).toEqual({game_build:"declared-build"});expect(payload.match_id).toBeUndefined();
+    submitted=true;
+    return route.fulfill({json:{id:"preview-upload-fixture",state:"COMPLETE",received_bytes:1024,bytes:1024,storage_provider:"LOCAL",chunk_bytes:262144}});
+  });
+  await page.goto("/");const region=page.getByRole("region",{name:"Private recordings",exact:true});
+  await region.getByText("Add an MP4 recording",{exact:true}).click();
+  await region.getByLabel("Recording file",{exact:true}).setInputFiles({name:"console-or-pc.mp4",mimeType:"video/mp4",buffer:Buffer.alloc(1024,7)});
+  await region.getByLabel("Game version, if known").fill("declared-build");
+  await region.getByLabel("I allow private processing",{exact:false}).check();
+  await region.getByRole("button",{name:"Upload for playback"}).click();
+  await expect(region.getByRole("status").filter({hasText:"Recording received"})).toBeVisible();
+  expect(submitted).toBe(true);await expect(region.getByText("Recording queued for private playback",{exact:true})).toBeVisible();
+});

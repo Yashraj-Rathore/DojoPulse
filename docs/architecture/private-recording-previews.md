@@ -21,7 +21,11 @@ created by this path. It reuses ordinary owner/operator admission, upload receip
 bounded resumable chunks, owner/global quota, consent and source-hash checks.
 
 Reserve source bytes plus 547,356,672 derivative bytes: 512 MiB video, 8 MiB report,
-2 MiB timeline. Repeated requests do not duplicate jobs or reservations. Snapshot
+2 MiB timeline. Repeated requests do not duplicate jobs or reservations.
+Old terminal receipts return current state without resetting a purged preview;
+a new conversion uses a fresh request/run and superseded receipts cannot overwrite it.
+Generic browser upload leaves platform undeclared rather than guessing Steam;
+declared version/context still grants no canonical identity or gameplay facts. Snapshot
 1,920 seconds per attempt and the existing maximum attempts/daily budget policy.
 Actual published artifact bytes replace the maximum reservation only on fenced
 success. Active execution, incomplete cleanup and write ambiguity hold storage.

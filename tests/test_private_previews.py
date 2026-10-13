@@ -441,6 +441,42 @@ def test_preview_upload_reserves_before_transfer_and_does_not_create_match(owner
     assert not Match.objects.exists()
 
 
+def test_playback_upload_api_keeps_unknown_platform_and_discards_unverified_match_claims(owner):
+    from backend.core.models import UploadSession
+
+    client = APIClient()
+    client.force_authenticate(owner)
+    data = b"unverified playback upload"
+    response = client.post(
+        "/api/upload-sessions",
+        {
+            "request_id": str(uuid4()),
+            "filename": "console-or-pc.mp4",
+            "bytes": len(data),
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "md5": base64.b64encode(hashlib.md5(data).digest()).decode(),
+            "processing_consent": True,
+            "single_continuous": False,
+            "preview_only": True,
+            "metadata": {
+                "game_build": "declared",
+                "player_id": "unverified",
+                "source_kind": "ranked",
+            },
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    metadata = UploadSession.objects.get().asset.metadata
+    assert metadata == {
+        "attachment": False,
+        "game_build": "declared",
+        "unattributed_recording": True,
+        "preview_only": True,
+    }
+    assert not Match.objects.exists() and not AnalysisRun.objects.exists()
+
+
 def test_restore_removes_unknown_local_asset_preview_but_preserves_its_original(owner):
     unknown = f"{owner.pk}/{uuid4()}/"
     original = private_path(unknown + "source.mp4")

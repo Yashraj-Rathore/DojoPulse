@@ -2191,3 +2191,34 @@ publication, all exact-source jobs and final receipt/latest-tip monitoring. No c
 provider/game-control activation, private artifacts or feature branches.
 
 Corrected preview/upload browser checks:8 passed/30.0s after the targeted status wait; lint/type checks pass. Corrected ordinary main publication follows, with exact-source CI still required.
+
+### 2026-10-13 - Verified private-preview source and neutral upload provenance
+
+M06.11/.12, M13.03/.06, M15.01/.06, M16.02/.05, M17.02/.03 and M19.02: corrected
+source0319aa157ab998ac833041a1ee86784a88272241 published directly on main; all seven
+CI jobs in38422433734 completed successfully15:42:26 UTC, independently verified seven
+exact-source check-runs/watcher exit0. Downloaded source JUnit/completed logs under ignored
+reports/private-preview-ci-corrected.663 Python cases:651 passes/12 separately exercised
+Docker-platform skips/690.555s; all27 new private-preview cases pass/no skips. Windows17/
+1.391s, Chromium61/1.1m, actual Docker11/146.723s (all four new preview cases), three
+Terraform, audits/static/mypy42/build/container startup and guarded native PostgreSQL
+pending-upload/private-preview erasure/repeated quarantine recovery pass.
+
+Marked coherent local/controlled M06.12 DONE; overall M06/M22 PARTIAL, actual hosted
+M06.11 PARTIAL, automatic ID-to-private replay M22.13 BLOCKED, G1-G6 NOT_RUN. Refreshed
+current position/requirements/next work, ADR-029/D044 contract and qualification. Initial
+a586914 typing/browser failures and superseded cancellation remain explicitly recorded.
+No private media, participant identifiers/checksums, credentials or cloud resources published.
+
+Final UI review removed an implicit Steam declaration from generic playback uploads;
+platform remains undeclared and unverified player/match input is discarded by the existing
+API. Resumable completion now says private playback for this job type, preserving the
+legacy attribution label. Changed private-recordings.tsx/resumable-upload.tsx and added
+API/browser regressions:two focused PostgreSQL cases/7.88s and nine Edge preview/upload
+checks/21.4s, lint/type pass. Initial API assertion omitted the safe attachment:false marker;
+corrected that harness expectation without changing production claim shaping. Final build/
+doc validation precede ordinary receipt publication; latest-main CI must be monitored.
+Next: actual permitted browser acquisition proof and independently authorized/qualified
+hosted isolation/storage/late-write/restore/capacity; local success is not release approval.
+
+Final receipt local validation:Next16.3.8 production build passes;390 relative Markdown links,178 unique requirements/six scientific gates, Architecture2.22.0 and whitespace pass. Restored only the generated next-env.d.ts build rewrite; no unrelated source changes or private assets included. Ordinary final main publication/latest-tip checks follow.

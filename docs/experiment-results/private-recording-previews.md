@@ -3,7 +3,28 @@
 Date: 2026-10-13. Requirements: M06.01/.02/.05-.07/.11/.12, M13.03/.06,
 M15.01/.06, M16.02/.05, M17.02/.03, M19.02. Architecture 2.22.0 / ADR-029 / D044.
 
-## Evidence so far
+M06.12 local/controlled engineering is qualified on corrected source
+0319aa157ab998ac833041a1ee86784a88272241: all seven exact-source
+[CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/38422433734)
+successful, completed 2026-10-13 15:42:26 UTC. Independent seven check-runs and
+watcher exit 0 verified; downloaded JUnit and completed logs retained under ignored
+reports/private-preview-ci-corrected. Actual hosting M06.11 remains PARTIAL.
+
+Source CI: 663 PostgreSQL/Python cases, 651 passes/12 platform-Docker skips in 690.555s;
+all 27 private-preview cases pass/no skips. Actual Windows 17/no skips/1.391s,
+Docker 11/no skips/146.723s (all four preview cases plus seven parser/max-profile),
+Chromium 61/1.1m, three Terraform, dependency/static/build/container and native
+PostgreSQL pending-upload/private-preview restore/guarded migration checks pass.
+
+The final receipt also removes an implicit Steam declaration from generic browser
+playback upload and uses the distinct private-playback completion label. API preserves
+unknown platform and discards unverified player/match context. Two focused PostgreSQL
+cases pass in 7.88s (one new platform case plus retry), nine Edge preview/legacy-upload
+cases pass in 21.4s, lint/TypeScript pass. Ordinary latest-tip checks remain required for
+this receipt; prior CI evidence below keeps its source/tree scope. No scientific,
+game-provider, automatic acquisition or hosted approval inferred.
+
+## Earlier local qualification and its scope
 
 - Focused PostgreSQL: 24 private-preview cases passed in 43.36 seconds. Covers
   ownership/ranges, source/derivative quota, request identity, stale attempt cleanup,
@@ -67,7 +88,7 @@ owner's product-account binding, hosted isolation, automatic acquisition, match
 attribution, uninterrupted normal-speed replay or scientific gate approval.
 
 M06.11 remains PARTIAL for actual hosted qualification; M06.12 local/controlled
-acceptance awaits completed evidence. G1-G6 remain NOT_RUN, M22.13 browser ID-to-private
+acceptance is now qualified by the corrected all-seven source evidence above. G1-G6 remain NOT_RUN, M22.13 browser ID-to-private
 video remains BLOCKED, no live GCS/cloud preview/game provider has been enabled.
 
 ## Initial publication failures and corrected local checks
@@ -79,6 +100,8 @@ or resource/revocation limits disabled. Review also fixed finished-request resur
 old receipts stay idempotent; fresh attempts get new IDs/runs after terminal conversion.
 Added backend/browser regression cases. Final local27 PostgreSQL/37.42s and explicit
 Linux/Windows mypy42 pass; corrected full source CI is still required. Earlier counts
-above retain their dated/tree scope. M06.12 remains in qualification.
+above retain their dated/tree scope; corrected all-seven source evidence above now qualifies M06.12.
 
 Corrected final local preview/upload browser suite:8 passed in30.0s; lint/TypeScript pass. No browser/backend assertion removed.
+
+Final neutral-platform UI production build passes on Next16.3.8. Documentation checks:390 local links/178 unique requirements/six scientific gates; ordinary final latest-tip verification required.
