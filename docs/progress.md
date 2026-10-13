@@ -2222,3 +2222,30 @@ Next: actual permitted browser acquisition proof and independently authorized/qu
 hosted isolation/storage/late-write/restore/capacity; local success is not release approval.
 
 Final receipt local validation:Next16.3.8 production build passes;390 relative Markdown links,178 unique requirements/six scientific gates, Architecture2.22.0 and whitespace pass. Restored only the generated next-env.d.ts build rewrite; no unrelated source changes or private assets included. Ordinary final main publication/latest-tip checks follow.
+
+### 2026-10-13 - Reopened preview upload maintenance/cancellation interval
+
+M06.02/.06/.12, M13.03/.06, M15.06 and M19.02: final lifecycle review found maintenance
+considered WAITING_UPLOAD unavailable while transfer was active, releasing derivative
+reservation early; source completion also queued a cancelled unstarted preview again.
+Reopened M06.12 explicitly. Pending eligibility now requires an active unexpired upload
+and still checks owner/processing/retention/quarantine. Verification under the owner lock
+only enqueues conversion if intent remains WAITING_UPLOAD; a cancelled derivative stays
+purged while the original can finish. Fresh explicit preparation still reserves/enqueues
+normally. Completion UI confirms receipt rather than claiming conversion was queued.
+Added maintenance-between-begin-and-verify and cancelled/expired intent regressions.
+Changed previews.py/resumable.py, private-recordings/resumable UI/browser expectation,
+private-preview Python tests and both trackers/qualification. Combined PostgreSQL and
+browser checks underway; no results invented. f32e267 receipt is superseded by this
+correction; source0319aa1 evidence remains separately scoped. No cloud/native provider
+activation or private artifacts. Next: qualify the interval and exact corrected main tip.
+
+Final pre-conversion qualification:65 combined PostgreSQL preview/resumable cases pass/
+61.09s with all30 preview cases/no skips; nine Edge/24.2s, lint/type/final Next16.3.8 build,
+explicit Linux/Windows mypy42, schema checks and native disposable PostgreSQL guarded
+restore/pending-upload/private-preview erasure pass. Precise completion-message assertion
+fixed after its broad filter matched both receipt and progress statuses; no checks disabled.
+M06.12 completed again only for checked local/controlled scope; M06.11/automatic/scientific
+gates unchanged. Updated contract/qualification/current requirement and kept reopen history.
+Final ordinary corrected main publication and exact-latest-tip CI follow; no private files
+included. Prior source651/all-seven and actual owner trial retain separately scoped evidence.

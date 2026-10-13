@@ -3,7 +3,13 @@
 Date: 2026-10-13. Requirements: M06.01/.02/.05-.07/.11/.12, M13.03/.06,
 M15.01/.06, M16.02/.05, M17.02/.03, M19.02. Architecture 2.22.0 / ADR-029 / D044.
 
-M06.12 local/controlled engineering is qualified on corrected source
+The pre-conversion upload maintenance/cancellation regression was reopened and corrected;
+65 combined PostgreSQL preview/resumable cases pass in61.09s, including all30 preview
+cases, and nine Edge cases pass in24.2s. Explicit Linux/Windows mypy42, schema/lint,
+production build and native PostgreSQL pending-upload/private-preview erasure pass.
+M06.12 is complete for this local/controlled scope; actual latest corrected-main CI
+must be verified before handoff. Actual hosting and scientific gates remain unchanged.
+Previous tested local/controlled engineering was qualified on corrected source
 0319aa157ab998ac833041a1ee86784a88272241: all seven exact-source
 [CI jobs](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/38422433734)
 successful, completed 2026-10-13 15:42:26 UTC. Independent seven check-runs and
@@ -105,3 +111,7 @@ above retain their dated/tree scope; corrected all-seven source evidence above n
 Corrected final local preview/upload browser suite:8 passed in30.0s; lint/TypeScript pass. No browser/backend assertion removed.
 
 Final neutral-platform UI production build passes on Next16.3.8. Documentation checks:390 local links/178 unique requirements/six scientific gates; ordinary final latest-tip verification required.
+
+Final interval review:active WAITING_UPLOAD was treated as unavailable by maintenance, and verified original completion could recreate cancelled conversion. M06.12 reopened; pending eligibility/conversion-intent fence, completion copy and regressions are being qualified. Prior source counts do not establish this interval.
+
+Corrected pre-conversion interval:65 combined PG/all30 preview/61.09s and nine Edge/24.2s, both platform typing/schema/build/native erasure pass. No cancelled intent is resurrected at upload completion; fresh explicit preparation remains available. Exact corrected main tip must be monitored.

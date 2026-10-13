@@ -91,6 +91,6 @@ test("playback upload leaves platform unknown and needs no match or continuity c
   await region.getByLabel("Game version, if known").fill("declared-build");
   await region.getByLabel("I allow private processing",{exact:false}).check();
   await region.getByRole("button",{name:"Upload for playback"}).click();
-  await expect(region.getByRole("status").filter({hasText:"Recording received"})).toBeVisible();
-  expect(submitted).toBe(true);await expect(region.getByText("Recording queued for private playback",{exact:true})).toBeVisible();
+  await expect(region.getByText("Recording received. Check playback status below.",{exact:true})).toBeVisible();
+  expect(submitted).toBe(true);await expect(region.getByText("Recording received for private playback",{exact:true})).toBeVisible();
 });

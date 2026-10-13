@@ -20,6 +20,12 @@ finishes the upload before enqueueing conversion. No Match or GameplayEvent is
 created by this path. It reuses ordinary owner/operator admission, upload receipts,
 bounded resumable chunks, owner/global quota, consent and source-hash checks.
 
+Maintenance preserves WAITING_UPLOAD reservation while its upload is active and
+unexpired, subject to owner/processing/retention/quarantine checks. Completion under
+the owner lock enqueues conversion only if WAITING_UPLOAD intent remains. Cancelling
+the derivative before verification lets the original finish without restarting it;
+later explicit preparation needs a fresh request and reservation.
+
 Reserve source bytes plus 547,356,672 derivative bytes: 512 MiB video, 8 MiB report,
 2 MiB timeline. Repeated requests do not duplicate jobs or reservations.
 Old terminal receipts return current state without resetting a purged preview;

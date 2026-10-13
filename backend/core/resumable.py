@@ -467,9 +467,15 @@ def verify(session_id, *, storage=None):
             current.verification_lease = None
             current.save(update_fields=["state", "verification_lease", "error_code"])
             if claim.get("preview_only"):
+                from backend.core.models import RecordingPreview
                 from backend.core.previews import enqueue_preview
 
-                enqueue_preview(current.owner, current.asset_id, current.pk)
+                # The owner lock serializes conversion intent with preview cancellation.
+                # Completing an original upload cannot resurrect a cancelled derivative.
+                if RecordingPreview.objects.filter(
+                    asset=current.asset, state="WAITING_UPLOAD"
+                ).exists():
+                    enqueue_preview(current.owner, current.asset_id, current.pk)
             else:
                 enqueue_run(
                     owner=current.owner, asset=current.asset, request_key=f"resumable:{current.pk}"

@@ -30,13 +30,16 @@ from backend.core.security import admit_run, check_capacity
 from backend.core.storage import private_path, storage_for
 
 
-def available(asset):
+def available(asset, *, pending_upload=False):
     return (
         asset.owner.is_active
         and not asset.deleted_at
         and not settings.RESTORE_QUARANTINE
         and (not asset.retain_until or asset.retain_until > timezone.now())
-        and not UploadSession.objects.filter(asset=asset).exclude(state="COMPLETE").exists()
+        and (
+            pending_upload
+            or not UploadSession.objects.filter(asset=asset).exclude(state="COMPLETE").exists()
+        )
     )
 
 
@@ -309,7 +312,15 @@ def reconcile_previews():
     for preview in RecordingPreview.objects.exclude(state="PURGED").select_related(
         "asset__owner", "run"
     )[:100]:
-        invalid = not available(preview.asset)
+        pending = (
+            preview.state == "WAITING_UPLOAD"
+            and UploadSession.objects.filter(
+                asset=preview.asset,
+                state__in=["INITIALIZING", "UPLOADING", "VERIFYING"],
+                expires_at__gt=timezone.now(),
+            ).exists()
+        )
+        invalid = not available(preview.asset, pending_upload=pending)
         try:
             require_processing(preview.asset.owner)
         except Exception:

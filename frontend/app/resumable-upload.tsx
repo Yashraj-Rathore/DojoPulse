@@ -126,7 +126,7 @@ export function useResumableUpload(csrf: string) {
         await wait(1000, signal); transfer = await api(path, "GET", undefined, signal);
       }
       if (transfer.state !== "COMPLETE") throw new Error(transfer.state === "VERIFYING" ? "Verification is still queued. Resume later to check its result." : "This upload is unavailable. Cancel it before starting a new recording.");
-      receipt.current = null; saveReceipt(null); setSessionId(""); setPhase(previewOnly ? "Recording queued for private playback" : "Recording queued for review");
+      receipt.current = null; saveReceipt(null); setSessionId(""); setPhase(previewOnly ? "Recording received for private playback" : "Recording queued for review");
       return transfer;
     } catch (problem) {
       if (signal.aborted) { setPhase("Upload paused"); return null; }

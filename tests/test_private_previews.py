@@ -432,6 +432,9 @@ def test_preview_upload_reserves_before_transfer_and_does_not_create_match(owner
         {"preview_only": True, "unattributed_recording": True},
     )
     assert RecordingPreview.objects.get(asset=session.asset).reserved_bytes == MAX_BYTES
+    previews.reconcile_previews()
+    pending = RecordingPreview.objects.get(asset=session.asset)
+    assert pending.state == "WAITING_UPLOAD" and pending.reserved_bytes == MAX_BYTES
     write_chunk(owner, session.pk, 0, data)
     request_completion(owner, session.pk)
     verify(session.pk)
@@ -439,6 +442,46 @@ def test_preview_upload_reserves_before_transfer_and_does_not_create_match(owner
     assert session.state == "COMPLETE"
     assert RecordingPreview.objects.get(asset=session.asset).run.pipeline_version == PIPELINE
     assert not Match.objects.exists()
+
+
+@pytest.mark.parametrize("reason", ["cancel", "expire"])
+def test_unstarted_preview_cannot_resurrect_on_original_upload_completion(owner, reason):
+    from backend.core.models import UploadSession
+
+    data = b"original survives conversion cancellation"
+    session = begin(
+        owner,
+        uuid4(),
+        len(data),
+        hashlib.sha256(data).hexdigest(),
+        base64.b64encode(hashlib.md5(data).digest()).decode(),
+        {"preview_only": True, "unattributed_recording": True},
+    )
+    client = APIClient()
+    client.force_authenticate(owner)
+    if reason == "cancel":
+        assert client.delete(f"/api/assets/{session.asset_id}/preview").status_code == 200
+    else:
+        UploadSession.objects.filter(pk=session.pk).update(
+            expires_at=timezone.now() - timedelta(seconds=1)
+        )
+        previews.reconcile_previews()
+        # Renewal here models a privileged fixture, not a customer expiry bypass.
+        UploadSession.objects.filter(pk=session.pk).update(
+            expires_at=timezone.now() + timedelta(minutes=1)
+        )
+    preview = RecordingPreview.objects.get(asset=session.asset)
+    assert preview.state == "PURGED" and preview.reserved_bytes == 0
+    write_chunk(owner, session.pk, 0, data)
+    request_completion(owner, session.pk)
+    verify(session.pk)
+    session.refresh_from_db()
+    preview.refresh_from_db()
+    assert session.state == "COMPLETE" and preview.state == "PURGED"
+    assert not AnalysisRun.objects.exists() and not Match.objects.exists()
+    assert private_path(session.asset.storage_key).read_bytes() == data
+    fresh = previews.enqueue_preview(owner, session.asset_id, uuid4())
+    assert fresh.state == "QUEUED" and fresh.reserved_bytes == MAX_BYTES
 
 
 def test_playback_upload_api_keeps_unknown_platform_and_discards_unverified_match_claims(owner):
