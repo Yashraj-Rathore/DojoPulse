@@ -29,6 +29,9 @@ def apply_restore_controls():
     if not settings.RESTORE_QUARANTINE:
         raise ValueError("RESTORE_QUARANTINE_REQUIRED")
     records = verified_records()
+    from backend.core.preview_writes import sync_holds
+
+    sync_holds()  # Verify and project post-backup/orphan intents before restored SQL is trusted.
     now = timezone.now()
     with transaction.atomic():
         Session.objects.all().delete()

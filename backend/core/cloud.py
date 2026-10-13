@@ -186,12 +186,14 @@ class GooglePrivateStorage:
             response = self.session.request(
                 method, url, timeout=(5, 20), allow_redirects=False, **kwargs
             )
-        except Exception as error:
-            raise CloudFailure("STORAGE_TRANSPORT_FAILURE") from error
+        except Exception:
+            # Transport exception text can contain the secret resumable capability URL.
+            raise CloudFailure("STORAGE_TRANSPORT_FAILURE") from None
         if response.status_code not in accepted:
             response.close()
             raise CloudFailure(
-                "STORAGE_REQUEST_REJECTED", retryable=response.status_code in {429, 500, 503}
+                "STORAGE_REQUEST_REJECTED",
+                retryable=response.status_code in {429, 500, 502, 503, 504},
             )
         return response
 
@@ -319,6 +321,133 @@ class GooglePrivateStorage:
             raise ValueError("OBJECT_OWNERSHIP_MISMATCH")
         self.object_url(prefix + "preview.mp4")
         self.delete_prefix(prefix)
+
+    def preview_session_url(self, value, key):
+        self.object_url(key)
+        if not key.startswith(self.prefix + "previews/"):
+            raise ValueError("OBJECT_OWNERSHIP_MISMATCH")
+        try:
+            if not isinstance(value, str) or len(value) > 4096:
+                raise ValueError
+            parsed = urlparse(value)
+            query = parse_qs(parsed.query, strict_parsing=True, keep_blank_values=True)
+            if (
+                parsed.scheme != "https"
+                or parsed.netloc != "storage.googleapis.com"
+                or parsed.path != f"/upload/storage/v1/b/{self.bucket}/o"
+                or parsed.fragment
+                or set(query) - {"uploadType", "name", "upload_id", "ifGenerationMatch"}
+                or any(len(values) != 1 for values in query.values())
+                or query.get("uploadType") != ["resumable"]
+                or query.get("name", [key]) != [key]
+                or query.get("ifGenerationMatch", ["0"]) != ["0"]
+                or not re.fullmatch(r"[A-Za-z0-9_-]{1,2048}", query.get("upload_id", [""])[0])
+            ):
+                raise ValueError
+        except ValueError:
+            raise CloudFailure("INVALID_PREVIEW_SESSION", retryable=False) from None
+        return value
+
+    def begin_preview(self, key, size, md5_hash, intent_id):
+        self.object_url(key)
+        if not key.startswith(self.prefix + "previews/") or not 0 < size <= 536870912:
+            raise ValueError("INVALID_PREVIEW_OBJECT")
+        content_type = "video/mp4" if key.endswith(".mp4") else "application/json"
+        response = self.call(
+            "POST",
+            f"https://storage.googleapis.com/upload/storage/v1/b/{self.bucket}/o",
+            params={"uploadType": "resumable", "name": key, "ifGenerationMatch": "0"},
+            headers={"X-Upload-Content-Length": str(size), "X-Upload-Content-Type": content_type},
+            json={
+                "name": key,
+                "contentType": content_type,
+                "md5Hash": md5_hash,
+                "metadata": {"preview_intent_id": str(intent_id)},
+            },
+            accepted=(200, 201),
+        )
+        try:
+            return self.preview_session_url(response.headers.get("Location", ""), key)
+        finally:
+            response.close()
+
+    def preview_upload(self, session, key, item, offset=0, block=None):
+        """One bounded PUT or status probe; caller persists and fences every operation."""
+        size = item["bytes"]
+        if block is not None and (
+            not block
+            or len(block) > 8388608
+            or not 0 <= offset < size
+            or offset + len(block) > size
+            or (offset + len(block) < size and len(block) % 262144)
+        ):
+            raise ValueError("INVALID_PREVIEW_CHUNK")
+        content_range = (
+            f"bytes */{size}"
+            if block is None
+            else f"bytes {offset}-{offset + len(block) - 1}/{size}"
+        )
+        response = self.call(
+            "PUT",
+            self.preview_session_url(session, key),
+            data=b"" if block is None else block,
+            headers={
+                "Content-Length": str(0 if block is None else len(block)),
+                "Content-Range": content_range,
+            },
+            stream=True,
+            accepted=(200, 201, 308),
+        )
+        try:
+            if response.status_code == 308:
+                value = response.headers.get("Range", "")
+                match = re.fullmatch(r"bytes=0-([0-9]{1,12})", value)
+                received = int(match[1]) + 1 if match else 0
+                if (value and not match) or not 0 <= received < size:
+                    raise CloudFailure("INVALID_PREVIEW_OFFSET", retryable=False)
+                return received, ""
+            raw = bytearray()
+            for chunk in response.iter_content(chunk_size=16384):
+                raw.extend(chunk)
+                if len(raw) > 65536:
+                    raise CloudFailure("INVALID_PREVIEW_OBJECT", retryable=False)
+            info = json.loads(raw)
+            generation = resource(str(info.get("generation", "")), r"[1-9][0-9]{0,29}")
+            if (
+                info.get("bucket") != self.bucket
+                or info.get("name") != key
+                or str(info.get("size")) != str(size)
+                or info.get("md5Hash") != item["md5"]
+                or info.get("contentEncoding") not in {None, "identity"}
+            ):
+                raise CloudFailure("INVALID_PREVIEW_OBJECT", retryable=False)
+            return size, generation
+        finally:
+            response.close()
+
+    def stop_preview_session(self, session, key):
+        response = self.call(
+            "DELETE",
+            self.preview_session_url(session, key),
+            headers={"Content-Length": "0"},
+            accepted=(204, 404, 410, 499),
+        )
+        response.close()
+
+    def erase_preview(self, prefix):
+        self.delete_preview(prefix)
+        response = self.call(
+            "GET",
+            f"https://storage.googleapis.com/storage/v1/b/{self.bucket}/o",
+            params={"prefix": prefix, "versions": "true", "maxResults": 1},
+            accepted=(200,),
+        )
+        try:
+            body = response.json()
+            if body.get("items") or body.get("nextPageToken"):
+                raise CloudFailure("STORAGE_PURGE_INCOMPLETE")
+        finally:
+            response.close()
 
     def create_preview_object(self, key, path):
         """Qualified coordinator only; create-only official API, bounded response, no session URI."""

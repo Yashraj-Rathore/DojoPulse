@@ -164,6 +164,15 @@ def cancel_run(owner, run_id):
     lock_owner(owner.pk)
     capacity_lock()
     run = AnalysisRun.objects.select_for_update().get(pk=run_id, owner=owner)
+    if run.pipeline_version == "recording-preview/1" and run.status in {
+        "QUEUED",
+        "PROCESSING",
+        "CANCELLED",
+    }:
+        from backend.core.models import RecordingPreview
+        from backend.core.preview_writes import revoke_ids
+
+        revoke_ids(RecordingPreview.objects.filter(run=run).values_list("pk", flat=True))
     if run.status == "CANCELLED":
         return run
     if run.status not in {"QUEUED", "PROCESSING"}:

@@ -256,7 +256,9 @@ def test_ambiguous_cloud_write_retains_quota_and_blocks_restore(
     bundle(directory, source.source_sha256)
 
     class FailedStorage:
-        def create_preview_object(self, key, path):
+        bucket = "preview-test-bucket"
+
+        def begin_preview(self, key, size, md5_hash, intent_id):
             assert RecordingPreview.objects.get(pk=preview.pk).write_pending
             raise CloudFailure("TRANSPORT_AMBIGUOUS", ambiguous=True)
 

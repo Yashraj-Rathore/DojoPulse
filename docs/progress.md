@@ -2249,3 +2249,45 @@ M06.12 completed again only for checked local/controlled scope; M06.11/automatic
 gates unchanged. Updated contract/qualification/current requirement and kept reopen history.
 Final ordinary corrected main publication and exact-latest-tip CI follow; no private files
 included. Prior source651/all-seven and actual owner trial retain separately scoped evidence.
+
+### 2026-10-13 - M06.13 independent preview write recovery
+
+Requirements: M06.02/.06/.07/.11/.13, M15.01/.06, M16.03/.05, M17.03, M19.02.
+Added signed bounded cross-process file ledger, immutable attempt pins, private
+session receipts, irreversible revocation/erasure, no-FK SQL quota projections
+including post-backup orphan attempts and guarded migration0025. Changed
+cloud.py/previews.py/security.py/storage.py/recovery.py for official create-only
+resumable upload, same-session probes, bounded retries, durable cancellation,
+stop-before-parent-erasure, empty all-version confirmation and fail-closed restore.
+Added redacted preview_write_maintenance, independent-root/key settings/.env
+example/gitignore and native rehearsal preserving a post-backup ledger separately
+from SQL/media restore. Added test_preview_write_recovery plus existing test fixture
+and ambiguous-write updates. Architecture2.23.0/ADR030/D045/README and tracker
+updated together. Canonical pipeline and production cloud/runtime flags unchanged.
+
+Actual validation so far:65 existing preview/resumable pass/51.77s, initial109
+focused pass/one Windows symlink-creation skip/75.16s; native disposable PostgreSQL
+guarded migration/dump/restore/repeated controls/pending-upload/private-preview
+erasure and post-backup orphan-ledger recovery pass. Added deletion-order/capacity
+fix and parent-erasure regression after initial focused run; full regression now
+running and exact-source main CI still required. No live cloud or new real-game
+trial; earlier149fd40 all-seven and owner HEVC evidence stay dated separate scopes.
+File-store replicated durability, entire-store freshness after SQL rollback,
+encryption/key custody, multi-host CAS/Windows ACL, managed isolation/IAM/CORS,
+actual late-write/load/restore and region/budget remain M06.11 gates. Missing init
+handles and torn ledgers cannot be auto-refunded or reinitialized. Next: finish
+validation, publish ordinary main commit and monitor its actual latest checks.
+
+Final implementation review also fenced generic preview-job cancellation in jobs.py with the independent tombstone before SQL mutation; added cancellation-rollback regression and clarified quota scopes. These edits followed the start of the local full run, so final affected tests/exact-source CI must qualify them separately; no stale full-run result will be represented as final source qualification. Default ledger path moved outside private media and ignored from Git. Architecture data/deployment docs updated.
+
+Broad pre-final local run:673 passes/16 platform-Docker skips/715.34s. Final cancellation/owned-ledger publication checks plus guard and meaningful orphan-quota boundary tests are being rechecked in the affected security/operations/hosted/preview/upload suite; final full-source CI still required. Added reverse-guard protection for SQL mirror loss while independent bytes remain. Static280, Linux/Windows typing42, schema checks and all102 Markdown local-link targets pass.
+
+Final local M06.13 qualification:157 affected PostgreSQL cases pass/one Windows
+symlink privilege skip/97.44s, including all25 ledger and30 preview cases. Generic
+job cancellation/SQL rollback, owner/source/manifest-pinned private publication,
+meaningful orphan-quota threshold and SQL/independent reverse guards pass. The
+broad673/16 skip/715.34s result remains labeled pre-final. Ruff280, Linux/Windows
+mypy42, schema/system and all102 Markdown links pass. M06.13 DONE only for
+controlled engineering; M06.11 actual replicated durability/freshness and managed
+cloud acceptance remain PARTIAL. Ordinary main source publication and exact-tip
+CI follow; the Windows/Docker skips must be covered by their actual CI jobs.

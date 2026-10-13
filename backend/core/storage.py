@@ -141,6 +141,15 @@ def delete_asset(owner, asset_id, storage=None):
     # Remote calls outside transaction; failure leaves tombstone and unfinished purge for retry.
     storage = storage or storage_for(asset)
     storage.cancel_upload(asset.upload_session)
+    from backend.core.previews import purge_preview
+
+    # Stop derivative upload capabilities before the parent cloud-prefix sweep.
+    # Unknown sessions/active conversion retain the physical reservation for retry.
+    if asset.storage_provider == "GCS":
+        for preview in RecordingPreview.objects.filter(asset=asset, state="PURGING"):
+            purge_preview(preview.pk)
+        if RecordingPreview.objects.filter(asset=asset).exclude(state="PURGED").exists():
+            return
     storage.delete_asset(asset.storage_key)
     if (
         asset.storage_provider == "GCS"

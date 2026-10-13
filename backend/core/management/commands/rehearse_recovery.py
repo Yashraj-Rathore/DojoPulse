@@ -16,6 +16,8 @@ from django.db import connection
 from psycopg import sql
 
 SEED = """
+from backend.core.preview_ledger import FileLedger
+FileLedger().initialize()
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from backend.core.models import Profile, ReplayAsset, Match
@@ -198,6 +200,9 @@ assert not DrillAssignment.objects.exclude(diagnosis={}, status='CANCELLED').exi
 from backend.core.models import RecordingPreview
 assert RecordingPreview.objects.count() == 1
 assert not RecordingPreview.objects.exclude(state='PURGED', reserved_bytes=0, manifest={}, quality={}, source_sha256='', write_pending=False).exists()
+from backend.core.models import PreviewWriteHold
+assert PreviewWriteHold.objects.count() == 1
+assert not PreviewWriteHold.objects.exclude(state='ERASED', reserved_bytes=0).exists()
 
 # Its immutable historical definition is retained; the restored grant is permanently revoked.
 for asset in ReplayAsset.objects.all():
@@ -252,6 +257,7 @@ class Command(BaseCommand):
                 DJANGO_DEBUG="1",
                 DEPLOYMENT_NAMESPACE="rehearsal-" + uuid.uuid4().hex,
                 CONTROL_JOURNAL_ROOT=str(root / "journal"),
+                PREVIEW_LEDGER_ROOT=str(root / "preview-ledger"),
                 CONTROL_JOURNAL_KEY=uuid.uuid4().hex,
                 PRIVATE_DATA_ROOT=str(root / "media"),
                 RESTORE_QUARANTINE="0",
@@ -319,6 +325,26 @@ class Command(BaseCommand):
                 dump = "/recovery/backup.dump" if image else str(root / "backup.dump")
                 run([*postgres_command("pg_dump"), *common, "-d", names[0], "-Fc", "-f", dump])
                 shutil.copytree(root / "media", root / "media-backup")
+                run(
+                    manage
+                    + [
+                        "shell",
+                        "-c",
+                        """
+from types import SimpleNamespace
+from uuid import uuid4
+from django.conf import settings
+from backend.core.preview_writes import plan
+directory = settings.PRIVATE_DATA_ROOT / 'post-backup-ledger-fixture'
+directory.mkdir()
+for name in ['preview.mp4', 'report.json', 'timeline.json']:
+    (directory / name).write_bytes(b'planned-only')
+orphan = SimpleNamespace(pk=uuid4(), run_id=uuid4(), asset_id=uuid4(),
+    asset=SimpleNamespace(owner_id=999999), source_sha256='a' * 64)
+plan(orphan, 1, directory, 'never-contacted-rehearsal-bucket')
+""",
+                    ]
+                )
                 run(manage + ["shell", "-c", DELETE])
                 run(
                     [
@@ -351,6 +377,7 @@ class Command(BaseCommand):
                             "repeat_replay": "PASS",
                             "pending_upload_erasure": "PASS",
                             "private_preview_erasure": "PASS",
+                            "post_backup_preview_ledger_recovery": "PASS",
                             "production_rpo_rto": "NOT_MEASURED",
                         }
                     )

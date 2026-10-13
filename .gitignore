@@ -9,6 +9,7 @@ __pycache__/
 !.env.example
 *.sqlite3
 private_data/
+private_control/
 reports/
 *.mp4
 *.mkv

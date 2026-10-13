@@ -82,3 +82,5 @@ with optional protocol/request pins, ImprovementEvaluation with immutable phase 
 and owned append-only ComparisonSession receipts. All recorded current target events,
 source/decoder manifests, missing collection and original practice dates qualify results;
 retention cannot rewrite a baseline or authorize real effectiveness/power claims.
+
+Migration0025 adds PreviewWriteHold: immutable independent intent UUID, numeric owner/asset/preview/run/fence pins, state/sequence and reserved bytes without foreign keys or capability secrets. RecordingPreview remains the private derivative authority. See [independent write recovery](preview-write-recovery.md); SQL is a quota projection, not proof of erasure.

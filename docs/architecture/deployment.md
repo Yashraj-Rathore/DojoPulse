@@ -32,3 +32,5 @@ file memory; operational cost cap. Scaffold/configuration is not deployed or pro
 
 Cloud Run scratch files consume memory: stream bounded output and test the maximum profile.
 Keep one media image and shared domain package. No Redis/Celery or HTTP-bound FFmpeg execution.
+
+Preview publication additionally requires [ADR-030 independent write recovery](preview-write-recovery.md). The local PREVIEW_LEDGER_ROOT defaults to ignored private_control/preview-writes outside media storage; use a separate stable key. It must survive SQL/media restores. Production needs replicated freshness/CAS, encrypted capability storage, independent key custody and tested cancellation/all-version erasure; the local file backend and all actual preview cloud flags remain unqualified.

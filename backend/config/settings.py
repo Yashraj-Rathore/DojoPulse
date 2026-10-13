@@ -177,6 +177,12 @@ CONTROL_JOURNAL_ROOT = Path(
     os.getenv("CONTROL_JOURNAL_ROOT", str(PRIVATE_DATA_ROOT / "control-journal"))
 )
 CONTROL_JOURNAL_KEY = os.getenv("CONTROL_JOURNAL_KEY", SECRET_KEY)
+PREVIEW_LEDGER_ROOT = Path(
+    os.getenv("PREVIEW_LEDGER_ROOT", str(BASE_DIR / "private_control" / "preview-writes"))
+)
+PREVIEW_LEDGER_KEY = os.getenv("PREVIEW_LEDGER_KEY", CONTROL_JOURNAL_KEY)
+PREVIEW_LEDGER_REQUIRED = False
+PREVIEW_LEDGER_RUNTIME_QUALIFIED = False
 DEPLOYMENT_NAMESPACE = os.getenv("DEPLOYMENT_NAMESPACE", "local")
 CLOUD_MEDIA_RUNTIME_QUALIFIED = False  # Qualification requires a reviewed code/profile change.
 GCS_PRIVATE_BUCKET = os.getenv("GCS_PRIVATE_BUCKET", "")

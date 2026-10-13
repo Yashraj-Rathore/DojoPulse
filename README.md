@@ -192,7 +192,7 @@ preview and inspect recorded timing gaps. This playback upload does not require 
 analysis metadata or a continuous-playback claim. Cancelling/removing converted playback
 retains the original; deleting the original or withdrawing processing revokes both.
 
-Apply migration 0024, enable the existing local operator upload configuration and run
+Apply current migrations (through 0025), enable the local operator upload configuration and run
 `python manage.py process_runs --once` plus ordinary upload/security maintenance. Default
 conversion requires the pinned offline Docker parser image; trusted-local decoding is only
 the existing explicit DEBUG/operator escape. See [setup/lifecycle](docs/architecture/private-recording-previews.md)
@@ -200,6 +200,14 @@ and [qualification](docs/experiment-results/private-recording-previews.md). Sour
 quota, physical staging and longer preview processing limits are separate from normal analysis.
 Actual GCS preview writes/cloud execution remain disabled. ID-to-replay acquisition, hosted
 release and frame-accurate coaching still require their independent evidence and approvals.
+
+Independent preview [write recovery](docs/architecture/preview-write-recovery.md)
+keeps session capabilities and orphan quota holds outside database/media restores.
+For local setup use `python manage.py preview_write_maintenance --initialize-local-ledger`
+with DEBUG enabled and private `PREVIEW_LEDGER_ROOT` /
+`PREVIEW_LEDGER_KEY`. Preserve that store independently of database/media backups.
+Initialization does not enable live GCS writes; replicated durability and actual
+cloud acceptance remain unqualified.
 
 ## Local match-import rehearsal
 

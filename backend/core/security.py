@@ -115,17 +115,22 @@ def check_capacity(owner, incoming_bytes=0):
     from backend.core.models import RecordingPreview
 
     previews = RecordingPreview.objects.exclude(state="PURGED")
-    for records, pending, preview_scope, limit in (
+    from backend.core.preview_writes import extra_capacity, sync_holds
+
+    sync_holds()
+    for records, pending, preview_scope, limit, owner_key in (
         (
             assets.filter(owner=owner),
             reservations.filter(owner=owner),
             previews.filter(asset__owner=owner),
             settings.OWNER_STORAGE_BYTES,
+            owner.pk,
         ),
-        (assets, reservations, previews, settings.GLOBAL_STORAGE_BYTES),
+        (assets, reservations, previews, settings.GLOBAL_STORAGE_BYTES, None),
     ):
         used = records.aggregate(total=Sum("bytes"))["total"] or 0
         used += preview_scope.aggregate(total=Sum("reserved_bytes"))["total"] or 0
+        used += extra_capacity(owner_key)
         held = pending.aggregate(total=Sum("reserved_bytes"))["total"] or 0
         if used + held + incoming_bytes > limit:
             audit("admission_rejected", "STORAGE_QUOTA")

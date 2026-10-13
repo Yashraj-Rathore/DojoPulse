@@ -379,6 +379,28 @@ class AnalysisRun(Owned):
         ]
 
 
+class PreviewWriteHold(models.Model):
+    """Quota projection of independent intents; orphan owners/assets need no live FK."""
+
+    id = models.UUIDField(primary_key=True)
+    owner_key = models.PositiveBigIntegerField(db_index=True)
+    asset_key = models.UUIDField()
+    preview_key = models.UUIDField()
+    run_key = models.UUIDField()
+    fence = models.PositiveIntegerField()
+    reserved_bytes = models.PositiveBigIntegerField()
+    state = models.CharField(max_length=16)
+    sequence = models.PositiveIntegerField()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(state__in=["OPEN", "PUBLISHED", "CLEANUP", "ERASED"]),
+                name="preview_write_hold_state_valid",
+            )
+        ]
+
+
 class RecordingPreview(models.Model):
     """Derivative lineage/capacity, never a canonical Match or gameplay approval."""
 

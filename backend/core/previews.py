@@ -100,6 +100,8 @@ def start_preview(run_id, fence):
         raise ValueError("RUN_REVOKED")
     preview.attempt_fence = fence
     preview.save(update_fields=["attempt_fence"])
+    if preview.asset.storage_provider == "GCS":
+        check_capacity(preview.asset.owner)  # A stale attempt loses its reservation credit.
     name = f"dojopulse-preview-{run.pk.hex}-{fence}"
     ExecutionSlot.objects.filter(run=run, fence=fence).update(execution_name=name)
     return preview, name
@@ -110,6 +112,22 @@ def publish_files(preview, fence, directory):
         raise ValueError("RUN_REVOKED")
     manifest = {}
     prefix = attempt_prefix(preview, fence)
+    storage, intent = None, None
+    if preview.asset.storage_provider == "GCS":
+        if not settings.GCS_PREVIEW_WRITES_QUALIFIED:
+            raise CloudFailure("GCS_PREVIEW_UNQUALIFIED", retryable=False)
+        from backend.core import preview_writes
+
+        storage = storage_for(preview.asset)
+        intent = preview_writes.plan(preview, fence, directory, storage.bucket)
+
+    def publication_check():
+        check = execution_check.get()
+        if check:
+            check()
+        if not heartbeat(preview.run_id, fence):
+            raise ValueError("RUN_REVOKED")
+
     for filename in FILES:
         check = execution_check.get()
         if check:
@@ -141,7 +159,9 @@ def publish_files(preview, fence, directory):
                 RecordingPreview.objects.filter(
                     pk=preview.pk, run_id=preview.run_id, attempt_fence=fence
                 ).update(write_pending=True)
-            generation = storage_for(preview.asset).create_preview_object(key, source)
+            generation = preview_writes.upload_file(
+                intent["id"], filename, source, storage, publication_check
+            )
             RecordingPreview.objects.filter(
                 pk=preview.pk, run_id=preview.run_id, attempt_fence=fence
             ).update(write_pending=False)
@@ -188,6 +208,10 @@ def complete_preview(run_id, fence, directory, identity):
     }
     if not finish_run(run_id, fence, report):
         return False
+    if preview.asset.storage_provider == "GCS":
+        from backend.core.preview_writes import published
+
+        published(preview, fence)  # Independent receipt cannot grant SQL publication authority.
     preview.state, preview.quality = "READY", quality
     preview.reserved_bytes = sum(item["bytes"] for item in manifest.values())
     preview.completed_at = timezone.now()
@@ -214,6 +238,9 @@ def process_preview(run, fence, source, scratch):
 
 
 def revoke(previews):
+    from backend.core.preview_writes import revoke_ids
+
+    revoke_ids(previews.values_list("pk", flat=True))  # Durable revocation survives SQL rollback.
     previews.exclude(state="PURGED").update(state="PURGING", quality={})
 
 
@@ -224,7 +251,25 @@ def purge_preview(preview_id):
     preview = (
         RecordingPreview.objects.select_for_update().select_related("asset").get(pk=preview_id)
     )
-    if preview.state != "PURGING" or preview.write_pending:
+    if preview.state != "PURGING":
+        return False
+    if preview.asset.storage_provider == "GCS":
+        from backend.core.preview_writes import cleanup, sync_holds
+
+        intents = [
+            identity
+            for identity, (row, _) in sync_holds().items()
+            if row["preview"] == str(preview.pk)
+        ]
+        if preview.write_pending and not intents:
+            return False  # Legacy ambiguous media POST has no cancellable receipt.
+        for identity in intents:
+            if not cleanup(identity):
+                return False
+        if intents:
+            preview.write_pending = False
+            preview.save(update_fields=["write_pending"])
+    elif preview.write_pending:
         return False
     if (
         preview.run_id
@@ -239,7 +284,7 @@ def purge_preview(preview_id):
         if path.exists():
             shutil.rmtree(path)
     else:
-        storage_for(preview.asset).delete_preview(prefix)
+        storage_for(preview.asset).erase_preview(prefix)
         path = private_path(prefix)
         if path.exists():
             shutil.rmtree(path)  # Remove this asset's bounded local staging, too.
@@ -262,6 +307,14 @@ def purge_preview(preview_id):
 def reconcile_previews():
     from backend.core.jobs import acknowledge_stopped
     from backend.core.preview_sandbox import remove_container
+    from backend.core.preview_writes import cleanup, sync_holds
+
+    for identity, (row, _) in sync_holds().items():
+        if row["state"] == "CLEANUP":
+            try:
+                cleanup(identity)
+            except (OSError, ValueError, CloudFailure):
+                continue  # Keep independent quota reserved; maintenance can retry.
 
     for slot in ExecutionSlot.objects.filter(
         runtime="LOCAL", released_at=None, run__pipeline_version=PIPELINE
@@ -290,7 +343,7 @@ def reconcile_previews():
                 if run.fence == slot.fence and run.status == "PROCESSING":
                     run.lease_until = None
                     run.save(update_fields=["lease_until"])
-                if preview and preview.write_pending:
+                if preview and (preview.write_pending or preview.asset.storage_provider == "GCS"):
                     run.status, run.error_code = "FAILED", "PREVIEW_WRITE_UNCONFIRMED"
                     run.fence += 1
                     run.save(update_fields=["status", "error_code", "fence"])
@@ -301,8 +354,6 @@ def reconcile_previews():
                         path = private_path(prefix)
                         if path.exists():
                             shutil.rmtree(path)
-                    else:
-                        storage_for(preview.asset).delete_preview(prefix)
                     RecordingPreview.objects.filter(
                         pk=preview.pk, run_id=slot.run_id, attempt_fence=slot.fence
                     ).update(manifest={})
@@ -353,6 +404,10 @@ def preview_view(asset):
         and preview.run.asset_id == asset.pk
         and preview.source_sha256 == asset.source_sha256
     )
+    if ready and asset.storage_provider == "GCS":
+        from backend.core.preview_writes import is_published
+
+        ready = is_published(preview)
     if ready:
         prefix = attempt_prefix(preview, preview.attempt_fence)
         manifest = preview.manifest
@@ -415,6 +470,11 @@ def purge_restored_previews():
         for slot in active:
             remove_container(f"dojopulse-preview-{slot.run_id.hex}-{slot.fence}")
             acknowledge_stopped(slot.run_id, slot.fence)
+    from backend.core.preview_writes import recover_all, sync_holds
+
+    recover_all()
+    erased = {row["preview"] for row, _ in sync_holds().values() if row["state"] == "ERASED"}
+    previews.filter(pk__in=erased).update(write_pending=False)
     if previews.filter(write_pending=True).exists():
         raise ValueError("RESTORE_PREVIEW_WRITE_UNCONFIRMED")
     if settings.PARSER_BACKEND == "docker" and settings.PARSER_IMAGE:
@@ -478,5 +538,5 @@ def purge_restored_previews():
         if asset.storage_provider == "GCS" and (
             previews.filter(asset=asset).exists() or settings.GCS_PREVIEW_WRITES_QUALIFIED
         ):
-            storage_for(asset).delete_preview(prefix)
+            storage_for(asset).erase_preview(prefix)
     previews.update(state="PURGED", reserved_bytes=0, manifest={}, quality={}, source_sha256="")

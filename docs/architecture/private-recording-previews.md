@@ -106,6 +106,12 @@ rows with no bytes, manifest or write uncertainty.
 
 ## Hosted release gates and reviewed references
 
+ADR-030 adds [independent write recovery](preview-write-recovery.md): initialization
+and session receipts, resumable create-only uploads, orphan quota mirrors,
+cancellation before all-version erasure and empty-inventory confirmation. Legacy
+ambiguous media POSTs without receipts stay blocked. Controlled correctness does
+not qualify independent replicated durability or actual cloud operation.
+
 GCS preview publication and managed runtime remain independently disabled, even
 when ordinary source storage is qualified. Controlled create-only media insertion
 uses the fixed official endpoint, ifGenerationMatch=0, bounded streamed body and
