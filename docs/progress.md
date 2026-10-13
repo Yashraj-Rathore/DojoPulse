@@ -2315,3 +2315,9 @@ multi-host CAS, hosted isolation/IAM/CORS/late-write/load/restore/region-budget
 remain M06.11 gates, with production flags false. No private game access or
 scientific approval. Final documentation receipt publishes with ordinary CI;
 verify the actual latest main tip's checks before handoff, not just this source.
+
+### 2026-10-13 - M06.13 migration guard reopened
+
+Final review found0025 could permit reversal with erased SQL mirrors and an unavailable independent store, which cannot rule out post-backup attempts. Reopened M06.13; guard now requires verified store whenever any mirror or qualification requirement exists, including all-erased mirrors. Added missing-ledger/erased-mirror regression. Supersedes receipt88f04fd; d932fc0 all-seven remains prior scoped evidence, not qualification of this correction. Focused guard/recovery/native validation and current main CI follow; no hosted flag changed.
+
+Final guard correction qualification:78 affected PG cases pass/one Windows symlink skip/79.23s, including26 ledger cases and30 preview. Missing-store/erased-mirror reversal fails closed; guard permits verified erased stores and protects both SQL-only and independent-only active holds. Static/schema and native independent post-backup restore rechecked. Controlled M06.13 DONE again; M06.11 hosted gates unchanged. Cancelled superseded88f04fd workflow38439323017. Publish ordinary corrected main; independently verify its actual latest checks before handoff. Prior d932fc0 all-seven remains dated pre-correction evidence.

@@ -47,7 +47,7 @@ session secrets. Admission verifies the independent store and projects orphan
 post-backup attempts, even with absent owners/assets. One matching child
 reservation covers its current attempt; stale/orphan attempts add their whole
 hold. New fences recheck capacity. Newer SQL sequences detect relative store
-rollback; omissions fail closed. Reversal requires both stores' holds erased.
+rollback; omissions fail closed. Reversal requires both stores' holds erased. Any SQL mirror or qualification requirement makes the verified independent store mandatory, even when SQL says every hold is erased; a missing store cannot prove post-backup erasure.
 
 Restore verifies the ledger before trusting restored SQL, projects post-backup
 holds, revokes attempts, stops known execution and reconciles sessions/objects.
