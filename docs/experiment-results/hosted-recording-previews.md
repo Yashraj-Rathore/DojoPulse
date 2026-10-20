@@ -40,7 +40,7 @@ Final local checks already passed: **62 Edge browser regressions / 1.1m**, **six
 server bridge tests**, production build/lint/typecheck, Linux and Windows mypy
 (42 files each), Ruff/format, schema/migration dry run, **five Terraform mock plans**
 and native disposable PostgreSQL dump/restore/guard/repeated control/pending
-upload/private preview/post-backup independent-ledger recovery. **410 local links**
+upload/private preview/post-backup independent-ledger recovery. **409 local links**
 and **179 unique valid requirement rows** checked; all six production flags
 confirmed false from settings syntax. The final full PostgreSQL/media suite on corrected source6e920a1 completed:
 **720 cases / 704 passed / 16 skipped / zero failures or errors / 875.25s**.

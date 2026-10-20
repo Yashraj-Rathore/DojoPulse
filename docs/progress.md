@@ -2424,7 +2424,7 @@ bf4dcfd all-seven is dated baseline evidence only.
 
 Other final checks:six native bridge tests,62 Edge/1.1m, production build/lint/
 typecheck, Ruff/format, Linux/Windows mypy42, schema/migration dry run, five
-Terraform mock plans and410 local links/179 unique valid requirement rows pass.
+Terraform mock plans and409 local links/179 unique valid requirement rows pass.
 Final native disposable dump/restore/migration/repeated control/pending upload/
 private preview/post-backup ledger recovery repeated after final code fixes:PASS;
 production RPO/RTO NOT_MEASURED. Fresh Python/core/cloud audits found no known
@@ -2439,3 +2439,10 @@ without explicit approval; finish this ordinary local receipt, then ask for that
 specific clean-tree merge/push/main-CI authorization. Repository access/history
 review and actual project/region/budget/IAM/CMEK/freshness/isolation/CORS/late-write/
 restore/load/cost acceptance remain open. No workaround or force push attempted.
+
+Final receipt correction:after replacing the outdated M19.02 row, the final
+tracker/documentation scan contains409 valid local links (the earlier410 scan
+was valid before that row edit). All179 requirement IDs/statuses remain valid.
+Code6e920a1 and its704/16/28/62 validation are unchanged; local receipt only,
+no merge/push/remote CI. Publication still awaits the explicitly required
+history-reconciliation approval.
