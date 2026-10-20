@@ -4,7 +4,10 @@ Current M16 engineering: [delivery/recovery contract](hosted-delivery.md),
 [ADR-015](../adr/ADR-015-hosted-delivery-recovery.md) and
 [local evidence](../experiment-results/m16-delivery.md). Google adapters are
 controlled-client contracts; Terraform is private, approval-gated and quarantined.
-Nested Docker is not available in Cloud Run, so managed media launch remains disabled.
+Nested Docker is not available in Cloud Run. [ADR-031 hosted preview preparation](hosted-recording-previews.md)
+therefore uses a dedicated Batch VM for the existing offline decoder, with independent
+shared journals and a server-only website bridge. Actual managed media launch stays
+disabled until project/runtime/storage/security/cost acceptance is recorded.
 
 Now: local CLI + Django API + PostgreSQL + Next.js, bound to loopback. Docker Compose supplies
 PostgreSQL when Docker is available. No paid cloud resources are provisioned by this task.
@@ -17,8 +20,10 @@ Hosted request-spooling quotas, an independent kill deadline, IAM and deployment
 failure tests are still required; local Docker evidence does not establish these.
 
 Hosted design: one region; private object storage; Cloud SQL; Cloud Run API; Cloud Tasks short
-dispatch -> Cloud Run Job; durable PostgreSQL run state/outbox; scheduled reconciler. Lease
-fencing protects publication; task acknowledgement is not completion. Bound total active Jobs
+dispatch -> dedicated Batch preview VM; a Cloud Run Job performs lightweight maintenance.
+The older Cloud Run analysis launcher stays unqualified. Durable PostgreSQL run state/outbox
+and independent GCS execution/write/control journals survive SQL/media restore. Lease
+fencing protects publication; task acknowledgement is not completion. Bound total active workers
 independently of queue dispatch concurrency. Whole-job retries are initially controlled by the
 application, avoiding layered retry multiplication. Poll status with backoff.
 
@@ -31,6 +36,12 @@ integration test; secrets and identity configuration; restore/deletion rehearsal
 file memory; operational cost cap. Scaffold/configuration is not deployed or production-certified.
 
 Cloud Run scratch files consume memory: stream bounded output and test the maximum profile.
-Keep one media image and shared domain package. No Redis/Celery or HTTP-bound FFmpeg execution.
+Keep one offline decoder image and shared domain package. No Redis/Celery or HTTP-bound FFmpeg execution.
 
 Preview publication additionally requires [ADR-030 independent write recovery](preview-write-recovery.md). The local PREVIEW_LEDGER_ROOT defaults to ignored private_control/preview-writes outside media storage; use a separate stable key. It must survive SQL/media restores. Production needs replicated freshness/CAS, encrypted capability storage, independent key custody and tested cancellation/all-version erasure; the local file backend and all actual preview cloud flags remain unqualified.
+
+The optional ADR-031 Terraform preparation adds three private versioned CMEK journal
+buckets with create/get/list application roles, a private Batch template, private API
+invocation from the website, and paused serial maintenance. Mock plans and controlled
+HTTP tests do not establish actual IAM, storage freshness, CORS, VM isolation or costs.
+No resources have been provisioned; see the linked activation procedure before any apply.

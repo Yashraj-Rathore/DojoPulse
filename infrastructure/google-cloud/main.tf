@@ -155,6 +155,13 @@ resource "google_cloud_run_v2_service" "api" {
         value = google_storage_bucket.media.name
       }
       dynamic "env" {
+        for_each = { for name, value in local.preview_api_env : name => value if name != "DEPLOYMENT_NAMESPACE" && name != "GCS_PRIVATE_BUCKET" }
+        content {
+          name  = env.key
+          value = env.value
+        }
+      }
+      dynamic "env" {
         for_each = var.secret_versions
         content {
           name = env.key

@@ -5,6 +5,13 @@ confirmed by the user. This document describes implemented local engineering and
 controlled-client contracts. No region, billable project, staging deployment or
 production release is approved or claimed.
 
+2026-10-20 extension: [ADR-031 hosted previews](hosted-recording-previews.md) selects
+dedicated Batch VMs with the existing offline decoder for preview conversion,
+independent create-only GCS write/control/execution journals and a private website
+identity bridge. The Cloud Run analysis-launch contract below is historical and
+still disabled; Cloud Run maintenance does no conversion. Actual project/isolation/
+storage/security/cost acceptance remains required and all live flags remain false.
+
 ## Durable work and bounded execution
 
 Upload, recording attachment and reprocessing create `AnalysisRun` and its

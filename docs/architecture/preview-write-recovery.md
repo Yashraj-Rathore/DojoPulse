@@ -3,6 +3,13 @@
 2026-10-13: ADR-030 / D045, architecture 2.23.0. M06.13 covers controlled
 engineering. Actual hosted M06.11 remains PARTIAL.
 
+2026-10-20: [ADR-031](../adr/ADR-031-isolated-hosted-preview-preparation.md)
+adds the optional official GCS archive backend and independent Batch execution
+intent. Fresh complete generation inventory and create-only signed sequences
+replace a mutable checkpoint for shared writers; FILE remains the local default.
+Actual IAM/freshness/durability/key/retention acceptance remains gated. See the
+[hosted contract](hosted-recording-previews.md) for bounds and restore procedure.
+
 A database snapshot cannot establish whether a later cloud upload stopped. Every
 new GCS derivative attempt records three bounded artifact hashes, byte counts,
 owner/asset/preview/run/fence and bucket before initialization. Its deterministic

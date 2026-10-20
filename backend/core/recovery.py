@@ -32,6 +32,9 @@ def apply_restore_controls():
     from backend.core.preview_writes import sync_holds
 
     sync_holds()  # Verify and project post-backup/orphan intents before restored SQL is trusted.
+    from backend.core.cloud_execution import records as execution_records
+
+    execution_records()  # Independent workers may be absent from this SQL snapshot.
     now = timezone.now()
     with transaction.atomic():
         Session.objects.all().delete()

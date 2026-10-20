@@ -116,6 +116,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci --ignore-scripts
       - run: npm run lint
+      - run: npm run test:proxy
       - run: npm run build
       - run: npm run typecheck
       - run: npx playwright install --with-deps chromium
@@ -146,6 +147,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -f infrastructure/Dockerfile.api -t dojopulse-api:ci .
+      - run: docker build -f infrastructure/Dockerfile.preview-coordinator -t dojopulse-preview-coordinator:ci .
+      - name: Verify cloud coordinator is disabled before qualification
+        run: |
+          set +e
+          docker run --rm -e DJANGO_SECRET_KEY=ci-only-not-a-deployment-secret \
+            -e ALLOW_SQLITE=1 dojopulse-preview-coordinator:ci \
+            --run-id 00000000-0000-0000-0000-000000000001 --fence 1 >/tmp/dojo-preview-guard 2>&1
+          result=$?
+          set -e
+          test "$result" -ne 0
+          grep -q 'BATCH_PREVIEW_UNQUALIFIED' /tmp/dojo-preview-guard
       - run: docker build -f infrastructure/Dockerfile.web -t dojopulse-web:ci .
       - name: Verify unprivileged API quarantine and standalone web
         run: |

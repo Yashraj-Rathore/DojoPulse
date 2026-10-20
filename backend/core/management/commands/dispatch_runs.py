@@ -20,6 +20,14 @@ class Command(BaseCommand):
         while True:
             dispatch_pending(provider)
             reconcile_cloud(provider)
+            if settings.PREVIEW_CLOUD_BACKEND == "BATCH":
+                from backend.core.batch_preview import GoogleBatchPreview
+                from backend.core.cloud_execution import reconcile
+
+                reconcile(GoogleBatchPreview())
+                from backend.core.previews import reconcile_previews
+
+                reconcile_previews()
             if options["once"]:
                 return
             time.sleep(2)

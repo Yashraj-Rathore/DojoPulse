@@ -57,6 +57,24 @@ def require_local_operator(owner):
         raise PermissionDenied("Local operator uploads must be enabled")
 
 
+def require_preview_operator(owner):
+    hosted = (
+        settings.HOSTED_PREVIEW_UPLOADS_QUALIFIED
+        and settings.GCS_STORAGE_QUALIFIED
+        and settings.GCS_PREVIEW_WRITES_QUALIFIED
+        and settings.CLOUD_PREVIEW_RUNTIME_QUALIFIED
+        and settings.CLOUD_MEDIA_RUNTIME_QUALIFIED
+        and settings.PREVIEW_LEDGER_RUNTIME_QUALIFIED
+        and settings.RESUMABLE_STORAGE_PROVIDER == "GCS"
+        and settings.PREVIEW_LEDGER_BACKEND == "GCS"
+        and settings.CONTROL_JOURNAL_BACKEND == "GCS"
+        and settings.PREVIEW_CLOUD_BACKEND == "BATCH"
+        and not settings.RESTORE_QUARANTINE
+    )
+    if not owner.is_active or not owner.is_staff or not (settings.LOCAL_OPERATOR_UPLOADS or hosted):
+        raise PermissionDenied("Recording preview uploads are not enabled for this account")
+
+
 def target_match(owner, match_id):
     match = Match.objects.select_related("player_identity").get(
         pk=match_id, owner=owner, deleted_at=None

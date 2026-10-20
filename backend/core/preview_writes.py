@@ -11,7 +11,7 @@ from analysis.media import file_hash
 from analysis.preview_bundle import FILES
 from backend.core.cloud import CloudFailure, GooglePrivateStorage, authorized_session
 from backend.core.models import PreviewWriteHold, RecordingPreview
-from backend.core.preview_ledger import FileLedger, LedgerFailure, held_bytes, prefix
+from backend.core.preview_ledger import LedgerFailure, held_bytes, ledger, ledger_present, prefix
 
 
 def intent_id(preview, fence):
@@ -24,9 +24,9 @@ def sync_holds():
         or settings.GCS_PREVIEW_WRITES_QUALIFIED
         or PreviewWriteHold.objects.exists()
     )
-    if not settings.PREVIEW_LEDGER_ROOT.exists() and not required:
+    if not ledger_present() and not required:
         return {}
-    rows = FileLedger().records()
+    rows = ledger().records()
     if PreviewWriteHold.objects.exclude(pk__in=rows).exists():
         raise LedgerFailure("PREVIEW_LEDGER_MIRROR_MISSING")
     for identity, (row, sequence) in rows.items():
@@ -107,13 +107,13 @@ def plan(preview, fence, directory, bucket):
             raise LedgerFailure("PREVIEW_WRITE_ALREADY_PLANNED")
         return row
 
-    result = FileLedger().update(row["id"], create)
+    result = ledger().update(row["id"], create)
     sync_holds()
     return result
 
 
 def current(identity):
-    return FileLedger().records()[str(identity)][0]
+    return ledger().records()[str(identity)][0]
 
 
 def file_state(identity, name, state, **receipts):
@@ -125,7 +125,7 @@ def file_state(identity, name, state, **receipts):
         row["files"][name].update(state=state, **receipts)
         return row
 
-    return FileLedger().update(str(identity), change)
+    return ledger().update(str(identity), change)
 
 
 def check_open(identity, check):
@@ -185,7 +185,7 @@ def published(preview, fence):
         row["state"] = "PUBLISHED"
         return row
 
-    FileLedger().update(intent_id(preview, fence), change)
+    ledger().update(intent_id(preview, fence), change)
     sync_holds()
 
 
@@ -200,7 +200,7 @@ def revoke_ids(preview_ids=None):
             old["state"] = "CLEANUP"
             return old
 
-        FileLedger().update(identity, change)
+        ledger().update(identity, change)
     sync_holds()
 
 
@@ -235,7 +235,7 @@ def cleanup(identity):
         old["state"] = "ERASED"
         return old
 
-    FileLedger().update(str(identity), erased)
+    ledger().update(str(identity), erased)
     sync_holds()
     return True
 
@@ -246,7 +246,7 @@ def recover_all():
         return
     revoke_ids()
     incomplete = False
-    for identity in FileLedger().records():
+    for identity in ledger().records():
         incomplete |= not cleanup(identity)
     if incomplete:
         raise LedgerFailure("RESTORE_PREVIEW_WRITE_UNCONFIRMED")

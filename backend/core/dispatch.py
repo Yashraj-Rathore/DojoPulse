@@ -77,12 +77,26 @@ def launch_dispatch(provider, dispatch_id, generation):
             item.status, item.error_code = "ATTENTION", "CLOUD_PREVIEW_RUNTIME_UNQUALIFIED"
             item.save(update_fields=["status", "error_code"])
             return "ATTENTION"
+        runtime = (
+            "CLOUD_BATCH" if getattr(provider, "runtime", None) == "CLOUD_BATCH" else "CLOUD_RUN"
+        )
+        if runtime == "CLOUD_BATCH":
+            try:
+                provider.preflight(run, item, run.fence + 1)
+            except (CloudFailure, ValueError):
+                item.status, item.error_code = "ATTENTION", "BATCH_CONFIGURATION_REJECTED"
+                item.save(update_fields=["status", "error_code"])
+                return "ATTENTION"
         fence = claim_run(run.pk)
         if fence is None:
             return "CAPACITY"
         item.status, item.lease_until = "LAUNCHING", timezone.now() + timedelta(seconds=60)
         item.save()
-        ExecutionSlot.objects.filter(run=run, fence=fence).update(runtime="CLOUD_RUN")
+        if runtime == "CLOUD_BATCH":
+            run.refresh_from_db()
+            run.lease_until = min(run.deadline_at, timezone.now() + timedelta(seconds=600))
+            run.save(update_fields=["lease_until"])
+        ExecutionSlot.objects.filter(run=run, fence=fence).update(runtime=runtime)
     # LAUNCHING is durable before the RPC. Crash/timeout never triggers another launch.
     try:
         if run.pipeline_version == "recording-preview/1":

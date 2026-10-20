@@ -25,7 +25,7 @@ from backend.core.models import (
     UploadSession,
 )
 from backend.core.ownership import lock_owner
-from backend.core.recordings import require_local_operator
+from backend.core.recordings import require_preview_operator
 from backend.core.security import admit_run, check_capacity
 from backend.core.storage import private_path, storage_for
 
@@ -46,7 +46,7 @@ def available(asset, *, pending_upload=False):
 @transaction.atomic
 def enqueue_preview(owner, asset_id, request_id):
     owner = lock_owner(owner.pk)
-    require_local_operator(owner)
+    require_preview_operator(owner)
     require_processing(owner)
     asset = ReplayAsset.objects.select_related("owner").get(pk=asset_id, owner=owner)
     if not available(asset) or not asset.source_sha256:
@@ -238,8 +238,10 @@ def process_preview(run, fence, source, scratch):
 
 
 def revoke(previews):
+    from backend.core.cloud_execution import stop_runs
     from backend.core.preview_writes import revoke_ids
 
+    stop_runs(previews.values_list("run_id", flat=True))
     revoke_ids(previews.values_list("pk", flat=True))  # Durable revocation survives SQL rollback.
     previews.exclude(state="PURGED").update(state="PURGING", quality={})
 
@@ -459,9 +461,18 @@ def quality_windows(asset, offset=0):
 
 def purge_restored_previews():
     """Sweep post-backup preview artifacts; require stop certainty before freeing bytes."""
+    from backend.core.cloud_execution import enabled as batch_enabled
+    from backend.core.cloud_execution import reconcile as reconcile_batch
+
+    if batch_enabled() or settings.GOOGLE_EXECUTION_JOURNAL_BUCKET:
+        from backend.core.batch_preview import GoogleBatchPreview
+
+        reconcile_batch(GoogleBatchPreview(), restore=True)
     previews = RecordingPreview.objects.all()
     active = ExecutionSlot.objects.filter(run__pipeline_version=PIPELINE, released_at=None)
     if active.exists():
+        if active.exclude(runtime="LOCAL").exists():
+            raise ValueError("RESTORE_PREVIEW_EXECUTION_UNCONFIRMED")
         if settings.PARSER_BACKEND != "docker":
             raise ValueError("RESTORE_PREVIEW_EXECUTION_UNCONFIRMED")
         from backend.core.jobs import acknowledge_stopped

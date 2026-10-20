@@ -13,3 +13,19 @@ private_subnetwork     = "REPLACE-existing-private-subnet"
 api_host               = "REPLACE"
 api_image              = "REPLACE@sha256:REPLACE"
 secret_versions        = {}
+
+# Optional M06.11 preparation; default null creates no preview-specific resources.
+# First prepare the authorized, quarantined API, then copy its exact api_uri.
+# Keep scheduler paused and all code qualification gates false until real acceptance.
+# Requires a separate numeric PREVIEW_LEDGER_KEY in secret_versions and a tested
+# named Batch VM image with Docker/Python3/Batch agent (not an image family).
+# preview = {
+#   coordinator_image      = "REGION-docker.pkg.dev/PROJECT/REPO/coordinator@sha256:DIGEST"
+#   decoder_image          = "REGION-docker.pkg.dev/PROJECT/REPO/decoder@sha256:DIGEST"
+#   web_image              = "REGION-docker.pkg.dev/PROJECT/REPO/web@sha256:DIGEST"
+#   api_origin             = "https://EXACT-API-SERVICE.run.app"
+#   batch_vm_image         = "projects/PROJECT/global/images/TESTED-NAMED-IMAGE"
+#   journal_location       = "APPROVED-GEOGRAPHY"
+#   journal_kms_key        = "projects/PROJECT/locations/LOCATION/keyRings/RING/cryptoKeys/KEY"
+#   journal_retention_days = 30 # Example only; privacy/recovery review required.
+# }

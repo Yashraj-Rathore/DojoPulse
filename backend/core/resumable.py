@@ -35,8 +35,13 @@ from backend.core.storage import delete_asset, materialize, private_path, storag
 PENDING = ("INITIALIZING", "UPLOADING", "VERIFYING", "PURGING")
 
 
-def require_access(owner):
-    require_local_operator(owner)
+def require_access(owner, *, preview_only=False):
+    if preview_only:
+        from backend.core.recordings import require_preview_operator
+
+        require_preview_operator(owner)
+    else:
+        require_local_operator(owner)
     if settings.RESTORE_QUARANTINE:
         raise CloudFailure("RESTORE_QUARANTINE", retryable=False)
     if settings.RESUMABLE_STORAGE_PROVIDER == "GCS" and not settings.GCS_STORAGE_QUALIFIED:
@@ -53,7 +58,7 @@ def owned_session(owner, session_id):
 
 
 def usable(session, owner):
-    require_access(owner)
+    require_access(owner, preview_only=session.asset.metadata.get("preview_only") is True)
     if (
         session.asset.owner_id != owner.pk
         or session.asset.deleted_at
@@ -64,7 +69,7 @@ def usable(session, owner):
 
 
 def begin(owner, request_id, size, sha256, md5_hash, metadata, match_id=None, *, storage=None):
-    require_access(owner)
+    require_access(owner, preview_only=metadata.get("preview_only") is True)
     if (
         type(size) is not int
         or not 0 < size <= 536870912
@@ -83,7 +88,7 @@ def begin(owner, request_id, size, sha256, md5_hash, metadata, match_id=None, *,
     )
     with transaction.atomic():
         active_owner(owner)
-        require_access(owner)
+        require_access(owner, preview_only=metadata.get("preview_only") is True)
         prior = UploadSession.objects.filter(owner=owner, request_id=request_id).first()
         if prior:
             if prior.claim_digest != claim_hash:

@@ -32,6 +32,20 @@ class LedgerFailure(ValueError):
     pass
 
 
+def ledger():
+    if settings.PREVIEW_LEDGER_BACKEND == "FILE":
+        return FileLedger()
+    if settings.PREVIEW_LEDGER_BACKEND == "GCS":
+        from backend.core.cloud_journal import GooglePreviewLedger
+
+        return GooglePreviewLedger()
+    raise LedgerFailure("PREVIEW_LEDGER_BACKEND_INVALID")
+
+
+def ledger_present():
+    return settings.PREVIEW_LEDGER_BACKEND != "FILE" or settings.PREVIEW_LEDGER_ROOT.exists()
+
+
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
 

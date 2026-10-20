@@ -2321,3 +2321,81 @@ verify the actual latest main tip's checks before handoff, not just this source.
 Final review found0025 could permit reversal with erased SQL mirrors and an unavailable independent store, which cannot rule out post-backup attempts. Reopened M06.13; guard now requires verified store whenever any mirror or qualification requirement exists, including all-erased mirrors. Added missing-ledger/erased-mirror regression. Supersedes receipt88f04fd; d932fc0 all-seven remains prior scoped evidence, not qualification of this correction. Focused guard/recovery/native validation and current main CI follow; no hosted flag changed.
 
 Final guard correction qualification:78 affected PG cases pass/one Windows symlink skip/79.23s, including26 ledger cases and30 preview. Missing-store/erased-mirror reversal fails closed; guard permits verified erased stores and protects both SQL-only and independent-only active holds. Static/schema and native independent post-backup restore rechecked. Controlled M06.13 DONE again; M06.11 hosted gates unchanged. Cancelled superseded88f04fd workflow38439323017. Publish ordinary corrected main; independently verify its actual latest checks before handoff. Prior d932fc0 all-seven remains dated pre-correction evidence.
+
+### 2026-10-20 - M06.11 hosted-preview module implementation started
+
+Affected M06.02/.05/.06/.07/.11/.13, M15.01/.06, M16.02/.03/.04/.05, M17.03, M19.02. Preparing shared append-only signed GCS journals with create-only sequence arbitration, independent control/execution intents and restore fencing; dedicated Google Batch VM coordinator uses the already isolated offline Docker decoder. Website/API stay on Cloud Run. Actual cloud project/region/budget, runtime/IAM/CMEK/retention/usage acceptance remain unqualified, all live flags false. No live calls or resource provisioning. Validation not yet run.
+
+### 2026-10-20 - Coherent hosted-preview preparation implemented
+
+M06.02/.05/.06/.07/.11/.13, M13.03/.06, M15.01/.06, M16.02-.05, M17.03,
+M19.02. Architecture2.24.0/ADR031/D046. New `cloud_journal.py`,
+`cloud_execution.py` and `batch_preview.py` provide bounded independent signed
+GCS sequence archives, conditional-create arbitration, verified immutable reads,
+post-backup worker discovery, irreversible cancellation and physical stop proof.
+Integrated preview writes/control/admission/dispatch/heartbeat/storage/recovery
+and migration0025 guard. Untracked original bytes remain charged; unknown handles
+retain capacity/quarantine. No automatic archive truncation or time-based refund.
+
+New `run_preview_batch` checks pinned decoder identity and enters the existing
+fenced preview worker; trusted root coordinator/socket is separate from the
+offline credential-free decoder. `hosted_preview_maintenance` performs bounded
+verification/reconciliation/dispatch under a real PostgreSQL session lock.
+New Next server route/bridge keeps service identity private while forwarding
+end-user sessions/CSRF/owned ranges. Optional `preview.tf`, coordinator image,
+CI and config examples prepare private VM/SQL/media, three CMEK journals,
+append-only roles, website/private API identity and paused/quarantined maintenance.
+Updated architecture/deployment/decision/qualification/tracker together.
+
+Actual checks so far:133 affected PG cases/132 passes/one Windows symlink skip,
+123.10s; expanded21 hosted cases/26.14s pass including repeated full restore.
+Schema clean, Ruff286, Linux/Windows mypy42, six native bridge tests, production
+build/typecheck, five Terraform mock plans and native disposable guarded recovery
+all pass. Full final PG suite and62 Edge regressions are running. Earlier fixture
+failure correctly hit the disabled Docker gate; selected controlled Docker in the
+fixture rather than weaken the guard. Browser discovery initially collected the
+native Node test; renamed it `.node.mjs` and retained its separate CI execution.
+No checks were disabled. Final counts/current-main CI still required.
+
+All cloud HTTP evidence is controlled, media output synthetic; actual cloud
+resources, multi-host durability/IAM/CMEK, VM isolation/deadline, browser CORS,
+late writes/erase/restore/load/cost are unqualified. All six production flags
+remain false, scheduler paused, quarantine retained; M06.11 remains PARTIAL.
+No game endpoints, new real-game/scientific evidence or automatic acquisition.
+Next:finish full local and ordinary exact-tip main CI, then authorize project/
+region/budget and qualify the real hosted deployment before activation. Provider
+rights/real ID acquisition and M07-M12 science remain separate workstreams.
+
+Final review correction before publication:independent cancellation now records a
+run tombstone even without an execution/output attempt, preventing queued or
+claim-to-plan cancellation SQL rollback from resurrecting work. Reconciliation
+also acknowledges a restored SQL slot whose independent attempt is already
+STOPPED. Added three boundary regressions. Reopened current M06.11 qualification;
+earlier full run was deliberately interrupted after40% when this correction was
+identified, so it is not a full-suite pass. All62 Edge and six bridge cases pass;
+final affected/full checks will qualify the corrected source. Production gates
+and actual hosting blockers unchanged.
+
+Final receipt-persistence correction:an archive outage after successful Batch
+creation is now explicitly ambiguous, so dispatch cannot refund a still-running
+worker as though launch had been rejected. Controlled adapter regression proves
+capacity remains until recovered UID/delete/empty-VM proof. All28 final hosted
+cases pass/31.89s. Restarted full PG suite on this frozen source; no result claimed
+for the deliberately interrupted earlier run. Edge62/six bridge tests, native
+restore, five Terraform plans, build/static/schema/both-platform typing retain
+their stated scope; exact-tip publication checks still follow.
+
+### 2026-10-20 - Remote source-integrity finding during publication preparation
+
+M01.06/M15.04/M19.02:read-only `ls-remote`/fetch found remote main forcibly
+rewritten from verified bf4dcfd to be09338040e4d78b545473c4f2730a18bd82db26,
+a sibling with parent88f04fd and the same displayed commit title/author. Its sole
+tree difference from bf4dcfd is `frontend/next.config.ts`:added createRequire
+setup and an obfuscated eval/atob payload after the export. Inspected as text,
+never imported/executed. No conclusion about who performed the rewrite.
+
+Keep the qualified clean configuration and current staged module. Reconcile the
+remote ancestry using a main-only merge that retains the reviewed clean tree;
+no force push, new branch or execution of remote configuration. This repeats the
+earlier source-integrity concern; repository access/history/prior-execution
+review remains open. Final local/full and actual latest-tip CI still required.

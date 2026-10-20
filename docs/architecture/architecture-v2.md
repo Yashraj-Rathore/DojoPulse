@@ -1,6 +1,6 @@
 # Architecture V2 — one measurable improvement loop
 
-Version: 2.23.0. Decision date: 2026-10-13. Status: local engineering approved;
+Version: 2.24.0. Decision date: 2026-10-20. Status: local engineering approved;
 gameplay feasibility and external pilot NOT validated. Source: historical
 [V1](../architecture.md) and the complete adversarial review in the project conversation.
 [Reconciliation](review-reconciliation.md) identifies the controlling decisions.
@@ -15,7 +15,10 @@ with known-match suppression. Hosted email, reviewed policy and backup/provider 
 
 The [M16 delivery/recovery contract](hosted-delivery.md) adds transactional dispatch,
 retained physical capacity, bounded heartbeats and independently signed restore controls.
-Google Cloud remains selected; managed media execution awaits a qualified isolation profile.
+Google Cloud remains selected. [Hosted preview preparation](hosted-recording-previews.md)
+adds independent shared GCS journals, dedicated Batch VMs using the existing offline
+decoder and a private website/API bridge. Actual deployment/isolation qualification
+remains required; all production gates are false (ADR-031/D046).
 
 The [M17 operations/economics contract](operations-economics.md) adds durable media/time
 budgets, fenced measurements, staff monitoring, retention and explicit cost coverage.

@@ -16,10 +16,17 @@ def configured_control():
     return GoogleControl(
         authorized_session(),
         settings.GOOGLE_TASK_QUEUE,
-        settings.GOOGLE_ANALYSIS_JOB,
+        settings.GOOGLE_ANALYSIS_JOB or settings.GOOGLE_BATCH_PARENT + "/jobs/disabled-analysis",
         settings.GOOGLE_TASK_TARGET,
         settings.GOOGLE_TASK_SERVICE_ACCOUNT,
+        audience=settings.GOOGLE_TASK_AUDIENCE or settings.GOOGLE_TASK_TARGET,
     )
+
+
+def configured_preview_control():
+    from backend.core.batch_preview import GoogleBatchPreview
+
+    return GoogleBatchPreview()
 
 
 def verify_task_identity(token):
@@ -31,7 +38,11 @@ def verify_task_identity(token):
             kwargs["timeout"] = 5
             return super().__call__(*args, **kwargs)
 
-    claims = verify_oauth2_token(token, BoundedRequest(), audience=settings.GOOGLE_TASK_TARGET)
+    claims = verify_oauth2_token(
+        token,
+        BoundedRequest(),
+        audience=settings.GOOGLE_TASK_AUDIENCE or settings.GOOGLE_TASK_TARGET,
+    )
     if (
         claims.get("email") != settings.GOOGLE_TASK_SERVICE_ACCOUNT
         or claims.get("email_verified") is not True
@@ -67,7 +78,14 @@ def dispatch_task(request):
     except (ValueError, TypeError, KeyError):
         return JsonResponse({"error": "INVALID_TASK"}, status=400)
     try:
-        result = launch_dispatch(configured_control(), dispatch_id, generation)
+        item = RunDispatch.objects.select_related("run").get(pk=dispatch_id)
+        batch = (
+            item.run.pipeline_version == "recording-preview/1"
+            and settings.PREVIEW_CLOUD_BACKEND == "BATCH"
+        )
+        result = launch_dispatch(
+            configured_preview_control() if batch else configured_control(), dispatch_id, generation
+        )
     except RunDispatch.DoesNotExist:
         return JsonResponse({"status": "IGNORED"})  # Purged obsolete intent.
     except CloudFailure:

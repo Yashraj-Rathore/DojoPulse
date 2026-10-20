@@ -48,6 +48,18 @@ def record_intent(owner_id, action, **payload):
         "payload": payload,
         "id": str(uuid.uuid4()),
     }
+    if settings.CONTROL_JOURNAL_BACKEND == "GCS":
+        from backend.core.cloud_journal import CloudLog
+
+        envelope = {"record": record, "signature": signature(record)}
+
+        def append(records):
+            return None if envelope in records else envelope
+
+        CloudLog("control").update(append)
+        return
+    if settings.CONTROL_JOURNAL_BACKEND != "FILE":
+        raise ValueError("CONTROL_JOURNAL_BACKEND_INVALID")
     root = Path(settings.CONTROL_JOURNAL_ROOT)
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
     target = root / (record["id"] + ".json")
@@ -97,6 +109,30 @@ def write_checkpoint(root):
 def verified_records():
     """Validate the complete supplied journal before applying any record."""
     records = []
+    if settings.CONTROL_JOURNAL_BACKEND == "GCS":
+        from backend.core.cloud_journal import CloudLog
+
+        for envelope in CloudLog("control").records()[0]:
+            record = envelope["record"]
+            if (
+                not hmac.compare_digest(envelope["signature"], signature(record))
+                or record.get("version") != 1
+                or record.get("namespace") != settings.DEPLOYMENT_NAMESPACE
+                or record.get("action")
+                not in {
+                    "ACCOUNT_DELETE",
+                    "ASSET_DELETE",
+                    "MATCH_DELETE",
+                    "CONSENT_WITHDRAW",
+                    "PILOT_WITHDRAW",
+                    "PILOT_CLOSE",
+                }
+            ):
+                raise ValueError("INVALID_CONTROL_JOURNAL")
+            records.append(record)
+        return records
+    if settings.CONTROL_JOURNAL_BACKEND != "FILE":
+        raise ValueError("CONTROL_JOURNAL_BACKEND_INVALID")
     root = Path(settings.CONTROL_JOURNAL_ROOT)
     if not root.is_dir() or list(root.glob("*.tmp")):
         raise ValueError("JOURNAL_UNAVAILABLE_OR_INCOMPLETE")

@@ -40,6 +40,12 @@ def claim_run(run_id):
         return None
     run = locked_run(run_id)
     now = timezone.now()
+    from backend.core.cloud_execution import run_revoked
+
+    if run.pipeline_version == "recording-preview/1" and run_revoked(run.pk):
+        run.status, run.lease_until, run.result = "CANCELLED", None, {}
+        run.save(update_fields=["status", "lease_until", "result"])
+        return None
     if (
         not run.owner.is_active
         or Profile.objects.filter(user=run.owner, deleted_at__isnull=False).exists()
@@ -83,9 +89,12 @@ def claim_run(run_id):
         return None
     capacity_lock()
     active = ExecutionSlot.objects.filter(released_at=None)
+    from backend.core.cloud_execution import extra_slots
+
     if (
-        active.count() >= settings.GLOBAL_ACTIVE_RUNS
+        active.count() + extra_slots() >= settings.GLOBAL_ACTIVE_RUNS
         or active.filter(run__owner=run.owner).exists()
+        or extra_slots(run.owner_id)
     ):
         return None
     run.status = "PROCESSING"
@@ -169,9 +178,11 @@ def cancel_run(owner, run_id):
         "PROCESSING",
         "CANCELLED",
     }:
+        from backend.core.cloud_execution import stop_runs
         from backend.core.models import RecordingPreview
         from backend.core.preview_writes import revoke_ids
 
+        stop_runs([run.pk])
         revoke_ids(RecordingPreview.objects.filter(run=run).values_list("pk", flat=True))
     if run.status == "CANCELLED":
         return run
@@ -221,6 +232,11 @@ def heartbeat(run_id, fence, *, phase="ANALYZING", progress=10):
     if settings.RESTORE_QUARANTINE:
         return False
     run = locked_run(run_id)
+    if ExecutionSlot.objects.filter(run=run, fence=fence, runtime="CLOUD_BATCH").exists():
+        from backend.core.cloud_execution import allowed
+
+        if not allowed(run_id, fence):
+            return False
     now = timezone.now()
     if (
         run.fence != fence

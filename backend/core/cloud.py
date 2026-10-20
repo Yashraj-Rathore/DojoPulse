@@ -34,7 +34,7 @@ def authorized_session():
 
 
 class GoogleControl:
-    def __init__(self, session, queue, job, target, service_account):
+    def __init__(self, session, queue, job, target, service_account, *, audience=None):
         self.session = session
         self.queue = resource(
             queue, r"projects/[a-z][a-z0-9-]+/locations/[a-z0-9-]+/queues/[a-z0-9-]+"
@@ -50,6 +50,16 @@ class GoogleControl:
         ):
             raise ValueError("INVALID_TASK_TARGET")
         self.target = target
+        self.audience = audience if audience is not None else target
+        parsed_audience = urlparse(self.audience)
+        if (
+            parsed_audience.scheme != "https"
+            or parsed_audience.netloc != parsed.netloc
+            or parsed_audience.username
+            or parsed_audience.query
+            or parsed_audience.fragment
+        ):
+            raise ValueError("INVALID_TASK_AUDIENCE")
         self.service_account = resource(
             service_account, r"[a-z0-9-]+@[a-z0-9-]+\.iam\.gserviceaccount\.com"
         )
@@ -75,6 +85,11 @@ class GoogleControl:
     def enqueue(self, dispatch_id, generation):
         name = f"{self.queue}/tasks/dispatch-{dispatch_id}-{generation}"
         payload = json.dumps({"dispatch_id": str(dispatch_id), "generation": generation}).encode()
+        headers = {"Content-Type": "application/json"}
+        if settings.GOOGLE_TASK_GATEWAY_HOST:
+            headers["X-Forwarded-Host"] = resource(
+                settings.GOOGLE_TASK_GATEWAY_HOST, r"[a-z0-9.-]{1,253}"
+            )
         response = self.request(
             "POST",
             f"https://cloudtasks.googleapis.com/v2/{self.queue}/tasks",
@@ -85,11 +100,11 @@ class GoogleControl:
                     "httpRequest": {
                         "httpMethod": "POST",
                         "url": self.target,
-                        "headers": {"Content-Type": "application/json"},
+                        "headers": headers,
                         "body": base64.b64encode(payload).decode(),
                         "oidcToken": {
                             "serviceAccountEmail": self.service_account,
-                            "audience": self.target,
+                            "audience": self.audience,
                         },
                     },
                 }
@@ -101,6 +116,8 @@ class GoogleControl:
         return name
 
     def launch(self, run_id, fence, dispatch_id, generation, *, timeout_seconds=None):
+        if self.job.endswith("/jobs/disabled-analysis"):
+            raise CloudFailure("CLOUD_ANALYSIS_RUNTIME_UNQUALIFIED", retryable=False)
         if not settings.CLOUD_MEDIA_RUNTIME_QUALIFIED:
             raise CloudFailure("CLOUD_MEDIA_RUNTIME_UNQUALIFIED", retryable=False)
         response = self.request(

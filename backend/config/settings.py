@@ -1,5 +1,6 @@
 """Local-only defaults. Production requires explicit secrets, PostgreSQL and release gates."""
 
+import json
 import os
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -96,7 +97,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 EXTERNAL_UPLOADS_ENABLED = False  # Hosted ingestion gate cannot be bypassed with a flag.
-RESUMABLE_STORAGE_PROVIDER = "LOCAL"
+RESUMABLE_STORAGE_PROVIDER = os.getenv("RESUMABLE_STORAGE_PROVIDER", "LOCAL")
+HOSTED_PREVIEW_UPLOADS_QUALIFIED = False
 GCS_STORAGE_QUALIFIED = False  # Reviewed IAM/CORS/transport/erasure activation is still required.
 UPLOAD_SESSION_SECONDS = 3600
 UPLOAD_CHUNK_BYTES = 8 * 1024**2
@@ -109,6 +111,7 @@ FILE_UPLOAD_HANDLERS = [
 ]
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = not DEBUG
+USE_X_FORWARDED_HOST = not DEBUG and os.getenv("DJANGO_TRUST_GATEWAY_HOST", "0") == "1"
 CSRF_COOKIE_SECURE = not DEBUG
 CSRF_TRUSTED_ORIGINS = (
     ["http://localhost:3000", "http://127.0.0.1:3000"]
@@ -183,12 +186,28 @@ PREVIEW_LEDGER_ROOT = Path(
 PREVIEW_LEDGER_KEY = os.getenv("PREVIEW_LEDGER_KEY", CONTROL_JOURNAL_KEY)
 PREVIEW_LEDGER_REQUIRED = False
 PREVIEW_LEDGER_RUNTIME_QUALIFIED = False
+PREVIEW_LEDGER_BACKEND = os.getenv("PREVIEW_LEDGER_BACKEND", "FILE")
+CONTROL_JOURNAL_BACKEND = os.getenv("CONTROL_JOURNAL_BACKEND", "FILE")
+GOOGLE_PREVIEW_LEDGER_BUCKET = os.getenv("GOOGLE_PREVIEW_LEDGER_BUCKET", "")
+GOOGLE_CONTROL_JOURNAL_BUCKET = os.getenv("GOOGLE_CONTROL_JOURNAL_BUCKET", "")
+GOOGLE_EXECUTION_JOURNAL_BUCKET = os.getenv("GOOGLE_EXECUTION_JOURNAL_BUCKET", "")
+PREVIEW_CLOUD_BACKEND = os.getenv("PREVIEW_CLOUD_BACKEND", "DISABLED")
+GOOGLE_BATCH_PARENT = os.getenv("GOOGLE_BATCH_PARENT", "")
+GOOGLE_BATCH_TEMPLATE = os.getenv("GOOGLE_BATCH_TEMPLATE", "")
+GOOGLE_PREVIEW_COORDINATOR_IMAGE = os.getenv("GOOGLE_PREVIEW_COORDINATOR_IMAGE", "")
+GOOGLE_PREVIEW_DECODER_IMAGE = os.getenv("GOOGLE_PREVIEW_DECODER_IMAGE", "")
+GOOGLE_PREVIEW_SERVICE_ACCOUNT = os.getenv("GOOGLE_PREVIEW_SERVICE_ACCOUNT", "")
+# Names/version references only; values are supplied by Batch/Secret Manager, never job JSON.
+GOOGLE_PREVIEW_ENV = json.loads(os.getenv("GOOGLE_PREVIEW_ENV_JSON", "{}"))
+GOOGLE_PREVIEW_SECRETS = json.loads(os.getenv("GOOGLE_PREVIEW_SECRETS_JSON", "{}"))
 DEPLOYMENT_NAMESPACE = os.getenv("DEPLOYMENT_NAMESPACE", "local")
 CLOUD_MEDIA_RUNTIME_QUALIFIED = False  # Qualification requires a reviewed code/profile change.
 GCS_PRIVATE_BUCKET = os.getenv("GCS_PRIVATE_BUCKET", "")
 GOOGLE_TASK_QUEUE = os.getenv("GOOGLE_TASK_QUEUE", "")
 GOOGLE_ANALYSIS_JOB = os.getenv("GOOGLE_ANALYSIS_JOB", "")
 GOOGLE_TASK_TARGET = os.getenv("GOOGLE_TASK_TARGET", "")
+GOOGLE_TASK_AUDIENCE = os.getenv("GOOGLE_TASK_AUDIENCE", "")
+GOOGLE_TASK_GATEWAY_HOST = os.getenv("GOOGLE_TASK_GATEWAY_HOST", "")
 GOOGLE_TASK_SERVICE_ACCOUNT = os.getenv("GOOGLE_TASK_SERVICE_ACCOUNT", "")
 PARSER_BACKEND = os.getenv("PARSER_BACKEND", "docker")
 PARSER_IMAGE = os.getenv("PARSER_IMAGE", "")  # Immutable sha256 image ID required.

@@ -23,11 +23,13 @@ containers. It does not contact a replay provider or validate gameplay recogniti
 
 The parser container must not receive database/cloud credentials. A coordinator leases work,
 stages one private source, invokes the sandbox, validates its output and publishes with a
-fencing token. No cloud adapter, IAM binding or resumable upload integration is claimed here.
-Those dependencies are release-gated in docs/architecture/deployment.md.
+fencing token. Official GCS/Batch adapters and IAM templates are now prepared and
+controlled-client tested; actual hosting remains release-gated in
+[deployment](../docs/architecture/deployment.md).
 
-Cloud design remains Cloud Run API, Cloud Run Jobs, Cloud SQL and private Cloud Storage;
-Cloud Tasks can dispatch work after a real need, with explicit job caps and a reconciler.
+Cloud design is Cloud Run website/private API, Cloud SQL, private Cloud Storage and
+Cloud Tasks dispatch. ADR-031 previews use dedicated Batch VMs with an offline
+decoder; Cloud Run Jobs perform bounded lightweight maintenance.
 A versioned deployment must include backup/restore and deletion rehearsals before public use.
 
 M16 adds `Dockerfile.api` (unprivileged WSGI/control plane), `Dockerfile.web`
@@ -38,10 +40,16 @@ and `test` need no cloud credentials with the supplied mocks. Never apply the
 example variables: no project/region/budget or recovery targets have been approved.
 
 The API defaults to restore quarantine in Terraform. External uploads/hosted
-playback and managed media execution are gated. No media Job is created because
-the qualified nested Docker sandbox cannot run inside Cloud Run. Production
-journal replication, web routing, secret/user creation, VPC/service access and
-live integration qualification remain dependencies. See the
+playback and managed media execution remain gated. Optional `preview.tf` prepares
+a private VM template, three independent versioned CMEK journal buckets with
+create/get/list roles, a server-only website identity bridge and paused scheduled
+maintenance. No VM job is launched during planning. `Dockerfile.preview-coordinator`
+is trusted/root for the host Docker socket; the decoder remains offline and
+unprivileged with no socket/secrets. Cloud Run cannot host that nested boundary.
+Actual journal durability/freshness, secret/user creation, VPC/service access,
+IAM/CORS/runtime isolation, retention/load/cost and live integration remain
+dependencies. See the [hosted preview procedure](../docs/architecture/hosted-recording-previews.md)
+and the
 [M16 contract](../docs/architecture/hosted-delivery.md) for the operator stop and
 restore procedures. Local rehearsal:
 

@@ -23,5 +23,9 @@ Result template: hypothesis; dataset manifest hash; method/version; sample/exclu
 metric and uncertainty; success/failure threshold; result; decision; reviewer time/cost;
 artifacts; limitations. A missing result is never PASS.
 
+[M06.11 hosted preview preparation](hosted-recording-previews.md) records controlled
+GCS/Batch/API/restore and website-bridge checks separately from unperformed actual
+Google Cloud runtime/IAM/durability/security/cost acceptance.
+
 [M10 player diagnosis](m10-player-model.md) records local policy/API/UI qualification
 separately from actual expert agreement, real player utility and gameplay release.
