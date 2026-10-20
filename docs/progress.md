@@ -2399,3 +2399,43 @@ remote ancestry using a main-only merge that retains the reviewed clean tree;
 no force push, new branch or execution of remote configuration. This repeats the
 earlier source-integrity concern; repository access/history/prior-execution
 review remains open. Final local/full and actual latest-tip CI still required.
+
+### 2026-10-20 - Publication review rejection; clean local implementation committed
+
+Automatic approval review rejected the combined commit/ancestry-merge command
+before execution:although the clean commit is authorized, incorporating the
+untrusted forcibly rewritten remote history permanently retains suspicious
+ancestry and requires explicit user approval after integrity review. No merge,
+push or workaround performed. Separately authorized clean local commit
+6e920a1b8e122add9e622367dd8f0ec120fc12ff succeeded on main only. Full local
+regression continues; exact-source remote CI is NOT_RUN. Complete local evidence
+and a concrete reviewable receipt before requesting the specific merge/push
+approval. No force push or branch creation; access/history review remains open.
+
+### 2026-10-20 - Final local hosted-preview preparation qualification
+
+Source6e920a1b8e122add9e622367dd8f0ec120fc12ff, main only. Final full local
+PostgreSQL/media regression:720 cases,704 passes,16 skips,zero errors/failures,
+875.25s. All28 hosted cases and30 private-preview cases pass without skips;
+26 write-recovery cases include25 passes/one Windows symlink skip. The16 overall
+skips are11 opt-in Docker/profile and five Windows symlink-privilege checks;
+new actual Docker/coordinator container/remote Chromium/CI are NOT_RUN. Prior
+bf4dcfd all-seven is dated baseline evidence only.
+
+Other final checks:six native bridge tests,62 Edge/1.1m, production build/lint/
+typecheck, Ruff/format, Linux/Windows mypy42, schema/migration dry run, five
+Terraform mock plans and410 local links/179 unique valid requirement rows pass.
+Final native disposable dump/restore/migration/repeated control/pending upload/
+private preview/post-backup ledger recovery repeated after final code fixes:PASS;
+production RPO/RTO NOT_MEASURED. Fresh Python/core/cloud audits found no known
+vulnerabilities; production npm audit found zero. All six production flags false,
+clean Next config confirmed. No actual cloud/game-provider/scientific activation.
+
+Updated current snapshot/affected requirements/milestone/blockers and qualification
+receipt together. M06.11 remains PARTIAL for publication CI/container checks and real hosted
+acceptance; the stated local controlled checks are qualified. Clean implementation local, no merge
+or push. Automatic approval rejected incorporating suspicious remote ancestry
+without explicit approval; finish this ordinary local receipt, then ask for that
+specific clean-tree merge/push/main-CI authorization. Repository access/history
+review and actual project/region/budget/IAM/CMEK/freshness/isolation/CORS/late-write/
+restore/load/cost acceptance remain open. No workaround or force push attempted.

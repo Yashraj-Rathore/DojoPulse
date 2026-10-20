@@ -42,9 +42,14 @@ server bridge tests**, production build/lint/typecheck, Linux and Windows mypy
 and native disposable PostgreSQL dump/restore/guard/repeated control/pending
 upload/private preview/post-backup independent-ledger recovery. **410 local links**
 and **179 unique valid requirement rows** checked; all six production flags
-confirmed false from settings syntax. The final full PostgreSQL/media suite is
-running on the corrected source. Exact current main CI/final counts must be
-recorded before handoff; no earlier green SHA proves this source.
+confirmed false from settings syntax. The final full PostgreSQL/media suite on corrected source6e920a1 completed:
+**720 cases / 704 passed / 16 skipped / zero failures or errors / 875.25s**.
+All28 hosted cases and30 private-preview cases pass without skips;26 independent
+write-recovery cases have25 passes and one Windows symlink privilege skip.
+The16 full-suite skips are11 opt-in Docker/profile cases and five Windows
+symlink-privilege cases. Actual Docker isolation/new coordinator container build
+and new remote Chromium/CI remain **NOT_RUN** on this source, pending publication
+approval; prior baseline CI is only dated evidence, not a substitute.
 
 No cloud resources, credentials, project/region/budget approval, permitted live
 Tekken access or game automation were used. Production flags remain false;
@@ -53,3 +58,21 @@ HEVC playback evidence from October 13 remains separately scoped, with no new
 real-game, hosted, automatic-acquisition or scientific approval. M06.11 remains
 PARTIAL until actual hosted acceptance; M06.13's earlier controlled engineering
 qualification does not qualify replication or production freshness.
+
+Publication boundary:clean implementation committed locally as6e920a1. Remote
+main was forcibly rewritten to be09338; its sole baseline tree difference is an
+obfuscated Next config payload, inspected as text only. Automatic approval review
+rejected retaining this suspicious ancestry in a clean-tree merge without
+explicit user approval. No merge/push/new remote CI performed. Final local full
+results and a reviewable receipt precede that request; earlier green CI is not
+substituted for this source. Repository access/history review remains open.
+
+Final verification on the frozen implementation:native disposable guarded restore
+was repeated after the final code corrections and passed all reported controls;
+production RPO/RTO remains NOT_MEASURED. Fresh pinned Python/core/cloud audits
+found no known vulnerabilities; production npm audit found zero. All six hard
+production gates remain false; Next config is the reviewed clean source.
+No merge/push has occurred. Local documentation receipt follows on main with
+ordinary CI semantics; its future exact-tip checks must be monitored after
+specific history-reconciliation approval. M06.11 remains PARTIAL for publication CI/container checks and actual hosting;
+the implemented preparation has completed the stated local controlled checks.
