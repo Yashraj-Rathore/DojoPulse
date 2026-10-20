@@ -76,3 +76,10 @@ No merge/push has occurred. Local documentation receipt follows on main with
 ordinary CI semantics; its future exact-tip checks must be monitored after
 specific history-reconciliation approval. M06.11 remains PARTIAL for publication CI/container checks and actual hosting;
 the implemented preparation has completed the stated local controlled checks.
+
+2026-10-20 approval update:user explicitly approved clean-tree history merge,
+main push and monitoring. Remote be09338 was rechecked; approved merge preserves
+reviewed4646706 files exactly before documentation updates, discarding all
+injected executable changes without running them. Publication/current-tip CI are
+now authorized and pending. Prior rejection is historical, not a current consent
+block. Actual cloud activation remains unauthorized/unqualified; flags false.

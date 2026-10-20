@@ -2446,3 +2446,18 @@ was valid before that row edit). All179 requirement IDs/statuses remain valid.
 Code6e920a1 and its704/16/28/62 validation are unchanged; local receipt only,
 no merge/push/remote CI. Publication still awaits the explicitly required
 history-reconciliation approval.
+
+### 2026-10-20 - Explicit publication approval and clean-tree reconciliation
+
+User explicitly approved retaining remote history with clean files, pushing main
+and monitoring CI. Re-fetched remote main:still be09338, sole baseline tree delta
+Next config injection. Approved `ours` strategy merge joins ancestry while keeping
+the reviewed4646706 tree exactly before these documentation updates. No payload
+imported/executed, new branch or force push. This resolves the earlier automatic
+approval rejection for this specific action; repository-access review stays open.
+
+M01.06/M06.11/M15.04/M19.02:updated current tracker/blockers/qualification and this
+log in the merge. Source code6e920a1's final704/16/28/62 local checks remain valid;
+only documentation changes. Ordinary main publication and actual latest-tip
+remote CI/Docker/coordinator build follow; no success claimed before observation.
+All actual cloud/game/provider/scientific gates remain unchanged and false.
