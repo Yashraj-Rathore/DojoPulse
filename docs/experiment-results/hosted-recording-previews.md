@@ -83,3 +83,30 @@ reviewed4646706 files exactly before documentation updates, discarding all
 injected executable changes without running them. Publication/current-tip CI are
 now authorized and pending. Prior rejection is historical, not a current consent
 block. Actual cloud activation remains unauthorized/unqualified; flags false.
+
+## Published source qualification
+
+User-approved clean-tree merge **e33bfa4d6e813dabca877930060fcc9f50cb5225**
+published on main only. [All seven CI checks](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/39453977429) passed, completed
+**2026-10-20 16:17:10 UTC**. Independent check-runs bind the same SHA; watcher
+exit0. Completed metadata/logs and downloaded JUnit are stored under ignored
+`reports/hosted-preview-ci-source`.
+
+| Actual source evidence | Result |
+|---|---|
+| PostgreSQL/Python |720 cases,708 passes,12 separate platform-Docker skips,zero errors/failures,722.584s |
+| Hosted module / independent write recovery / private previews |28 /26 /30 cases,all pass,no skips in these modules |
+| Actual offline Docker isolation/maximum profile |11 cases,all pass,no skips,151.351s |
+| Actual Windows helper |17 cases,all pass,no skips,1.398s |
+| Chromium / server bridge |62 browser passes/51.5s;six native bridge passes |
+| Infrastructure |Five Terraform mock plans plus fmt/validation pass;no apply |
+| Images/startup |API/web/coordinator builds pass;coordinator disabled-before-qualification guard,unprivileged API quarantine and standalone web pass |
+| Static/schema/dependencies |Ruff289,mypy42,schema/migration/load/build and pinned core/cloud/production npm audits pass |
+| Native recovery |Guarded disposable dump/restore/migration/repeated controls,pending upload/private preview/post-backup ledger recovery pass;production RPO/RTO NOT_MEASURED |
+
+This supersedes the earlier NOT_RUN statements only for these exact-source remote
+software/container checks. No actual Batch VM, Google IAM/CMEK/freshness/CORS/
+late-write/full hosted restore/load/cost was qualified. All live flags remain
+false; M06.11 actual hosted acceptance is PARTIAL. Repository access/history
+review remains open. Final documentation receipt uses ordinary CI; verify its
+actual latest-main checks before handoff rather than reuse this source result.

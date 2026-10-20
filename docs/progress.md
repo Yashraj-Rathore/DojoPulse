@@ -2461,3 +2461,27 @@ log in the merge. Source code6e920a1's final704/16/28/62 local checks remain val
 only documentation changes. Ordinary main publication and actual latest-tip
 remote CI/Docker/coordinator build follow; no success claimed before observation.
 All actual cloud/game/provider/scientific gates remain unchanged and false.
+
+### 2026-10-20 - Exact-source main publication and CI verified
+
+M01.06/M06.11/.13/M13.03/.06/M15.01/.04/.06/M16.02-.05/M17.03/M19.02:
+user-approved clean-tree merge e33bfa4d6e813dabca877930060fcc9f50cb5225 pushed
+normally to main. All seven checks passed in [run39453977429](https://github.com/Yashraj-Rathore/DojoPulse/actions/runs/39453977429), completed
+16:17:10 UTC. Independent check-runs all bind that SHA; watcher exited0.
+Downloaded JUnit:720 PG/Python cases,708 passes/12 separate platform-Docker skips,
+zero errors/failures/722.584s; all28 hosted,26 ledger and30 private preview pass
+without module skips. Actual Docker11/no skips/151.351s; Windows17/no skips/
+1.398s; Chromium62/51.5s; six bridge and five Terraform plans pass. Audits,
+Ruff289/mypy42/schema/load/build, API/web/coordinator images, disabled coordinator
+and unprivileged quarantine/standalone startup pass. Native guarded dump/restore/
+migration/repeated control/pending-upload/preview/post-backup ledger recovery pass;
+production RPO/RTO NOT_MEASURED. Evidence in ignored reports/hosted-preview-ci-source.
+
+Updated tracker/current position/affected rows/decision/qualification together.
+M06.11 controlled engineering preparation is qualified; actual Google project/
+region/budget/IAM/CMEK/freshness/multi-host/VM/CORS/late-write/restore/load/cost
+remain PARTIAL, with all six live flags false. No provisioning/game/provider/
+scientific activation. Repository-access/history review stays open; clean tested
+files retained, suspicious payload never executed. Final ordinary receipt is
+published with CI enabled and its actual latest-tip checks must be verified
+before handoff; source success does not establish the receipt's status.
